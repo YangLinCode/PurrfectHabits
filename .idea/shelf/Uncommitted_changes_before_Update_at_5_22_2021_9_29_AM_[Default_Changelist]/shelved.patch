@@ -1,0 +1,331 @@
+Index: src/main/persistence/JsonReader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package persistence;\r\n\r\nimport model.Dashboard;\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\nimport org.json.JSONArray;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.IOException;\r\nimport java.nio.charset.StandardCharsets;\r\nimport java.nio.file.Files;\r\nimport java.nio.file.Paths;\r\nimport java.util.stream.Stream;\r\n\r\n// Represents a reader that reads journal from JSON data stored in file\r\n// Note: The structure of this Class and all of the methods inside it are largely\r\n//       based off the WorkRoom application that was given to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonReader {\r\n    private String source; // this should be given the path to the habits folder\r\n\r\n    // EFFECTS: constructs reader to read from source file\r\n    public JsonReader(String source) {\r\n        this.source = source;\r\n    }\r\n\r\n    // EFFECTS: reads journal from file and returns it;\r\n    //          throws IOException if an error occurs when reading data from file\r\n    public Dashboard read() throws IOException {\r\n        // loop through all the habit folders in the habits folder\r\n        // for each habit folder, go to the\r\n\r\n\r\n\r\n\r\n\r\n        String jsonData = readFile(source);\r\n        JSONObject jsonObject = new JSONObject(jsonData);\r\n        return parseDashboard(jsonObject);\r\n    }\r\n\r\n    // EFFECTS: reads source file as string and returns it\r\n    private String readFile(String source) throws IOException {\r\n        StringBuilder contentBuilder = new StringBuilder();\r\n\r\n        try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {\r\n            stream.forEach(s -> contentBuilder.append(s));\r\n        }\r\n\r\n        return contentBuilder.toString();\r\n    }\r\n\r\n    // EFFECTS: parses journal from JSON object and returns it\r\n    private Dashboard parseDashboard(JSONObject jsonObject) {\r\n        Dashboard dashboard = new Dashboard();\r\n        addHabits(dashboard, jsonObject);\r\n        return dashboard;\r\n    }\r\n\r\n    // MODIFIES: dashboard\r\n    // EFFECTS: parses habits from JSON object and adds them to dashboard\r\n    private void addHabits(Dashboard dashboard, JSONObject jsonObject) {\r\n        JSONArray jsonArray = jsonObject.getJSONArray(\"matches\");\r\n\r\n        for (Object json : jsonArray) {\r\n            JSONObject nextMatch = (JSONObject) json;\r\n            addHabit(dashboard, nextMatch);\r\n        }\r\n    }\r\n\r\n    // MODIFIES: journal\r\n    // EFFECTS: parses habit from JSON object and adds it to dashboard\r\n    private void addHabit(Dashboard dashboard, JSONObject jsonObject) {\r\n        MatchDetails matchDetails = getMatchDetails(jsonObject);\r\n        MatchStats matchStats = getMatchStats(jsonObject);\r\n        TennisMatch tennisMatch = new TennisMatch(matchDetails, matchStats);\r\n\r\n        journal.addMatch(tennisMatch);\r\n    }\r\n\r\n    // EFFECTS: gets the match details from JSON object\r\n    private MatchDetails getMatchDetails(JSONObject jsonObject) {\r\n        String opponent = jsonObject.getString(\"opponent\");\r\n        boolean isWon = jsonObject.getBoolean(\"isWon\");\r\n        String surface = jsonObject.getString(\"surface\");\r\n        int duration = jsonObject.getInt(\"duration\");\r\n        String date = jsonObject.getString(\"date\");\r\n\r\n        return new MatchDetails(opponent, isWon, surface, duration, date);\r\n    }\r\n\r\n    // EFFECTS: gets the match stats from JSON object\r\n    private MatchStats getMatchStats(JSONObject jsonObject) {\r\n        String score = jsonObject.getString(\"score\");\r\n        int aces = jsonObject.getInt(\"aces\");\r\n        int doubleFaults = jsonObject.getInt(\"doubleFaults\");\r\n        int winners = jsonObject.getInt(\"winners\");\r\n        int unforcedErrors = jsonObject.getInt(\"unforcedErrors\");\r\n\r\n        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/persistence/JsonReader.java b/src/main/persistence/JsonReader.java
+--- a/src/main/persistence/JsonReader.java	(revision e0d60979515876209ec76dcb6cbea81ccce6df14)
++++ b/src/main/persistence/JsonReader.java	(date 1621649703872)
+@@ -1,107 +1,107 @@
+-package persistence;
+-
+-import model.Dashboard;
+-import model.MatchDetails;
+-import model.MatchStats;
+-import model.TennisMatch;
+-import model.TennisMatchJournal;
+-import org.json.JSONArray;
+-import org.json.JSONObject;
+-
+-import java.io.IOException;
+-import java.nio.charset.StandardCharsets;
+-import java.nio.file.Files;
+-import java.nio.file.Paths;
+-import java.util.stream.Stream;
+-
+-// Represents a reader that reads journal from JSON data stored in file
+-// Note: The structure of this Class and all of the methods inside it are largely
+-//       based off the WorkRoom application that was given to us on GitHub.
+-//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-public class JsonReader {
+-    private String source; // this should be given the path to the habits folder
+-
+-    // EFFECTS: constructs reader to read from source file
+-    public JsonReader(String source) {
+-        this.source = source;
+-    }
+-
+-    // EFFECTS: reads journal from file and returns it;
+-    //          throws IOException if an error occurs when reading data from file
+-    public Dashboard read() throws IOException {
+-        // loop through all the habit folders in the habits folder
+-        // for each habit folder, go to the
+-
+-
+-
+-
+-
+-        String jsonData = readFile(source);
+-        JSONObject jsonObject = new JSONObject(jsonData);
+-        return parseDashboard(jsonObject);
+-    }
+-
+-    // EFFECTS: reads source file as string and returns it
+-    private String readFile(String source) throws IOException {
+-        StringBuilder contentBuilder = new StringBuilder();
+-
+-        try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {
+-            stream.forEach(s -> contentBuilder.append(s));
+-        }
+-
+-        return contentBuilder.toString();
+-    }
+-
+-    // EFFECTS: parses journal from JSON object and returns it
+-    private Dashboard parseDashboard(JSONObject jsonObject) {
+-        Dashboard dashboard = new Dashboard();
+-        addHabits(dashboard, jsonObject);
+-        return dashboard;
+-    }
+-
+-    // MODIFIES: dashboard
+-    // EFFECTS: parses habits from JSON object and adds them to dashboard
+-    private void addHabits(Dashboard dashboard, JSONObject jsonObject) {
+-        JSONArray jsonArray = jsonObject.getJSONArray("matches");
+-
+-        for (Object json : jsonArray) {
+-            JSONObject nextMatch = (JSONObject) json;
+-            addHabit(dashboard, nextMatch);
+-        }
+-    }
+-
+-    // MODIFIES: journal
+-    // EFFECTS: parses habit from JSON object and adds it to dashboard
+-    private void addHabit(Dashboard dashboard, JSONObject jsonObject) {
+-        MatchDetails matchDetails = getMatchDetails(jsonObject);
+-        MatchStats matchStats = getMatchStats(jsonObject);
+-        TennisMatch tennisMatch = new TennisMatch(matchDetails, matchStats);
+-
+-        journal.addMatch(tennisMatch);
+-    }
+-
+-    // EFFECTS: gets the match details from JSON object
+-    private MatchDetails getMatchDetails(JSONObject jsonObject) {
+-        String opponent = jsonObject.getString("opponent");
+-        boolean isWon = jsonObject.getBoolean("isWon");
+-        String surface = jsonObject.getString("surface");
+-        int duration = jsonObject.getInt("duration");
+-        String date = jsonObject.getString("date");
+-
+-        return new MatchDetails(opponent, isWon, surface, duration, date);
+-    }
+-
+-    // EFFECTS: gets the match stats from JSON object
+-    private MatchStats getMatchStats(JSONObject jsonObject) {
+-        String score = jsonObject.getString("score");
+-        int aces = jsonObject.getInt("aces");
+-        int doubleFaults = jsonObject.getInt("doubleFaults");
+-        int winners = jsonObject.getInt("winners");
+-        int unforcedErrors = jsonObject.getInt("unforcedErrors");
+-
+-        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
+-    }
+-}
++//package persistence;
++//
++//import model.Dashboard;
++//import model.MatchDetails;
++//import model.MatchStats;
++//import model.TennisMatch;
++//import model.TennisMatchJournal;
++//import org.json.JSONArray;
++//import org.json.JSONObject;
++//
++//import java.io.IOException;
++//import java.nio.charset.StandardCharsets;
++//import java.nio.file.Files;
++//import java.nio.file.Paths;
++//import java.util.stream.Stream;
++//
++//// Represents a reader that reads journal from JSON data stored in file
++//// Note: The structure of this Class and all of the methods inside it are largely
++////       based off the WorkRoom application that was given to us on GitHub.
++////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
++//public class JsonReader {
++//    private String source; // this should be given the path to the habits folder
++//
++//    // EFFECTS: constructs reader to read from source file
++//    public JsonReader(String source) {
++//        this.source = source;
++//    }
++//
++//    // EFFECTS: reads journal from file and returns it;
++//    //          throws IOException if an error occurs when reading data from file
++//    public Dashboard read() throws IOException {
++//        // loop through all the habit folders in the habits folder
++//        // for each habit folder, go to the
++//
++//
++//
++//
++//
++//        String jsonData = readFile(source);
++//        JSONObject jsonObject = new JSONObject(jsonData);
++//        return parseDashboard(jsonObject);
++//    }
++//
++//    // EFFECTS: reads source file as string and returns it
++//    private String readFile(String source) throws IOException {
++//        StringBuilder contentBuilder = new StringBuilder();
++//
++//        try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {
++//            stream.forEach(s -> contentBuilder.append(s));
++//        }
++//
++//        return contentBuilder.toString();
++//    }
++//
++//    // EFFECTS: parses journal from JSON object and returns it
++//    private Dashboard parseDashboard(JSONObject jsonObject) {
++//        Dashboard dashboard = new Dashboard();
++//        addHabits(dashboard, jsonObject);
++//        return dashboard;
++//    }
++//
++//    // MODIFIES: dashboard
++//    // EFFECTS: parses habits from JSON object and adds them to dashboard
++//    private void addHabits(Dashboard dashboard, JSONObject jsonObject) {
++//        JSONArray jsonArray = jsonObject.getJSONArray("matches");
++//
++//        for (Object json : jsonArray) {
++//            JSONObject nextMatch = (JSONObject) json;
++//            addHabit(dashboard, nextMatch);
++//        }
++//    }
++//
++//    // MODIFIES: journal
++//    // EFFECTS: parses habit from JSON object and adds it to dashboard
++//    private void addHabit(Dashboard dashboard, JSONObject jsonObject) {
++//        MatchDetails matchDetails = getMatchDetails(jsonObject);
++//        MatchStats matchStats = getMatchStats(jsonObject);
++//        TennisMatch tennisMatch = new TennisMatch(matchDetails, matchStats);
++//
++//        journal.addMatch(tennisMatch);
++//    }
++//
++//    // EFFECTS: gets the match details from JSON object
++//    private MatchDetails getMatchDetails(JSONObject jsonObject) {
++//        String opponent = jsonObject.getString("opponent");
++//        boolean isWon = jsonObject.getBoolean("isWon");
++//        String surface = jsonObject.getString("surface");
++//        int duration = jsonObject.getInt("duration");
++//        String date = jsonObject.getString("date");
++//
++//        return new MatchDetails(opponent, isWon, surface, duration, date);
++//    }
++//
++//    // EFFECTS: gets the match stats from JSON object
++//    private MatchStats getMatchStats(JSONObject jsonObject) {
++//        String score = jsonObject.getString("score");
++//        int aces = jsonObject.getInt("aces");
++//        int doubleFaults = jsonObject.getInt("doubleFaults");
++//        int winners = jsonObject.getInt("winners");
++//        int unforcedErrors = jsonObject.getInt("unforcedErrors");
++//
++//        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
++//    }
++//}
+ 
+ 
+ 
+Index: src/main/persistence/JsonWriter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package persistence;\r\n\r\nimport model.TennisMatchJournal;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.File;\r\nimport java.io.FileNotFoundException;\r\nimport java.io.PrintWriter;\r\n\r\n// Represents a writer that writes JSON representation of journal to file\r\n// Note: The structure of this class and all of the methods inside it are\r\n//       largely based off the WorkRoom application provided to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonWriter {\r\n    private static final int TAB = 4;\r\n    private PrintWriter writer;\r\n    private String destination;\r\n\r\n    // EFFECTS: constructs writer to write to destination file\r\n    public JsonWriter(String destination) {\r\n        this.destination = destination;\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: opens writer; throws FileNotFoundException if destination file\r\n    //          cannot be opened for writing\r\n    public void open() throws FileNotFoundException {\r\n        writer = new PrintWriter(new File(destination));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: writes JSON representation of journal to file\r\n    public void write(TennisMatchJournal journal) {\r\n        JSONObject json = journal.toJson();\r\n        saveToFile(json.toString(TAB));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: writes string to file\r\n    private void saveToFile(String json) {\r\n        writer.print(json);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes writer\r\n    public void close() {\r\n        writer.close();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/persistence/JsonWriter.java b/src/main/persistence/JsonWriter.java
+--- a/src/main/persistence/JsonWriter.java	(revision e0d60979515876209ec76dcb6cbea81ccce6df14)
++++ b/src/main/persistence/JsonWriter.java	(date 1621649684047)
+@@ -1,49 +1,49 @@
+-package persistence;
+-
+-import model.TennisMatchJournal;
+-import org.json.JSONObject;
+-
+-import java.io.File;
+-import java.io.FileNotFoundException;
+-import java.io.PrintWriter;
+-
+-// Represents a writer that writes JSON representation of journal to file
+-// Note: The structure of this class and all of the methods inside it are
+-//       largely based off the WorkRoom application provided to us on GitHub.
+-//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-public class JsonWriter {
+-    private static final int TAB = 4;
+-    private PrintWriter writer;
+-    private String destination;
+-
+-    // EFFECTS: constructs writer to write to destination file
+-    public JsonWriter(String destination) {
+-        this.destination = destination;
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: opens writer; throws FileNotFoundException if destination file
+-    //          cannot be opened for writing
+-    public void open() throws FileNotFoundException {
+-        writer = new PrintWriter(new File(destination));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: writes JSON representation of journal to file
+-    public void write(TennisMatchJournal journal) {
+-        JSONObject json = journal.toJson();
+-        saveToFile(json.toString(TAB));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: writes string to file
+-    private void saveToFile(String json) {
+-        writer.print(json);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes writer
+-    public void close() {
+-        writer.close();
+-    }
+-}
++//package persistence;
++//
++//import model.TennisMatchJournal;
++//import org.json.JSONObject;
++//
++//import java.io.File;
++//import java.io.FileNotFoundException;
++//import java.io.PrintWriter;
++//
++//// Represents a writer that writes JSON representation of journal to file
++//// Note: The structure of this class and all of the methods inside it are
++////       largely based off the WorkRoom application provided to us on GitHub.
++////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
++//public class JsonWriter {
++//    private static final int TAB = 4;
++//    private PrintWriter writer;
++//    private String destination;
++//
++//    // EFFECTS: constructs writer to write to destination file
++//    public JsonWriter(String destination) {
++//        this.destination = destination;
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: opens writer; throws FileNotFoundException if destination file
++//    //          cannot be opened for writing
++//    public void open() throws FileNotFoundException {
++//        writer = new PrintWriter(new File(destination));
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: writes JSON representation of journal to file
++//    public void write(TennisMatchJournal journal) {
++//        JSONObject json = journal.toJson();
++//        saveToFile(json.toString(TAB));
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: writes string to file
++//    private void saveToFile(String json) {
++//        writer.print(json);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes writer
++//    public void close() {
++//        writer.close();
++//    }
++//}

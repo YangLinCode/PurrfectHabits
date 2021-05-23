@@ -1,0 +1,2223 @@
+Index: src/main/persistence/JsonWriter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package persistence;\r\n\r\nimport model.TennisMatchJournal;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.File;\r\nimport java.io.FileNotFoundException;\r\nimport java.io.PrintWriter;\r\n\r\n// Represents a writer that writes JSON representation of journal to file\r\n// Note: The structure of this class and all of the methods inside it are\r\n//       largely based off the WorkRoom application provided to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonWriter {\r\n    private static final int TAB = 4;\r\n    private PrintWriter writer;\r\n    private String destination;\r\n\r\n    // EFFECTS: constructs writer to write to destination file\r\n    public JsonWriter(String destination) {\r\n        this.destination = destination;\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: opens writer; throws FileNotFoundException if destination file\r\n    //          cannot be opened for writing\r\n    public void open() throws FileNotFoundException {\r\n        writer = new PrintWriter(new File(destination));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: writes JSON representation of journal to file\r\n    public void write(TennisMatchJournal journal) {\r\n        JSONObject json = journal.toJson();\r\n        saveToFile(json.toString(TAB));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: writes string to file\r\n    private void saveToFile(String json) {\r\n        writer.print(json);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes writer\r\n    public void close() {\r\n        writer.close();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/persistence/JsonWriter.java b/src/main/persistence/JsonWriter.java
+--- a/src/main/persistence/JsonWriter.java	(revision 55daf7ade6e645487e6cf99923599969cc0f1485)
++++ b/src/main/persistence/JsonWriter.java	(date 1621700979170)
+@@ -1,49 +1,49 @@
+-package persistence;
+-
+-import model.TennisMatchJournal;
+-import org.json.JSONObject;
+-
+-import java.io.File;
+-import java.io.FileNotFoundException;
+-import java.io.PrintWriter;
+-
+-// Represents a writer that writes JSON representation of journal to file
+-// Note: The structure of this class and all of the methods inside it are
+-//       largely based off the WorkRoom application provided to us on GitHub.
+-//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-public class JsonWriter {
+-    private static final int TAB = 4;
+-    private PrintWriter writer;
+-    private String destination;
+-
+-    // EFFECTS: constructs writer to write to destination file
+-    public JsonWriter(String destination) {
+-        this.destination = destination;
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: opens writer; throws FileNotFoundException if destination file
+-    //          cannot be opened for writing
+-    public void open() throws FileNotFoundException {
+-        writer = new PrintWriter(new File(destination));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: writes JSON representation of journal to file
+-    public void write(TennisMatchJournal journal) {
+-        JSONObject json = journal.toJson();
+-        saveToFile(json.toString(TAB));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: writes string to file
+-    private void saveToFile(String json) {
+-        writer.print(json);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes writer
+-    public void close() {
+-        writer.close();
+-    }
+-}
++//package persistence;
++//
++//import model.TennisMatchJournal;
++//import org.json.JSONObject;
++//
++//import java.io.File;
++//import java.io.FileNotFoundException;
++//import java.io.PrintWriter;
++//
++//// Represents a writer that writes JSON representation of journal to file
++//// Note: The structure of this class and all of the methods inside it are
++////       largely based off the WorkRoom application provided to us on GitHub.
++////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
++//public class JsonWriter {
++//    private static final int TAB = 4;
++//    private PrintWriter writer;
++//    private String destination;
++//
++//    // EFFECTS: constructs writer to write to destination file
++//    public JsonWriter(String destination) {
++//        this.destination = destination;
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: opens writer; throws FileNotFoundException if destination file
++//    //          cannot be opened for writing
++//    public void open() throws FileNotFoundException {
++//        writer = new PrintWriter(new File(destination));
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: writes JSON representation of journal to file
++//    public void write(TennisMatchJournal journal) {
++//        JSONObject json = journal.toJson();
++//        saveToFile(json.toString(TAB));
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: writes string to file
++//    private void saveToFile(String json) {
++//        writer.print(json);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes writer
++//    public void close() {
++//        writer.close();
++//    }
++//}
+Index: src/main/ui/controller/WelcomePage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.controller;\r\n\r\nimport javafx.application.Application;\r\nimport javafx.geometry.Insets;\r\nimport javafx.geometry.Pos;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.control.Button;\r\nimport javafx.scene.control.Label;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.image.ImageView;\r\nimport javafx.scene.layout.BorderPane;\r\nimport javafx.scene.layout.HBox;\r\nimport javafx.scene.layout.VBox;\r\nimport javafx.scene.text.Font;\r\nimport javafx.stage.Stage;\r\n\r\nimport java.io.FileInputStream;\r\nimport java.io.FileNotFoundException;\r\n\r\npublic class WelcomePage extends Application {\r\n    BorderPane borderPane;\r\n    VBox leftVBox;\r\n    VBox rightVBox;\r\n    HBox bottomHBox;\r\n\r\n    @Override\r\n    public void start(Stage primaryStage) throws Exception {\r\n        borderPane = new BorderPane();\r\n        borderPane.setPrefSize(1000, 500);\r\n        borderPane.setStyle(\"-fx-background-color: #86D0F7\");\r\n\r\n        createLeftVBox();\r\n        createRightVBox();\r\n        createBottomHBox();\r\n\r\n        Scene root = new Scene(borderPane);\r\n        primaryStage.setScene(root);\r\n        primaryStage.show();\r\n    }\r\n\r\n    public void createLeftVBox() throws FileNotFoundException {\r\n        leftVBox = new VBox();\r\n        leftVBox.setAlignment(Pos.CENTER);\r\n\r\n        //Image Stuff\r\n        FileInputStream stream = new FileInputStream(\"data/misc/catLogo.png\");\r\n        Image image = new Image(stream);\r\n        ImageView logo = new ImageView(image);\r\n        logo.setFitWidth(333);\r\n        logo.setPreserveRatio(true);\r\n\r\n        VBox.setMargin(logo, new Insets(70, 0, 0, 50));\r\n        leftVBox.getChildren().add(logo);\r\n        borderPane.setLeft(leftVBox);\r\n    }\r\n\r\n    public void createRightVBox() {\r\n        rightVBox = new VBox();\r\n        rightVBox.setAlignment(Pos.CENTER);\r\n\r\n        //Label Stuff\r\n        Label welcomeTo = new Label(\"WELCOME TO\");\r\n        Label purrfectHabits = new Label(\"PURRFECT HABITS\");\r\n        welcomeTo.setFont(new Font(\"Showcard Gothic\", 50));\r\n        purrfectHabits.setFont(new Font(\"Showcard Gothic\", 50));\r\n\r\n        VBox.setMargin(welcomeTo, new Insets(0, 100, 0, 0));\r\n        VBox.setMargin(purrfectHabits, new Insets(0, 100, 0, 0));\r\n        rightVBox.getChildren().addAll(welcomeTo, purrfectHabits);\r\n        borderPane.setRight(rightVBox);\r\n    }\r\n\r\n    public void createBottomHBox() {\r\n        bottomHBox = new HBox();\r\n        bottomHBox.setAlignment(Pos.CENTER_RIGHT);\r\n\r\n        //Button Stuff\r\n        Button button = new Button(\"Get Started\");\r\n        button.setFont(new Font(\"Dosis Bold\", 25));\r\n        button.setStyle(\"-fx-background-color: #FFCB3D\");\r\n\r\n        HBox.setMargin(button, new Insets(0, 240,125, 0));\r\n        bottomHBox.getChildren().add(button);\r\n        borderPane.setBottom(bottomHBox);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/WelcomePage.java b/src/main/ui/controller/WelcomePage.java
+--- a/src/main/ui/controller/WelcomePage.java	(revision 55daf7ade6e645487e6cf99923599969cc0f1485)
++++ b/src/main/ui/controller/WelcomePage.java	(date 1621717070622)
+@@ -1,86 +1,56 @@
+ package ui.controller;
+ 
+ import javafx.application.Application;
+-import javafx.geometry.Insets;
+ import javafx.geometry.Pos;
+ import javafx.scene.Scene;
+ import javafx.scene.control.Button;
+ import javafx.scene.control.Label;
+ import javafx.scene.image.Image;
+ import javafx.scene.image.ImageView;
+-import javafx.scene.layout.BorderPane;
+-import javafx.scene.layout.HBox;
+-import javafx.scene.layout.VBox;
++import javafx.scene.layout.GridPane;
+ import javafx.scene.text.Font;
+ import javafx.stage.Stage;
+ 
+ import java.io.FileInputStream;
+-import java.io.FileNotFoundException;
++
+ 
+ public class WelcomePage extends Application {
+-    BorderPane borderPane;
+-    VBox leftVBox;
+-    VBox rightVBox;
+-    HBox bottomHBox;
++    GridPane gridPane;
+ 
+     @Override
+     public void start(Stage primaryStage) throws Exception {
+-        borderPane = new BorderPane();
+-        borderPane.setPrefSize(1000, 500);
+-        borderPane.setStyle("-fx-background-color: #86D0F7");
+-
+-        createLeftVBox();
+-        createRightVBox();
+-        createBottomHBox();
+-
+-        Scene root = new Scene(borderPane);
+-        primaryStage.setScene(root);
+-        primaryStage.show();
+-    }
+-
+-    public void createLeftVBox() throws FileNotFoundException {
+-        leftVBox = new VBox();
+-        leftVBox.setAlignment(Pos.CENTER);
++        gridPane = new GridPane();
++        gridPane.setPrefSize(1000, 500);
++        gridPane.setAlignment(Pos.CENTER);
++        gridPane.setStyle("-fx-background-color: #86D0F7");
+ 
+         //Image Stuff
+         FileInputStream stream = new FileInputStream("data/misc/catLogo.png");
+         Image image = new Image(stream);
+         ImageView logo = new ImageView(image);
+-        logo.setFitWidth(333);
++        logo.setFitWidth(300);
+         logo.setPreserveRatio(true);
+ 
+-        VBox.setMargin(logo, new Insets(70, 0, 0, 50));
+-        leftVBox.getChildren().add(logo);
+-        borderPane.setLeft(leftVBox);
+-    }
+-
+-    public void createRightVBox() {
+-        rightVBox = new VBox();
+-        rightVBox.setAlignment(Pos.CENTER);
+-
+         //Label Stuff
+         Label welcomeTo = new Label("WELCOME TO");
+         Label purrfectHabits = new Label("PURRFECT HABITS");
+         welcomeTo.setFont(new Font("Showcard Gothic", 50));
+         purrfectHabits.setFont(new Font("Showcard Gothic", 50));
+ 
+-        VBox.setMargin(welcomeTo, new Insets(0, 100, 0, 0));
+-        VBox.setMargin(purrfectHabits, new Insets(0, 100, 0, 0));
+-        rightVBox.getChildren().addAll(welcomeTo, purrfectHabits);
+-        borderPane.setRight(rightVBox);
+-    }
+-
+-    public void createBottomHBox() {
+-        bottomHBox = new HBox();
+-        bottomHBox.setAlignment(Pos.CENTER_RIGHT);
+-
+         //Button Stuff
+         Button button = new Button("Get Started");
+-        button.setFont(new Font("Dosis Bold", 25));
++        button.setFont(new Font("Dosis Bold", 20));
+         button.setStyle("-fx-background-color: #FFCB3D");
+ 
+-        HBox.setMargin(button, new Insets(0, 240,125, 0));
+-        bottomHBox.getChildren().add(button);
+-        borderPane.setBottom(bottomHBox);
++        gridPane.add(logo, 0, 0, 1, 3);
++        gridPane.add(welcomeTo, 1, 0);
++        gridPane.add(purrfectHabits, 1, 1);
++        gridPane.add(button, 1, 2);
++
++
++        Scene root = new Scene(gridPane);
++        primaryStage.setScene(root);
++        primaryStage.show();
+     }
+ }
++
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM__Default_Changelist_1.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM__Default_Changelist_1.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM__Default_Changelist_1.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM__Default_Changelist_1.xml	(revision 55daf7ade6e645487e6cf99923599969cc0f1485)
++++ /dev/null	(revision 55daf7ade6e645487e6cf99923599969cc0f1485)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM_[Default_Changelist]1" date="1621040151476" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM_[Default_Changelist]1/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 5/14/2021 5:54 PM [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM_[Default_Changelist]1/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM_[Default_Changelist]1/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM_[Default_Changelist]1/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_5_14_2021_5_54_PM_[Default_Changelist]1/shelved.patch	(revision 55daf7ade6e645487e6cf99923599969cc0f1485)
++++ /dev/null	(revision 55daf7ade6e645487e6cf99923599969cc0f1485)
+@@ -1,1979 +0,0 @@
+-Index: src/main/ui/viewer/ViewPage.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package ui.viewer;\r\n\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\n\r\nimport javax.swing.*;\r\nimport java.awt.*;\r\nimport java.awt.event.ActionListener;\r\n\r\n// Represents the view page where the user can view a list of all the matches in the journal\r\npublic class ViewPage extends JFrame {\r\n    private JButton backButton;\r\n    private JButton selectButton;\r\n    private JList<String> viewPanel;\r\n    private JScrollPane scrollPane;\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the view page\r\n    public ViewPage(ActionListener listener, TennisMatchJournal journal) {\r\n        initializeViewPanel(journal);\r\n        initializeScrollPane();\r\n        initializeButtons(listener);\r\n        initializeFrame();\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the view panel\r\n    private void initializeViewPanel(TennisMatchJournal journal) {\r\n        DefaultListModel<String> listModel = new DefaultListModel();\r\n\r\n        for (TennisMatch match : journal.getJournal()) {\r\n            String opponent = match.getMatchDetails().getOpponent();\r\n            String date = match.getMatchDetails().getDate();\r\n\r\n            String toAdd = \"vs. \" + opponent + \" on \" + date;\r\n            listModel.addElement(toAdd);\r\n        }\r\n\r\n        viewPanel = new JList(listModel);\r\n        viewPanel.setLayoutOrientation(JList.VERTICAL);\r\n        viewPanel.setFont(new Font(\"Arial\", Font.PLAIN, 25));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the scroll pane\r\n    private void initializeScrollPane() {\r\n        scrollPane = new JScrollPane();\r\n        scrollPane.setViewportView(viewPanel);\r\n        scrollPane.setBounds(500, 100, 500, 700);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the buttons\r\n    private void initializeButtons(ActionListener listener) {\r\n        backButton = new JButton(\"Back\");\r\n        backButton.setFocusable(false);\r\n        backButton.setBounds(530, 850, 200, 50);\r\n        backButton.addActionListener(listener);\r\n\r\n        selectButton = new JButton(\"Select\");\r\n        selectButton.setFocusable(false);\r\n        selectButton.setBounds(770, 850, 200, 50);\r\n        selectButton.addActionListener(listener);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the frame\r\n    private void initializeFrame() {\r\n        ImageIcon frameIcon = new ImageIcon(\"./data/tennis_ball.png\");\r\n        this.add(backButton);\r\n        this.add(selectButton);\r\n        this.add(scrollPane);\r\n        this.setSize(1500, 1000);\r\n        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\r\n        this.setLayout(null);\r\n        this.setTitle(\"Tennis Match Journal\");\r\n        this.setIconImage(frameIcon.getImage());\r\n        this.setLocationRelativeTo(null);\r\n        this.setVisible(true);\r\n    }\r\n\r\n    public JButton getBackButton() {\r\n        return backButton;\r\n    }\r\n\r\n    public JButton getSelectButton() {\r\n        return selectButton;\r\n    }\r\n\r\n    public JList<String> getViewPanel() {\r\n        return viewPanel;\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/main/ui/viewer/ViewPage.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/main/ui/viewer/ViewPage.java	(date 1621031183956)
+-@@ -1,93 +1,93 @@
+--package ui.viewer;
+--
+--import model.TennisMatch;
+--import model.TennisMatchJournal;
+--
+--import javax.swing.*;
+--import java.awt.*;
+--import java.awt.event.ActionListener;
+--
+--// Represents the view page where the user can view a list of all the matches in the journal
+--public class ViewPage extends JFrame {
+--    private JButton backButton;
+--    private JButton selectButton;
+--    private JList<String> viewPanel;
+--    private JScrollPane scrollPane;
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the view page
+--    public ViewPage(ActionListener listener, TennisMatchJournal journal) {
+--        initializeViewPanel(journal);
+--        initializeScrollPane();
+--        initializeButtons(listener);
+--        initializeFrame();
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the view panel
+--    private void initializeViewPanel(TennisMatchJournal journal) {
+--        DefaultListModel<String> listModel = new DefaultListModel();
+--
+--        for (TennisMatch match : journal.getJournal()) {
+--            String opponent = match.getMatchDetails().getOpponent();
+--            String date = match.getMatchDetails().getDate();
+--
+--            String toAdd = "vs. " + opponent + " on " + date;
+--            listModel.addElement(toAdd);
+--        }
+--
+--        viewPanel = new JList(listModel);
+--        viewPanel.setLayoutOrientation(JList.VERTICAL);
+--        viewPanel.setFont(new Font("Arial", Font.PLAIN, 25));
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the scroll pane
+--    private void initializeScrollPane() {
+--        scrollPane = new JScrollPane();
+--        scrollPane.setViewportView(viewPanel);
+--        scrollPane.setBounds(500, 100, 500, 700);
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the buttons
+--    private void initializeButtons(ActionListener listener) {
+--        backButton = new JButton("Back");
+--        backButton.setFocusable(false);
+--        backButton.setBounds(530, 850, 200, 50);
+--        backButton.addActionListener(listener);
+--
+--        selectButton = new JButton("Select");
+--        selectButton.setFocusable(false);
+--        selectButton.setBounds(770, 850, 200, 50);
+--        selectButton.addActionListener(listener);
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the frame
+--    private void initializeFrame() {
+--        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+--        this.add(backButton);
+--        this.add(selectButton);
+--        this.add(scrollPane);
+--        this.setSize(1500, 1000);
+--        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+--        this.setLayout(null);
+--        this.setTitle("Tennis Match Journal");
+--        this.setIconImage(frameIcon.getImage());
+--        this.setLocationRelativeTo(null);
+--        this.setVisible(true);
+--    }
+--
+--    public JButton getBackButton() {
+--        return backButton;
+--    }
+--
+--    public JButton getSelectButton() {
+--        return selectButton;
+--    }
+--
+--    public JList<String> getViewPanel() {
+--        return viewPanel;
+--    }
+--}
+-+//package ui.viewer;
+-+//
+-+//import model.TennisMatch;
+-+//import model.TennisMatchJournal;
+-+//
+-+//import javax.swing.*;
+-+//import java.awt.*;
+-+//import java.awt.event.ActionListener;
+-+//
+-+//// Represents the view page where the user can view a list of all the matches in the journal
+-+//public class ViewPage extends JFrame {
+-+//    private JButton backButton;
+-+//    private JButton selectButton;
+-+//    private JList<String> viewPanel;
+-+//    private JScrollPane scrollPane;
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the view page
+-+//    public ViewPage(ActionListener listener, TennisMatchJournal journal) {
+-+//        initializeViewPanel(journal);
+-+//        initializeScrollPane();
+-+//        initializeButtons(listener);
+-+//        initializeFrame();
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the view panel
+-+//    private void initializeViewPanel(TennisMatchJournal journal) {
+-+//        DefaultListModel<String> listModel = new DefaultListModel();
+-+//
+-+//        for (TennisMatch match : journal.getJournal()) {
+-+//            String opponent = match.getMatchDetails().getOpponent();
+-+//            String date = match.getMatchDetails().getDate();
+-+//
+-+//            String toAdd = "vs. " + opponent + " on " + date;
+-+//            listModel.addElement(toAdd);
+-+//        }
+-+//
+-+//        viewPanel = new JList(listModel);
+-+//        viewPanel.setLayoutOrientation(JList.VERTICAL);
+-+//        viewPanel.setFont(new Font("Arial", Font.PLAIN, 25));
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the scroll pane
+-+//    private void initializeScrollPane() {
+-+//        scrollPane = new JScrollPane();
+-+//        scrollPane.setViewportView(viewPanel);
+-+//        scrollPane.setBounds(500, 100, 500, 700);
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the buttons
+-+//    private void initializeButtons(ActionListener listener) {
+-+//        backButton = new JButton("Back");
+-+//        backButton.setFocusable(false);
+-+//        backButton.setBounds(530, 850, 200, 50);
+-+//        backButton.addActionListener(listener);
+-+//
+-+//        selectButton = new JButton("Select");
+-+//        selectButton.setFocusable(false);
+-+//        selectButton.setBounds(770, 850, 200, 50);
+-+//        selectButton.addActionListener(listener);
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the frame
+-+//    private void initializeFrame() {
+-+//        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-+//        this.add(backButton);
+-+//        this.add(selectButton);
+-+//        this.add(scrollPane);
+-+//        this.setSize(1500, 1000);
+-+//        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-+//        this.setLayout(null);
+-+//        this.setTitle("Tennis Match Journal");
+-+//        this.setIconImage(frameIcon.getImage());
+-+//        this.setLocationRelativeTo(null);
+-+//        this.setVisible(true);
+-+//    }
+-+//
+-+//    public JButton getBackButton() {
+-+//        return backButton;
+-+//    }
+-+//
+-+//    public JButton getSelectButton() {
+-+//        return selectButton;
+-+//    }
+-+//
+-+//    public JList<String> getViewPanel() {
+-+//        return viewPanel;
+-+//    }
+-+//}
+-Index: src/test/model/MatchStatsTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\npublic class MatchStatsTest {\r\n    MatchStats testStats1;\r\n    MatchStats testStats2;\r\n    MatchStats testStats3;\r\n    MatchStats testStats4;\r\n    MatchStats testStats5;\r\n    MatchStats testStats6;\r\n    MatchStats testStats7;\r\n\r\n    @BeforeEach\r\n    void runBefore() {\r\n        testStats1 = new MatchStats(\"7-5 6-1\", 10, 1, 4, 7);\r\n        testStats2 = new MatchStats(\"7-5 6-1\", 10, 1, 4, 7);\r\n        testStats3 = new MatchStats(\"7-5 6-2\", 10, 1, 4, 7);\r\n        testStats4 = new MatchStats(\"7-5 6-1\", 11, 1, 4, 7);\r\n        testStats5 = new MatchStats(\"7-5 6-1\", 10, 2, 4, 7);\r\n        testStats6 = new MatchStats(\"7-5 6-1\", 10, 1, 5, 7);\r\n        testStats7 = new MatchStats(\"7-5 6-1\", 10, 1, 4, 8);\r\n    }\r\n\r\n    @Test\r\n    void testConstructor() {\r\n        assertEquals(\"7-5 6-1\", testStats1.getScore());\r\n        assertEquals(10, testStats1.getAces());\r\n        assertEquals(1, testStats1.getDoubleFaults());\r\n        assertEquals(4, testStats1.getWinners());\r\n        assertEquals(7, testStats1.getUnforcedErrors());\r\n    }\r\n\r\n    @Test\r\n    void testEqualsIsEqual() {\r\n        boolean isEqual = testStats1.equals(testStats2);\r\n\r\n        assertTrue(isEqual);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsIsNotEqual() {\r\n        boolean isEqual1 = testStats1.equals(testStats3);\r\n        assertFalse(isEqual1);\r\n\r\n        boolean isEqual2 = testStats1.equals(testStats4);\r\n        assertFalse(isEqual2);\r\n\r\n        boolean isEqual3 = testStats1.equals(testStats5);\r\n        assertFalse(isEqual3);\r\n\r\n        boolean isEqual4 = testStats1.equals(testStats6);\r\n        assertFalse(isEqual4);\r\n\r\n        boolean isEqual5 = testStats1.equals(testStats7);\r\n        assertFalse(isEqual5);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsNotAnInstanceOf() {\r\n        boolean isEqual = testStats1.equals(\"random string\");\r\n\r\n        assertFalse(isEqual);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsSameObject() {\r\n        MatchStats testStats4 = testStats3;\r\n\r\n        boolean isEqual = testStats3.equals(testStats4);\r\n\r\n        assertTrue(isEqual);\r\n    }\r\n\r\n    @Test\r\n    void testHashCodesAreEqual() {\r\n        int statsCode1 = testStats1.hashCode();\r\n        int statsCode2 = testStats2.hashCode();\r\n\r\n        assertEquals(statsCode1, statsCode2);\r\n    }\r\n\r\n    @Test\r\n    void testHashCodesAreNotEqual() {\r\n        int statsCode1 = testStats1.hashCode();\r\n        int statsCode3 = testStats3.hashCode();\r\n\r\n        assertNotEquals(statsCode1, statsCode3);\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/model/MatchStatsTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/model/MatchStatsTest.java	(date 1621031253295)
+-@@ -1,93 +1,93 @@
+--package model;
+--
+--import org.junit.jupiter.api.BeforeEach;
+--import org.junit.jupiter.api.Test;
+--
+--import static org.junit.jupiter.api.Assertions.*;
+--
+--public class MatchStatsTest {
+--    MatchStats testStats1;
+--    MatchStats testStats2;
+--    MatchStats testStats3;
+--    MatchStats testStats4;
+--    MatchStats testStats5;
+--    MatchStats testStats6;
+--    MatchStats testStats7;
+--
+--    @BeforeEach
+--    void runBefore() {
+--        testStats1 = new MatchStats("7-5 6-1", 10, 1, 4, 7);
+--        testStats2 = new MatchStats("7-5 6-1", 10, 1, 4, 7);
+--        testStats3 = new MatchStats("7-5 6-2", 10, 1, 4, 7);
+--        testStats4 = new MatchStats("7-5 6-1", 11, 1, 4, 7);
+--        testStats5 = new MatchStats("7-5 6-1", 10, 2, 4, 7);
+--        testStats6 = new MatchStats("7-5 6-1", 10, 1, 5, 7);
+--        testStats7 = new MatchStats("7-5 6-1", 10, 1, 4, 8);
+--    }
+--
+--    @Test
+--    void testConstructor() {
+--        assertEquals("7-5 6-1", testStats1.getScore());
+--        assertEquals(10, testStats1.getAces());
+--        assertEquals(1, testStats1.getDoubleFaults());
+--        assertEquals(4, testStats1.getWinners());
+--        assertEquals(7, testStats1.getUnforcedErrors());
+--    }
+--
+--    @Test
+--    void testEqualsIsEqual() {
+--        boolean isEqual = testStats1.equals(testStats2);
+--
+--        assertTrue(isEqual);
+--    }
+--
+--    @Test
+--    void testEqualsIsNotEqual() {
+--        boolean isEqual1 = testStats1.equals(testStats3);
+--        assertFalse(isEqual1);
+--
+--        boolean isEqual2 = testStats1.equals(testStats4);
+--        assertFalse(isEqual2);
+--
+--        boolean isEqual3 = testStats1.equals(testStats5);
+--        assertFalse(isEqual3);
+--
+--        boolean isEqual4 = testStats1.equals(testStats6);
+--        assertFalse(isEqual4);
+--
+--        boolean isEqual5 = testStats1.equals(testStats7);
+--        assertFalse(isEqual5);
+--    }
+--
+--    @Test
+--    void testEqualsNotAnInstanceOf() {
+--        boolean isEqual = testStats1.equals("random string");
+--
+--        assertFalse(isEqual);
+--    }
+--
+--    @Test
+--    void testEqualsSameObject() {
+--        MatchStats testStats4 = testStats3;
+--
+--        boolean isEqual = testStats3.equals(testStats4);
+--
+--        assertTrue(isEqual);
+--    }
+--
+--    @Test
+--    void testHashCodesAreEqual() {
+--        int statsCode1 = testStats1.hashCode();
+--        int statsCode2 = testStats2.hashCode();
+--
+--        assertEquals(statsCode1, statsCode2);
+--    }
+--
+--    @Test
+--    void testHashCodesAreNotEqual() {
+--        int statsCode1 = testStats1.hashCode();
+--        int statsCode3 = testStats3.hashCode();
+--
+--        assertNotEquals(statsCode1, statsCode3);
+--    }
+--}
+-+//package model;
+-+//
+-+//import org.junit.jupiter.api.BeforeEach;
+-+//import org.junit.jupiter.api.Test;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.*;
+-+//
+-+//public class MatchStatsTest {
+-+//    MatchStats testStats1;
+-+//    MatchStats testStats2;
+-+//    MatchStats testStats3;
+-+//    MatchStats testStats4;
+-+//    MatchStats testStats5;
+-+//    MatchStats testStats6;
+-+//    MatchStats testStats7;
+-+//
+-+//    @BeforeEach
+-+//    void runBefore() {
+-+//        testStats1 = new MatchStats("7-5 6-1", 10, 1, 4, 7);
+-+//        testStats2 = new MatchStats("7-5 6-1", 10, 1, 4, 7);
+-+//        testStats3 = new MatchStats("7-5 6-2", 10, 1, 4, 7);
+-+//        testStats4 = new MatchStats("7-5 6-1", 11, 1, 4, 7);
+-+//        testStats5 = new MatchStats("7-5 6-1", 10, 2, 4, 7);
+-+//        testStats6 = new MatchStats("7-5 6-1", 10, 1, 5, 7);
+-+//        testStats7 = new MatchStats("7-5 6-1", 10, 1, 4, 8);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testConstructor() {
+-+//        assertEquals("7-5 6-1", testStats1.getScore());
+-+//        assertEquals(10, testStats1.getAces());
+-+//        assertEquals(1, testStats1.getDoubleFaults());
+-+//        assertEquals(4, testStats1.getWinners());
+-+//        assertEquals(7, testStats1.getUnforcedErrors());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsIsEqual() {
+-+//        boolean isEqual = testStats1.equals(testStats2);
+-+//
+-+//        assertTrue(isEqual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsIsNotEqual() {
+-+//        boolean isEqual1 = testStats1.equals(testStats3);
+-+//        assertFalse(isEqual1);
+-+//
+-+//        boolean isEqual2 = testStats1.equals(testStats4);
+-+//        assertFalse(isEqual2);
+-+//
+-+//        boolean isEqual3 = testStats1.equals(testStats5);
+-+//        assertFalse(isEqual3);
+-+//
+-+//        boolean isEqual4 = testStats1.equals(testStats6);
+-+//        assertFalse(isEqual4);
+-+//
+-+//        boolean isEqual5 = testStats1.equals(testStats7);
+-+//        assertFalse(isEqual5);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsNotAnInstanceOf() {
+-+//        boolean isEqual = testStats1.equals("random string");
+-+//
+-+//        assertFalse(isEqual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsSameObject() {
+-+//        MatchStats testStats4 = testStats3;
+-+//
+-+//        boolean isEqual = testStats3.equals(testStats4);
+-+//
+-+//        assertTrue(isEqual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testHashCodesAreEqual() {
+-+//        int statsCode1 = testStats1.hashCode();
+-+//        int statsCode2 = testStats2.hashCode();
+-+//
+-+//        assertEquals(statsCode1, statsCode2);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testHashCodesAreNotEqual() {
+-+//        int statsCode1 = testStats1.hashCode();
+-+//        int statsCode3 = testStats3.hashCode();
+-+//
+-+//        assertNotEquals(statsCode1, statsCode3);
+-+//    }
+-+//}
+-Index: src/main/ui/viewer/StatsPage.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package ui.viewer;\r\n\r\nimport model.TennisMatch;\r\n\r\nimport javax.swing.*;\r\nimport java.awt.*;\r\nimport java.awt.event.ActionListener;\r\n\r\n// Represents the stats page where the user can view detailed statistics about a single match\r\npublic class StatsPage extends JFrame {\r\n    JTable table;\r\n    JButton backButton;\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the stats page\r\n    public StatsPage(ActionListener listener, TennisMatch match) {\r\n        initializeTable(match);\r\n        initializeButton(listener);\r\n        initializeFrame();\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the table\r\n    private void initializeTable(TennisMatch match) {\r\n        String[][] rowData = {\r\n                {\"Opponent\", match.getMatchDetails().getOpponent()},\r\n                {\"Result\", (match.getMatchDetails().getIsWon()) ? \"Win\" : \"Loss\"},\r\n                {\"Surface\", match.getMatchDetails().getSurface()},\r\n                {\"Duration\", Integer.toString(match.getMatchDetails().getDuration())},\r\n                {\"Date\", match.getMatchDetails().getDate()},\r\n                {\"Score\", match.getMatchStats().getScore()},\r\n                {\"Aces\", Integer.toString(match.getMatchStats().getAces())},\r\n                {\"Double Faults\", Integer.toString(match.getMatchStats().getDoubleFaults())},\r\n                {\"Winners\", Integer.toString(match.getMatchStats().getWinners())},\r\n                {\"Unforced Errors\", Integer.toString(match.getMatchStats().getUnforcedErrors())}\r\n        };\r\n\r\n        String[] columnData = {\"1\",\"1\"};\r\n\r\n        table = new JTable(rowData, columnData);\r\n        table.setBounds(0, 0, 500, 700);\r\n        table.setFont(new Font(\"Arial\", Font.PLAIN, 30));\r\n        table.setRowHeight(table.getRowHeight() + 30);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the back button\r\n    private void initializeButton(ActionListener listener) {\r\n        backButton = new JButton(\"Back\");\r\n        backButton.setFocusable(false);\r\n        backButton.setBounds(140, 480, 200, 50);\r\n        backButton.addActionListener(listener);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the frame\r\n    private void initializeFrame() {\r\n        ImageIcon frameIcon = new ImageIcon(\"./data/tennis_ball.png\");\r\n        this.add(backButton);\r\n        this.add(table);\r\n        this.setSize(500, 600);\r\n        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\r\n        this.setLayout(null);\r\n        this.setTitle(\"Tennis Match Journal\");\r\n        this.setIconImage(frameIcon.getImage());\r\n        this.setLocationRelativeTo(null);\r\n        this.setVisible(true);\r\n    }\r\n\r\n    public JButton getBackButton() {\r\n        return backButton;\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/main/ui/viewer/StatsPage.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/main/ui/viewer/StatsPage.java	(date 1621031162096)
+-@@ -1,73 +1,73 @@
+--package ui.viewer;
+--
+--import model.TennisMatch;
+--
+--import javax.swing.*;
+--import java.awt.*;
+--import java.awt.event.ActionListener;
+--
+--// Represents the stats page where the user can view detailed statistics about a single match
+--public class StatsPage extends JFrame {
+--    JTable table;
+--    JButton backButton;
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the stats page
+--    public StatsPage(ActionListener listener, TennisMatch match) {
+--        initializeTable(match);
+--        initializeButton(listener);
+--        initializeFrame();
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the table
+--    private void initializeTable(TennisMatch match) {
+--        String[][] rowData = {
+--                {"Opponent", match.getMatchDetails().getOpponent()},
+--                {"Result", (match.getMatchDetails().getIsWon()) ? "Win" : "Loss"},
+--                {"Surface", match.getMatchDetails().getSurface()},
+--                {"Duration", Integer.toString(match.getMatchDetails().getDuration())},
+--                {"Date", match.getMatchDetails().getDate()},
+--                {"Score", match.getMatchStats().getScore()},
+--                {"Aces", Integer.toString(match.getMatchStats().getAces())},
+--                {"Double Faults", Integer.toString(match.getMatchStats().getDoubleFaults())},
+--                {"Winners", Integer.toString(match.getMatchStats().getWinners())},
+--                {"Unforced Errors", Integer.toString(match.getMatchStats().getUnforcedErrors())}
+--        };
+--
+--        String[] columnData = {"1","1"};
+--
+--        table = new JTable(rowData, columnData);
+--        table.setBounds(0, 0, 500, 700);
+--        table.setFont(new Font("Arial", Font.PLAIN, 30));
+--        table.setRowHeight(table.getRowHeight() + 30);
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the back button
+--    private void initializeButton(ActionListener listener) {
+--        backButton = new JButton("Back");
+--        backButton.setFocusable(false);
+--        backButton.setBounds(140, 480, 200, 50);
+--        backButton.addActionListener(listener);
+--    }
+--
+--    // MODIFIES: this
+--    // EFFECTS: initializes the frame
+--    private void initializeFrame() {
+--        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+--        this.add(backButton);
+--        this.add(table);
+--        this.setSize(500, 600);
+--        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+--        this.setLayout(null);
+--        this.setTitle("Tennis Match Journal");
+--        this.setIconImage(frameIcon.getImage());
+--        this.setLocationRelativeTo(null);
+--        this.setVisible(true);
+--    }
+--
+--    public JButton getBackButton() {
+--        return backButton;
+--    }
+--}
+-+//package ui.viewer;
+-+//
+-+//import model.TennisMatch;
+-+//
+-+//import javax.swing.*;
+-+//import java.awt.*;
+-+//import java.awt.event.ActionListener;
+-+//
+-+//// Represents the stats page where the user can view detailed statistics about a single match
+-+//public class StatsPage extends JFrame {
+-+//    JTable table;
+-+//    JButton backButton;
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the stats page
+-+//    public StatsPage(ActionListener listener, TennisMatch match) {
+-+//        initializeTable(match);
+-+//        initializeButton(listener);
+-+//        initializeFrame();
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the table
+-+//    private void initializeTable(TennisMatch match) {
+-+//        String[][] rowData = {
+-+//                {"Opponent", match.getMatchDetails().getOpponent()},
+-+//                {"Result", (match.getMatchDetails().getIsWon()) ? "Win" : "Loss"},
+-+//                {"Surface", match.getMatchDetails().getSurface()},
+-+//                {"Duration", Integer.toString(match.getMatchDetails().getDuration())},
+-+//                {"Date", match.getMatchDetails().getDate()},
+-+//                {"Score", match.getMatchStats().getScore()},
+-+//                {"Aces", Integer.toString(match.getMatchStats().getAces())},
+-+//                {"Double Faults", Integer.toString(match.getMatchStats().getDoubleFaults())},
+-+//                {"Winners", Integer.toString(match.getMatchStats().getWinners())},
+-+//                {"Unforced Errors", Integer.toString(match.getMatchStats().getUnforcedErrors())}
+-+//        };
+-+//
+-+//        String[] columnData = {"1","1"};
+-+//
+-+//        table = new JTable(rowData, columnData);
+-+//        table.setBounds(0, 0, 500, 700);
+-+//        table.setFont(new Font("Arial", Font.PLAIN, 30));
+-+//        table.setRowHeight(table.getRowHeight() + 30);
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the back button
+-+//    private void initializeButton(ActionListener listener) {
+-+//        backButton = new JButton("Back");
+-+//        backButton.setFocusable(false);
+-+//        backButton.setBounds(140, 480, 200, 50);
+-+//        backButton.addActionListener(listener);
+-+//    }
+-+//
+-+//    // MODIFIES: this
+-+//    // EFFECTS: initializes the frame
+-+//    private void initializeFrame() {
+-+//        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-+//        this.add(backButton);
+-+//        this.add(table);
+-+//        this.setSize(500, 600);
+-+//        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-+//        this.setLayout(null);
+-+//        this.setTitle("Tennis Match Journal");
+-+//        this.setIconImage(frameIcon.getImage());
+-+//        this.setLocationRelativeTo(null);
+-+//        this.setVisible(true);
+-+//    }
+-+//
+-+//    public JButton getBackButton() {
+-+//        return backButton;
+-+//    }
+-+//}
+-Index: src/test/persistence/JsonReaderTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package persistence;\r\n\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport java.io.IOException;\r\nimport java.util.List;\r\n\r\nimport static org.junit.jupiter.api.Assertions.assertEquals;\r\nimport static org.junit.jupiter.api.Assertions.fail;\r\n\r\n// NOTE: The structure of this class and many of the methods in it are based off of\r\n//       the JsonReaderTest class in the WorkRoom application that was given to us\r\n//       on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonReaderTest extends JsonTest {\r\n    MatchDetails matchDetails1;\r\n    MatchStats matchStats1;\r\n    MatchDetails matchDetails2;\r\n    MatchStats matchStats2;\r\n    MatchDetails matchDetails3;\r\n    MatchStats matchStats3;\r\n\r\n    @BeforeEach\r\n    void runBefore() {\r\n        matchDetails1 = new MatchDetails(\"Yang Lin\", false, \"hard\", 30, \"10/25/2020\");\r\n        matchStats1 = new MatchStats(\"0-6 0-6\", 0, 10, 0, 10);\r\n\r\n        matchDetails2 = new MatchDetails(\"Rafael Nadal\", true, \"clay\", 120, \"10/25/2020\");\r\n        matchStats2 = new MatchStats(\"6-4 6-4\", 6, 2, 12, 9);\r\n\r\n        matchDetails3 = new MatchDetails(\"Roger Federer\", true, \"grass\", 60, \"10/25/2020\");\r\n        matchStats3 = new MatchStats(\"7-6 7-6\", 4, 1, 15, 4);\r\n    }\r\n\r\n    @Test\r\n    void testReaderNonExistentFile() {\r\n        JsonReader reader = new JsonReader(\"./data/noSuchFile.json\");\r\n\r\n        try {\r\n            TennisMatchJournal journal = reader.read();\r\n            fail(\"IOException expected\"); // we are expecting read() to throw an IOException\r\n        } catch (IOException e) {\r\n            // our test passes\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testReaderEmptyJournal() {\r\n        JsonReader reader = new JsonReader(\"./data/testReaderEmptyJournal.json\");\r\n\r\n        try {\r\n            TennisMatchJournal journal = reader.read();\r\n            assertEquals(0, journal.journalLength());\r\n        } catch (IOException e) {\r\n            fail(\"Couldn't read from file\");\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testReaderGeneralJournal() {\r\n        JsonReader reader = new JsonReader(\"./data/testReaderGeneralJournal.json\");\r\n\r\n        try {\r\n            TennisMatchJournal journal = reader.read();\r\n            List<TennisMatch> matches = journal.getJournal();\r\n\r\n            assertEquals(3, matches.size());\r\n            checkMatch(matchDetails1, matchStats1, matches.get(0));\r\n            checkMatch(matchDetails2, matchStats2, matches.get(1));\r\n            checkMatch(matchDetails3, matchStats3, matches.get(2));\r\n        } catch (IOException e) {\r\n            fail(\"Couldn't read from file\");\r\n        }\r\n    }\r\n\r\n\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/persistence/JsonReaderTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/persistence/JsonReaderTest.java	(date 1621031253257)
+-@@ -1,82 +1,82 @@
+--package persistence;
+--
+--import model.MatchDetails;
+--import model.MatchStats;
+--import model.TennisMatch;
+--import model.TennisMatchJournal;
+--import org.junit.jupiter.api.BeforeEach;
+--import org.junit.jupiter.api.Test;
+--
+--import java.io.IOException;
+--import java.util.List;
+--
+--import static org.junit.jupiter.api.Assertions.assertEquals;
+--import static org.junit.jupiter.api.Assertions.fail;
+--
+--// NOTE: The structure of this class and many of the methods in it are based off of
+--//       the JsonReaderTest class in the WorkRoom application that was given to us
+--//       on GitHub.
+--//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+--public class JsonReaderTest extends JsonTest {
+--    MatchDetails matchDetails1;
+--    MatchStats matchStats1;
+--    MatchDetails matchDetails2;
+--    MatchStats matchStats2;
+--    MatchDetails matchDetails3;
+--    MatchStats matchStats3;
+--
+--    @BeforeEach
+--    void runBefore() {
+--        matchDetails1 = new MatchDetails("Yang Lin", false, "hard", 30, "10/25/2020");
+--        matchStats1 = new MatchStats("0-6 0-6", 0, 10, 0, 10);
+--
+--        matchDetails2 = new MatchDetails("Rafael Nadal", true, "clay", 120, "10/25/2020");
+--        matchStats2 = new MatchStats("6-4 6-4", 6, 2, 12, 9);
+--
+--        matchDetails3 = new MatchDetails("Roger Federer", true, "grass", 60, "10/25/2020");
+--        matchStats3 = new MatchStats("7-6 7-6", 4, 1, 15, 4);
+--    }
+--
+--    @Test
+--    void testReaderNonExistentFile() {
+--        JsonReader reader = new JsonReader("./data/noSuchFile.json");
+--
+--        try {
+--            TennisMatchJournal journal = reader.read();
+--            fail("IOException expected"); // we are expecting read() to throw an IOException
+--        } catch (IOException e) {
+--            // our test passes
+--        }
+--    }
+--
+--    @Test
+--    void testReaderEmptyJournal() {
+--        JsonReader reader = new JsonReader("./data/testReaderEmptyJournal.json");
+--
+--        try {
+--            TennisMatchJournal journal = reader.read();
+--            assertEquals(0, journal.journalLength());
+--        } catch (IOException e) {
+--            fail("Couldn't read from file");
+--        }
+--    }
+--
+--    @Test
+--    void testReaderGeneralJournal() {
+--        JsonReader reader = new JsonReader("./data/testReaderGeneralJournal.json");
+--
+--        try {
+--            TennisMatchJournal journal = reader.read();
+--            List<TennisMatch> matches = journal.getJournal();
+--
+--            assertEquals(3, matches.size());
+--            checkMatch(matchDetails1, matchStats1, matches.get(0));
+--            checkMatch(matchDetails2, matchStats2, matches.get(1));
+--            checkMatch(matchDetails3, matchStats3, matches.get(2));
+--        } catch (IOException e) {
+--            fail("Couldn't read from file");
+--        }
+--    }
+--
+--
+--}
+-+//package persistence;
+-+//
+-+//import model.MatchDetails;
+-+//import model.MatchStats;
+-+//import model.TennisMatch;
+-+//import model.TennisMatchJournal;
+-+//import org.junit.jupiter.api.BeforeEach;
+-+//import org.junit.jupiter.api.Test;
+-+//
+-+//import java.io.IOException;
+-+//import java.util.List;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.assertEquals;
+-+//import static org.junit.jupiter.api.Assertions.fail;
+-+//
+-+//// NOTE: The structure of this class and many of the methods in it are based off of
+-+////       the JsonReaderTest class in the WorkRoom application that was given to us
+-+////       on GitHub.
+-+////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-+//public class JsonReaderTest extends JsonTest {
+-+//    MatchDetails matchDetails1;
+-+//    MatchStats matchStats1;
+-+//    MatchDetails matchDetails2;
+-+//    MatchStats matchStats2;
+-+//    MatchDetails matchDetails3;
+-+//    MatchStats matchStats3;
+-+//
+-+//    @BeforeEach
+-+//    void runBefore() {
+-+//        matchDetails1 = new MatchDetails("Yang Lin", false, "hard", 30, "10/25/2020");
+-+//        matchStats1 = new MatchStats("0-6 0-6", 0, 10, 0, 10);
+-+//
+-+//        matchDetails2 = new MatchDetails("Rafael Nadal", true, "clay", 120, "10/25/2020");
+-+//        matchStats2 = new MatchStats("6-4 6-4", 6, 2, 12, 9);
+-+//
+-+//        matchDetails3 = new MatchDetails("Roger Federer", true, "grass", 60, "10/25/2020");
+-+//        matchStats3 = new MatchStats("7-6 7-6", 4, 1, 15, 4);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testReaderNonExistentFile() {
+-+//        JsonReader reader = new JsonReader("./data/noSuchFile.json");
+-+//
+-+//        try {
+-+//            TennisMatchJournal journal = reader.read();
+-+//            fail("IOException expected"); // we are expecting read() to throw an IOException
+-+//        } catch (IOException e) {
+-+//            // our test passes
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testReaderEmptyJournal() {
+-+//        JsonReader reader = new JsonReader("./data/testReaderEmptyJournal.json");
+-+//
+-+//        try {
+-+//            TennisMatchJournal journal = reader.read();
+-+//            assertEquals(0, journal.journalLength());
+-+//        } catch (IOException e) {
+-+//            fail("Couldn't read from file");
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testReaderGeneralJournal() {
+-+//        JsonReader reader = new JsonReader("./data/testReaderGeneralJournal.json");
+-+//
+-+//        try {
+-+//            TennisMatchJournal journal = reader.read();
+-+//            List<TennisMatch> matches = journal.getJournal();
+-+//
+-+//            assertEquals(3, matches.size());
+-+//            checkMatch(matchDetails1, matchStats1, matches.get(0));
+-+//            checkMatch(matchDetails2, matchStats2, matches.get(1));
+-+//            checkMatch(matchDetails3, matchStats3, matches.get(2));
+-+//        } catch (IOException e) {
+-+//            fail("Couldn't read from file");
+-+//        }
+-+//    }
+-+//
+-+//
+-+//}
+-Index: src/test/persistence/JsonTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package persistence;\r\n\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\n\r\nimport static org.junit.jupiter.api.Assertions.assertEquals;\r\n\r\n// Note: The structure of this class and the method inside it is based on\r\n//       the WorkRoom application given to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonTest {\r\n    protected void checkMatch(MatchDetails details, MatchStats stats, TennisMatch match) {\r\n        MatchDetails md = match.getMatchDetails();\r\n        MatchStats ms = match.getMatchStats();\r\n\r\n        assertEquals(details.getOpponent(), md.getOpponent());\r\n        assertEquals(details.getIsWon(), md.getIsWon());\r\n        assertEquals(details.getSurface(), md.getSurface());\r\n        assertEquals(details.getDuration(), md.getDuration());\r\n        assertEquals(details.getDate(), md.getDate());\r\n\r\n        assertEquals(stats.getScore(), ms.getScore());\r\n        assertEquals(stats.getAces(), ms.getAces());\r\n        assertEquals(stats.getDoubleFaults(), ms.getDoubleFaults());\r\n        assertEquals(stats.getWinners(), ms.getWinners());\r\n        assertEquals(stats.getUnforcedErrors(), ms.getUnforcedErrors());\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/persistence/JsonTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/persistence/JsonTest.java	(date 1621031253278)
+-@@ -1,29 +1,29 @@
+- package persistence;
+--
+--import model.MatchDetails;
+--import model.MatchStats;
+--import model.TennisMatch;
+--
+--import static org.junit.jupiter.api.Assertions.assertEquals;
+--
+--// Note: The structure of this class and the method inside it is based on
+--//       the WorkRoom application given to us on GitHub.
+--//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+--public class JsonTest {
+--    protected void checkMatch(MatchDetails details, MatchStats stats, TennisMatch match) {
+--        MatchDetails md = match.getMatchDetails();
+--        MatchStats ms = match.getMatchStats();
+--
+--        assertEquals(details.getOpponent(), md.getOpponent());
+--        assertEquals(details.getIsWon(), md.getIsWon());
+--        assertEquals(details.getSurface(), md.getSurface());
+--        assertEquals(details.getDuration(), md.getDuration());
+--        assertEquals(details.getDate(), md.getDate());
+--
+--        assertEquals(stats.getScore(), ms.getScore());
+--        assertEquals(stats.getAces(), ms.getAces());
+--        assertEquals(stats.getDoubleFaults(), ms.getDoubleFaults());
+--        assertEquals(stats.getWinners(), ms.getWinners());
+--        assertEquals(stats.getUnforcedErrors(), ms.getUnforcedErrors());
+--    }
+--}
+-+//
+-+//import model.MatchDetails;
+-+//import model.MatchStats;
+-+//import model.TennisMatch;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.assertEquals;
+-+//
+-+//// Note: The structure of this class and the method inside it is based on
+-+////       the WorkRoom application given to us on GitHub.
+-+////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-+//public class JsonTest {
+-+//    protected void checkMatch(MatchDetails details, MatchStats stats, TennisMatch match) {
+-+//        MatchDetails md = match.getMatchDetails();
+-+//        MatchStats ms = match.getMatchStats();
+-+//
+-+//        assertEquals(details.getOpponent(), md.getOpponent());
+-+//        assertEquals(details.getIsWon(), md.getIsWon());
+-+//        assertEquals(details.getSurface(), md.getSurface());
+-+//        assertEquals(details.getDuration(), md.getDuration());
+-+//        assertEquals(details.getDate(), md.getDate());
+-+//
+-+//        assertEquals(stats.getScore(), ms.getScore());
+-+//        assertEquals(stats.getAces(), ms.getAces());
+-+//        assertEquals(stats.getDoubleFaults(), ms.getDoubleFaults());
+-+//        assertEquals(stats.getWinners(), ms.getWinners());
+-+//        assertEquals(stats.getUnforcedErrors(), ms.getUnforcedErrors());
+-+//    }
+-+//}
+-Index: src/test/model/TennisMatchJournalTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\nimport model.exceptions.InvalidIndexException;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport java.util.List;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\npublic class TennisMatchJournalTest {\r\n    private TennisMatchJournal testJournal;\r\n    private TennisMatch testMatch0;\r\n    private TennisMatch testMatch1;\r\n    private TennisMatch testMatch2;\r\n    private MatchDetails testDetails0;\r\n    private MatchDetails testDetails1;\r\n    private MatchDetails testDetails2;\r\n    private MatchStats testStats0;\r\n    private MatchStats testStats1;\r\n    private MatchStats testStats2;\r\n    private String expected;\r\n    private String actual;\r\n\r\n    @BeforeEach\r\n    void runBefore() {\r\n        testDetails0 = new MatchDetails(\"Rafa Nadal\", true, \"clay\", 60, \"10/11/2020\");\r\n        testDetails1 = new MatchDetails(\"Yang Lin\", true, \"hard\", 30, \"1/2/2020\");\r\n        testDetails2 = new MatchDetails(\"Yang Lin\", false, \"hard\", 30, \"1/3/2020\");\r\n        testStats0 = new MatchStats(\"6-1 6-2\", 5, 1, 10, 8);\r\n        testStats1 = new MatchStats(\"7-5 6-4\", 2, 0, 13, 9);\r\n        testStats2 = new MatchStats(\"3-6 1-6\", 4, 7, 8, 10);\r\n        testMatch0 = new TennisMatch(testDetails0, testStats0);\r\n        testMatch1 = new TennisMatch(testDetails1, testStats1);\r\n        testMatch2 = new TennisMatch(testDetails2, testStats2);\r\n        testJournal = new TennisMatchJournal();\r\n    }\r\n\r\n    @Test\r\n    void testConstructor() {\r\n        assertEquals(0, testJournal.journalLength());\r\n    }\r\n\r\n    @Test\r\n    void testAddMatchNotAlreadyThere() {\r\n        testJournal.addMatch(testMatch0);\r\n        assertTrue(testJournal.containsMatch(testMatch0));\r\n    }\r\n\r\n    @Test\r\n    void testAddMatchAlreadyThere() {\r\n        testJournal.addMatch(testMatch0);\r\n        testJournal.addMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n    }\r\n\r\n    @Test\r\n    void testAddMultipleMatches() {\r\n        testJournal.addMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n        testJournal.addMatch(testMatch1);\r\n        assertEquals(2, testJournal.journalLength());\r\n        testJournal.addMatch(testMatch2);\r\n        assertEquals(3, testJournal.journalLength());\r\n    }\r\n\r\n    @Test\r\n    void testContainsMatch() {\r\n        testJournal.addMatch(testMatch0);\r\n\r\n        assertTrue(testJournal.containsMatch(testMatch0));\r\n\r\n        assertFalse(testJournal.containsMatch(testMatch1));\r\n    }\r\n\r\n    @Test\r\n    void testJournalLength() {\r\n        assertEquals(0, testJournal.journalLength());\r\n        testJournal.addMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n        testJournal.addMatch(testMatch1);\r\n        assertEquals(2, testJournal.journalLength());\r\n    }\r\n\r\n    @Test\r\n    void testDeleteExistingMatch() {\r\n        testJournal.addMatch(testMatch0);\r\n        assertTrue(testJournal.containsMatch(testMatch0));\r\n\r\n        testJournal.deleteMatch(testMatch0);\r\n        assertFalse(testJournal.containsMatch(testMatch0));\r\n    }\r\n\r\n    @Test\r\n    void testDeleteNonExistingMatch() {\r\n        testJournal.addMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n\r\n        testJournal.deleteMatch(testMatch1);\r\n        assertEquals(1, testJournal.journalLength());\r\n    }\r\n\r\n    @Test\r\n    void testDeleteMultipleMatches() {\r\n        testJournal.addMatch(testMatch0);\r\n        testJournal.addMatch(testMatch1);\r\n        testJournal.addMatch(testMatch2);\r\n        assertEquals(3, testJournal.journalLength());\r\n\r\n        testJournal.deleteMatch(testMatch2);\r\n        assertEquals(2, testJournal.journalLength());\r\n        testJournal.deleteMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n        testJournal.deleteMatch(testMatch1);\r\n        assertEquals(0, testJournal.journalLength());\r\n    }\r\n\r\n    @Test\r\n    void testViewJournalOneMatch() {\r\n        testJournal.addMatch(testMatch2);\r\n\r\n        expected = \"\\n<DETAILS>\\n\\tOpponent: Yang Lin\\n\\tOutcome: LOSS\" +\r\n                \"\\n\\tSurface: HARD\\n\\tDuration: 30 minutes\\n\\tDate: 1/3/2020\\n<STATS>\" +\r\n                \"\\n\\tScore: 3-6 1-6\" + \"\\n\\tAces: 4\\n\\tDouble Faults: 7\\n\\tWinners: 8\" +\r\n                \"\\n\\tUnforced Errors: 10\\n\";\r\n        actual = testJournal.viewJournal();\r\n\r\n        assertEquals(expected, actual);\r\n    }\r\n\r\n    @Test\r\n    void testViewJournalNoMatches() {\r\n        expected = \"<YOUR JOURNAL IS EMPTY>\";\r\n        actual = testJournal.viewJournal();\r\n\r\n        assertEquals(expected, actual);\r\n    }\r\n\r\n    @Test\r\n    void testViewJournalTwoMatches() {\r\n        testJournal.addMatch(testMatch0);\r\n        testJournal.addMatch(testMatch1);\r\n\r\n        expected = \"\\n<DETAILS>\\n\\tOpponent: Rafa Nadal\\n\\tOutcome: WIN\" +\r\n                \"\\n\\tSurface: CLAY\\n\\tDuration: 60 minutes\\n\\tDate: 10/11/2020\\n<STATS>\\n\\tScore: 6-1 6-2\" +\r\n                \"\\n\\tAces: 5\\n\\tDouble Faults: 1\\n\\tWinners: 10\\n\\tUnforced Errors: 8\\n\" +\r\n                \"\\n<DETAILS>\\n\\tOpponent: Yang Lin\\n\\tOutcome: WIN\" +\r\n                \"\\n\\tSurface: HARD\\n\\tDuration: 30 minutes\\n\\tDate: 1/2/2020\\n<STATS>\\n\\tScore: 7-5 6-4\" +\r\n                \"\\n\\tAces: 2\\n\\tDouble Faults: 0\\n\\tWinners: 13\\n\\tUnforced Errors: 9\\n\";\r\n\r\n        actual = testJournal.viewJournal();\r\n\r\n        assertEquals(expected, actual);\r\n    }\r\n\r\n    @Test\r\n    void testViewWinLossRatioNoMatches() {\r\n        assertEquals(\"0 : 0\", testJournal.viewWinLossRatio());\r\n    }\r\n\r\n    @Test\r\n    void testViewWinLossRatioOneMatch() {\r\n        testJournal.addMatch(testMatch0);\r\n\r\n        assertEquals(\"1 : 0\", testJournal.viewWinLossRatio());\r\n\r\n        testJournal.deleteMatch(testMatch0);\r\n        testJournal.addMatch(testMatch2);\r\n\r\n        assertEquals(\"0 : 1\", testJournal.viewWinLossRatio());\r\n    }\r\n\r\n    @Test\r\n    void testViewWinLossRatioSomeMatches() {\r\n        testJournal.addMatch(testMatch0);\r\n        testJournal.addMatch(testMatch1);\r\n        testJournal.addMatch(testMatch2);\r\n\r\n        assertEquals(\"2 : 1\", testJournal.viewWinLossRatio());\r\n    }\r\n\r\n    @Test\r\n    void testGetJournal() {\r\n        testJournal.addMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n\r\n        List<TennisMatch> journal = testJournal.getJournal();\r\n        assertEquals(1, journal.size());\r\n    }\r\n\r\n    @Test\r\n    void testGetMatchAt() {\r\n        testJournal.addMatch(testMatch0);\r\n        assertEquals(1, testJournal.journalLength());\r\n\r\n        try {\r\n            TennisMatch match = testJournal.getMatchAt(0);\r\n            assertEquals(match.getMatchDetails().getOpponent(), testMatch0.getMatchDetails().getOpponent());\r\n        } catch (InvalidIndexException e) {\r\n            fail(\"InvalidIndexException should not have been thrown\");\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testGetMatchAtEmptyJournal() {\r\n        assertEquals(0, testJournal.journalLength());\r\n\r\n        try {\r\n            TennisMatch match = testJournal.getMatchAt(0);\r\n            fail(\"InvalidIndexException was supposed to be thrown\");\r\n        } catch (InvalidIndexException e) {\r\n            // pass\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testGetMatchAtIndexTooLarge() {\r\n        testJournal.addMatch(testMatch0);\r\n        testJournal.addMatch(testMatch1);\r\n        testJournal.addMatch(testMatch2);\r\n\r\n        try {\r\n            testJournal.getMatchAt(3);\r\n            fail(\"InvalidIndexException was supposed to be thrown\");\r\n        } catch (InvalidIndexException e) {\r\n            // pass\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testGetMatchAtNegativeIndex() {\r\n        testJournal.addMatch(testMatch0);\r\n        testJournal.addMatch(testMatch1);\r\n        testJournal.addMatch(testMatch2);\r\n\r\n        try {\r\n            testJournal.getMatchAt(-1);\r\n            fail(\"InvalidIndexException was supposed to be thrown\");\r\n        } catch (InvalidIndexException e) {\r\n            // pass\r\n        }\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/model/TennisMatchJournalTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/model/TennisMatchJournalTest.java	(date 1621031253268)
+-@@ -1,246 +1,246 @@
+--package model;
+--
+--import model.exceptions.InvalidIndexException;
+--import org.junit.jupiter.api.BeforeEach;
+--import org.junit.jupiter.api.Test;
+--
+--import java.util.List;
+--
+--import static org.junit.jupiter.api.Assertions.*;
+--
+--public class TennisMatchJournalTest {
+--    private TennisMatchJournal testJournal;
+--    private TennisMatch testMatch0;
+--    private TennisMatch testMatch1;
+--    private TennisMatch testMatch2;
+--    private MatchDetails testDetails0;
+--    private MatchDetails testDetails1;
+--    private MatchDetails testDetails2;
+--    private MatchStats testStats0;
+--    private MatchStats testStats1;
+--    private MatchStats testStats2;
+--    private String expected;
+--    private String actual;
+--
+--    @BeforeEach
+--    void runBefore() {
+--        testDetails0 = new MatchDetails("Rafa Nadal", true, "clay", 60, "10/11/2020");
+--        testDetails1 = new MatchDetails("Yang Lin", true, "hard", 30, "1/2/2020");
+--        testDetails2 = new MatchDetails("Yang Lin", false, "hard", 30, "1/3/2020");
+--        testStats0 = new MatchStats("6-1 6-2", 5, 1, 10, 8);
+--        testStats1 = new MatchStats("7-5 6-4", 2, 0, 13, 9);
+--        testStats2 = new MatchStats("3-6 1-6", 4, 7, 8, 10);
+--        testMatch0 = new TennisMatch(testDetails0, testStats0);
+--        testMatch1 = new TennisMatch(testDetails1, testStats1);
+--        testMatch2 = new TennisMatch(testDetails2, testStats2);
+--        testJournal = new TennisMatchJournal();
+--    }
+--
+--    @Test
+--    void testConstructor() {
+--        assertEquals(0, testJournal.journalLength());
+--    }
+--
+--    @Test
+--    void testAddMatchNotAlreadyThere() {
+--        testJournal.addMatch(testMatch0);
+--        assertTrue(testJournal.containsMatch(testMatch0));
+--    }
+--
+--    @Test
+--    void testAddMatchAlreadyThere() {
+--        testJournal.addMatch(testMatch0);
+--        testJournal.addMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--    }
+--
+--    @Test
+--    void testAddMultipleMatches() {
+--        testJournal.addMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--        testJournal.addMatch(testMatch1);
+--        assertEquals(2, testJournal.journalLength());
+--        testJournal.addMatch(testMatch2);
+--        assertEquals(3, testJournal.journalLength());
+--    }
+--
+--    @Test
+--    void testContainsMatch() {
+--        testJournal.addMatch(testMatch0);
+--
+--        assertTrue(testJournal.containsMatch(testMatch0));
+--
+--        assertFalse(testJournal.containsMatch(testMatch1));
+--    }
+--
+--    @Test
+--    void testJournalLength() {
+--        assertEquals(0, testJournal.journalLength());
+--        testJournal.addMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--        testJournal.addMatch(testMatch1);
+--        assertEquals(2, testJournal.journalLength());
+--    }
+--
+--    @Test
+--    void testDeleteExistingMatch() {
+--        testJournal.addMatch(testMatch0);
+--        assertTrue(testJournal.containsMatch(testMatch0));
+--
+--        testJournal.deleteMatch(testMatch0);
+--        assertFalse(testJournal.containsMatch(testMatch0));
+--    }
+--
+--    @Test
+--    void testDeleteNonExistingMatch() {
+--        testJournal.addMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--
+--        testJournal.deleteMatch(testMatch1);
+--        assertEquals(1, testJournal.journalLength());
+--    }
+--
+--    @Test
+--    void testDeleteMultipleMatches() {
+--        testJournal.addMatch(testMatch0);
+--        testJournal.addMatch(testMatch1);
+--        testJournal.addMatch(testMatch2);
+--        assertEquals(3, testJournal.journalLength());
+--
+--        testJournal.deleteMatch(testMatch2);
+--        assertEquals(2, testJournal.journalLength());
+--        testJournal.deleteMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--        testJournal.deleteMatch(testMatch1);
+--        assertEquals(0, testJournal.journalLength());
+--    }
+--
+--    @Test
+--    void testViewJournalOneMatch() {
+--        testJournal.addMatch(testMatch2);
+--
+--        expected = "\n<DETAILS>\n\tOpponent: Yang Lin\n\tOutcome: LOSS" +
+--                "\n\tSurface: HARD\n\tDuration: 30 minutes\n\tDate: 1/3/2020\n<STATS>" +
+--                "\n\tScore: 3-6 1-6" + "\n\tAces: 4\n\tDouble Faults: 7\n\tWinners: 8" +
+--                "\n\tUnforced Errors: 10\n";
+--        actual = testJournal.viewJournal();
+--
+--        assertEquals(expected, actual);
+--    }
+--
+--    @Test
+--    void testViewJournalNoMatches() {
+--        expected = "<YOUR JOURNAL IS EMPTY>";
+--        actual = testJournal.viewJournal();
+--
+--        assertEquals(expected, actual);
+--    }
+--
+--    @Test
+--    void testViewJournalTwoMatches() {
+--        testJournal.addMatch(testMatch0);
+--        testJournal.addMatch(testMatch1);
+--
+--        expected = "\n<DETAILS>\n\tOpponent: Rafa Nadal\n\tOutcome: WIN" +
+--                "\n\tSurface: CLAY\n\tDuration: 60 minutes\n\tDate: 10/11/2020\n<STATS>\n\tScore: 6-1 6-2" +
+--                "\n\tAces: 5\n\tDouble Faults: 1\n\tWinners: 10\n\tUnforced Errors: 8\n" +
+--                "\n<DETAILS>\n\tOpponent: Yang Lin\n\tOutcome: WIN" +
+--                "\n\tSurface: HARD\n\tDuration: 30 minutes\n\tDate: 1/2/2020\n<STATS>\n\tScore: 7-5 6-4" +
+--                "\n\tAces: 2\n\tDouble Faults: 0\n\tWinners: 13\n\tUnforced Errors: 9\n";
+--
+--        actual = testJournal.viewJournal();
+--
+--        assertEquals(expected, actual);
+--    }
+--
+--    @Test
+--    void testViewWinLossRatioNoMatches() {
+--        assertEquals("0 : 0", testJournal.viewWinLossRatio());
+--    }
+--
+--    @Test
+--    void testViewWinLossRatioOneMatch() {
+--        testJournal.addMatch(testMatch0);
+--
+--        assertEquals("1 : 0", testJournal.viewWinLossRatio());
+--
+--        testJournal.deleteMatch(testMatch0);
+--        testJournal.addMatch(testMatch2);
+--
+--        assertEquals("0 : 1", testJournal.viewWinLossRatio());
+--    }
+--
+--    @Test
+--    void testViewWinLossRatioSomeMatches() {
+--        testJournal.addMatch(testMatch0);
+--        testJournal.addMatch(testMatch1);
+--        testJournal.addMatch(testMatch2);
+--
+--        assertEquals("2 : 1", testJournal.viewWinLossRatio());
+--    }
+--
+--    @Test
+--    void testGetJournal() {
+--        testJournal.addMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--
+--        List<TennisMatch> journal = testJournal.getJournal();
+--        assertEquals(1, journal.size());
+--    }
+--
+--    @Test
+--    void testGetMatchAt() {
+--        testJournal.addMatch(testMatch0);
+--        assertEquals(1, testJournal.journalLength());
+--
+--        try {
+--            TennisMatch match = testJournal.getMatchAt(0);
+--            assertEquals(match.getMatchDetails().getOpponent(), testMatch0.getMatchDetails().getOpponent());
+--        } catch (InvalidIndexException e) {
+--            fail("InvalidIndexException should not have been thrown");
+--        }
+--    }
+--
+--    @Test
+--    void testGetMatchAtEmptyJournal() {
+--        assertEquals(0, testJournal.journalLength());
+--
+--        try {
+--            TennisMatch match = testJournal.getMatchAt(0);
+--            fail("InvalidIndexException was supposed to be thrown");
+--        } catch (InvalidIndexException e) {
+--            // pass
+--        }
+--    }
+--
+--    @Test
+--    void testGetMatchAtIndexTooLarge() {
+--        testJournal.addMatch(testMatch0);
+--        testJournal.addMatch(testMatch1);
+--        testJournal.addMatch(testMatch2);
+--
+--        try {
+--            testJournal.getMatchAt(3);
+--            fail("InvalidIndexException was supposed to be thrown");
+--        } catch (InvalidIndexException e) {
+--            // pass
+--        }
+--    }
+--
+--    @Test
+--    void testGetMatchAtNegativeIndex() {
+--        testJournal.addMatch(testMatch0);
+--        testJournal.addMatch(testMatch1);
+--        testJournal.addMatch(testMatch2);
+--
+--        try {
+--            testJournal.getMatchAt(-1);
+--            fail("InvalidIndexException was supposed to be thrown");
+--        } catch (InvalidIndexException e) {
+--            // pass
+--        }
+--    }
+--}
+-+//package model;
+-+//
+-+//import model.exceptions.InvalidIndexException;
+-+//import org.junit.jupiter.api.BeforeEach;
+-+//import org.junit.jupiter.api.Test;
+-+//
+-+//import java.util.List;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.*;
+-+//
+-+//public class TennisMatchJournalTest {
+-+//    private TennisMatchJournal testJournal;
+-+//    private TennisMatch testMatch0;
+-+//    private TennisMatch testMatch1;
+-+//    private TennisMatch testMatch2;
+-+//    private MatchDetails testDetails0;
+-+//    private MatchDetails testDetails1;
+-+//    private MatchDetails testDetails2;
+-+//    private MatchStats testStats0;
+-+//    private MatchStats testStats1;
+-+//    private MatchStats testStats2;
+-+//    private String expected;
+-+//    private String actual;
+-+//
+-+//    @BeforeEach
+-+//    void runBefore() {
+-+//        testDetails0 = new MatchDetails("Rafa Nadal", true, "clay", 60, "10/11/2020");
+-+//        testDetails1 = new MatchDetails("Yang Lin", true, "hard", 30, "1/2/2020");
+-+//        testDetails2 = new MatchDetails("Yang Lin", false, "hard", 30, "1/3/2020");
+-+//        testStats0 = new MatchStats("6-1 6-2", 5, 1, 10, 8);
+-+//        testStats1 = new MatchStats("7-5 6-4", 2, 0, 13, 9);
+-+//        testStats2 = new MatchStats("3-6 1-6", 4, 7, 8, 10);
+-+//        testMatch0 = new TennisMatch(testDetails0, testStats0);
+-+//        testMatch1 = new TennisMatch(testDetails1, testStats1);
+-+//        testMatch2 = new TennisMatch(testDetails2, testStats2);
+-+//        testJournal = new TennisMatchJournal();
+-+//    }
+-+//
+-+//    @Test
+-+//    void testConstructor() {
+-+//        assertEquals(0, testJournal.journalLength());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testAddMatchNotAlreadyThere() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertTrue(testJournal.containsMatch(testMatch0));
+-+//    }
+-+//
+-+//    @Test
+-+//    void testAddMatchAlreadyThere() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testAddMultipleMatches() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//        testJournal.addMatch(testMatch1);
+-+//        assertEquals(2, testJournal.journalLength());
+-+//        testJournal.addMatch(testMatch2);
+-+//        assertEquals(3, testJournal.journalLength());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testContainsMatch() {
+-+//        testJournal.addMatch(testMatch0);
+-+//
+-+//        assertTrue(testJournal.containsMatch(testMatch0));
+-+//
+-+//        assertFalse(testJournal.containsMatch(testMatch1));
+-+//    }
+-+//
+-+//    @Test
+-+//    void testJournalLength() {
+-+//        assertEquals(0, testJournal.journalLength());
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//        testJournal.addMatch(testMatch1);
+-+//        assertEquals(2, testJournal.journalLength());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testDeleteExistingMatch() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertTrue(testJournal.containsMatch(testMatch0));
+-+//
+-+//        testJournal.deleteMatch(testMatch0);
+-+//        assertFalse(testJournal.containsMatch(testMatch0));
+-+//    }
+-+//
+-+//    @Test
+-+//    void testDeleteNonExistingMatch() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//
+-+//        testJournal.deleteMatch(testMatch1);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testDeleteMultipleMatches() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch1);
+-+//        testJournal.addMatch(testMatch2);
+-+//        assertEquals(3, testJournal.journalLength());
+-+//
+-+//        testJournal.deleteMatch(testMatch2);
+-+//        assertEquals(2, testJournal.journalLength());
+-+//        testJournal.deleteMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//        testJournal.deleteMatch(testMatch1);
+-+//        assertEquals(0, testJournal.journalLength());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testViewJournalOneMatch() {
+-+//        testJournal.addMatch(testMatch2);
+-+//
+-+//        expected = "\n<DETAILS>\n\tOpponent: Yang Lin\n\tOutcome: LOSS" +
+-+//                "\n\tSurface: HARD\n\tDuration: 30 minutes\n\tDate: 1/3/2020\n<STATS>" +
+-+//                "\n\tScore: 3-6 1-6" + "\n\tAces: 4\n\tDouble Faults: 7\n\tWinners: 8" +
+-+//                "\n\tUnforced Errors: 10\n";
+-+//        actual = testJournal.viewJournal();
+-+//
+-+//        assertEquals(expected, actual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testViewJournalNoMatches() {
+-+//        expected = "<YOUR JOURNAL IS EMPTY>";
+-+//        actual = testJournal.viewJournal();
+-+//
+-+//        assertEquals(expected, actual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testViewJournalTwoMatches() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch1);
+-+//
+-+//        expected = "\n<DETAILS>\n\tOpponent: Rafa Nadal\n\tOutcome: WIN" +
+-+//                "\n\tSurface: CLAY\n\tDuration: 60 minutes\n\tDate: 10/11/2020\n<STATS>\n\tScore: 6-1 6-2" +
+-+//                "\n\tAces: 5\n\tDouble Faults: 1\n\tWinners: 10\n\tUnforced Errors: 8\n" +
+-+//                "\n<DETAILS>\n\tOpponent: Yang Lin\n\tOutcome: WIN" +
+-+//                "\n\tSurface: HARD\n\tDuration: 30 minutes\n\tDate: 1/2/2020\n<STATS>\n\tScore: 7-5 6-4" +
+-+//                "\n\tAces: 2\n\tDouble Faults: 0\n\tWinners: 13\n\tUnforced Errors: 9\n";
+-+//
+-+//        actual = testJournal.viewJournal();
+-+//
+-+//        assertEquals(expected, actual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testViewWinLossRatioNoMatches() {
+-+//        assertEquals("0 : 0", testJournal.viewWinLossRatio());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testViewWinLossRatioOneMatch() {
+-+//        testJournal.addMatch(testMatch0);
+-+//
+-+//        assertEquals("1 : 0", testJournal.viewWinLossRatio());
+-+//
+-+//        testJournal.deleteMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch2);
+-+//
+-+//        assertEquals("0 : 1", testJournal.viewWinLossRatio());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testViewWinLossRatioSomeMatches() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch1);
+-+//        testJournal.addMatch(testMatch2);
+-+//
+-+//        assertEquals("2 : 1", testJournal.viewWinLossRatio());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testGetJournal() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//
+-+//        List<TennisMatch> journal = testJournal.getJournal();
+-+//        assertEquals(1, journal.size());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testGetMatchAt() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        assertEquals(1, testJournal.journalLength());
+-+//
+-+//        try {
+-+//            TennisMatch match = testJournal.getMatchAt(0);
+-+//            assertEquals(match.getMatchDetails().getOpponent(), testMatch0.getMatchDetails().getOpponent());
+-+//        } catch (InvalidIndexException e) {
+-+//            fail("InvalidIndexException should not have been thrown");
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testGetMatchAtEmptyJournal() {
+-+//        assertEquals(0, testJournal.journalLength());
+-+//
+-+//        try {
+-+//            TennisMatch match = testJournal.getMatchAt(0);
+-+//            fail("InvalidIndexException was supposed to be thrown");
+-+//        } catch (InvalidIndexException e) {
+-+//            // pass
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testGetMatchAtIndexTooLarge() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch1);
+-+//        testJournal.addMatch(testMatch2);
+-+//
+-+//        try {
+-+//            testJournal.getMatchAt(3);
+-+//            fail("InvalidIndexException was supposed to be thrown");
+-+//        } catch (InvalidIndexException e) {
+-+//            // pass
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testGetMatchAtNegativeIndex() {
+-+//        testJournal.addMatch(testMatch0);
+-+//        testJournal.addMatch(testMatch1);
+-+//        testJournal.addMatch(testMatch2);
+-+//
+-+//        try {
+-+//            testJournal.getMatchAt(-1);
+-+//            fail("InvalidIndexException was supposed to be thrown");
+-+//        } catch (InvalidIndexException e) {
+-+//            // pass
+-+//        }
+-+//    }
+-+//}
+- 
+- 
+- 
+-Index: src/test/model/TennisMatchTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\nclass TennisMatchTest {\r\n    TennisMatch testMatch1;\r\n    TennisMatch testMatch2;\r\n    TennisMatch testMatch3;\r\n    TennisMatch testMatch4;\r\n    MatchDetails testDetails1;\r\n    MatchDetails testDetails2;\r\n    MatchDetails testDetails3;\r\n    MatchDetails testDetails4;\r\n    MatchStats testStats1;\r\n    MatchStats testStats2;\r\n    MatchStats testStats3;\r\n    MatchStats testStats4;\r\n\r\n    @BeforeEach\r\n    void runBefore() {\r\n        testDetails1 = new MatchDetails(\"James Blake\", false, \"GRASS\", 70, \"1/1/2020\");\r\n        testStats1 = new MatchStats(\"0-6 3-6\", 1, 5, 2, 11);\r\n        testMatch1 = new TennisMatch(testDetails1, testStats1);\r\n\r\n        testDetails2 = new MatchDetails(\"James Blake\", false, \"GRASS\", 70, \"1/1/2020\");\r\n        testStats2 = new MatchStats(\"0-6 3-6\", 1, 5, 2, 11);\r\n        testMatch2 = new TennisMatch(testDetails2, testStats2);\r\n\r\n        testDetails3 = new MatchDetails(\"Yang Lin\", false, \"GRASS\", 70, \"1/1/2020\");\r\n        testStats3 = new MatchStats(\"0-6 3-6\", 1, 5, 2, 11);\r\n        testMatch3 = new TennisMatch(testDetails3, testStats3);\r\n\r\n        testDetails4 = new MatchDetails(\"James Blake\", false, \"GRASS\", 70, \"1/1/2020\");\r\n        testStats4 = new MatchStats(\"0-6 3-6\", 2, 5, 2, 11);\r\n        testMatch4 = new TennisMatch(testDetails4, testStats4);\r\n    }\r\n\r\n    @Test\r\n    void testConstructor() {\r\n        assertEquals(\"James Blake\", testDetails1.getOpponent());\r\n        assertFalse(testDetails1.getIsWon());\r\n        assertEquals(\"GRASS\", testDetails1.getSurface());\r\n        assertEquals(70, testDetails1.getDuration());\r\n        assertEquals(\"1/1/2020\", testDetails1.getDate());\r\n\r\n        assertEquals(\"0-6 3-6\", testStats1.getScore());\r\n        assertEquals(1, testStats1.getAces());\r\n        assertEquals(5, testStats1.getDoubleFaults());\r\n        assertEquals(2, testStats1.getWinners());\r\n        assertEquals(11, testStats1.getUnforcedErrors());\r\n    }\r\n\r\n    @Test\r\n    void testEqualsIsEqual() {\r\n        boolean equalsTest = testMatch1.equals(testMatch2);\r\n\r\n        assertTrue(equalsTest);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsIsNotEqual() {\r\n        boolean equalsTest1 = testMatch1.equals(testMatch3);\r\n        assertFalse(equalsTest1);\r\n\r\n        boolean equalsTest2 = testMatch1.equals(testMatch4);\r\n        assertFalse(equalsTest2);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsNotInstanceOf() {\r\n        boolean equalsTest = testMatch1.equals(\"random string\");\r\n\r\n        assertFalse(equalsTest);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsSameObject() {\r\n        boolean equalsTest = testMatch1.equals(testMatch1);\r\n\r\n        assertTrue(equalsTest);\r\n    }\r\n\r\n    @Test\r\n    void testHashCodesAreEqual() {\r\n        int matchCode1 = testMatch1.hashCode();\r\n        int matchCode2 = testMatch2.hashCode();\r\n\r\n        assertEquals(matchCode1, matchCode2);\r\n    }\r\n\r\n    @Test\r\n    void testHashCodesAreNotEqual() {\r\n        int matchCode1 = testMatch1.hashCode();\r\n        int matchCode3 = testMatch3.hashCode();\r\n\r\n        assertNotEquals(matchCode1, matchCode3);\r\n    }\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/model/TennisMatchTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/model/TennisMatchTest.java	(date 1621031253315)
+-@@ -1,101 +1,101 @@
+--package model;
+--
+--import org.junit.jupiter.api.BeforeEach;
+--import org.junit.jupiter.api.Test;
+--
+--import static org.junit.jupiter.api.Assertions.*;
+--
+--class TennisMatchTest {
+--    TennisMatch testMatch1;
+--    TennisMatch testMatch2;
+--    TennisMatch testMatch3;
+--    TennisMatch testMatch4;
+--    MatchDetails testDetails1;
+--    MatchDetails testDetails2;
+--    MatchDetails testDetails3;
+--    MatchDetails testDetails4;
+--    MatchStats testStats1;
+--    MatchStats testStats2;
+--    MatchStats testStats3;
+--    MatchStats testStats4;
+--
+--    @BeforeEach
+--    void runBefore() {
+--        testDetails1 = new MatchDetails("James Blake", false, "GRASS", 70, "1/1/2020");
+--        testStats1 = new MatchStats("0-6 3-6", 1, 5, 2, 11);
+--        testMatch1 = new TennisMatch(testDetails1, testStats1);
+--
+--        testDetails2 = new MatchDetails("James Blake", false, "GRASS", 70, "1/1/2020");
+--        testStats2 = new MatchStats("0-6 3-6", 1, 5, 2, 11);
+--        testMatch2 = new TennisMatch(testDetails2, testStats2);
+--
+--        testDetails3 = new MatchDetails("Yang Lin", false, "GRASS", 70, "1/1/2020");
+--        testStats3 = new MatchStats("0-6 3-6", 1, 5, 2, 11);
+--        testMatch3 = new TennisMatch(testDetails3, testStats3);
+--
+--        testDetails4 = new MatchDetails("James Blake", false, "GRASS", 70, "1/1/2020");
+--        testStats4 = new MatchStats("0-6 3-6", 2, 5, 2, 11);
+--        testMatch4 = new TennisMatch(testDetails4, testStats4);
+--    }
+--
+--    @Test
+--    void testConstructor() {
+--        assertEquals("James Blake", testDetails1.getOpponent());
+--        assertFalse(testDetails1.getIsWon());
+--        assertEquals("GRASS", testDetails1.getSurface());
+--        assertEquals(70, testDetails1.getDuration());
+--        assertEquals("1/1/2020", testDetails1.getDate());
+--
+--        assertEquals("0-6 3-6", testStats1.getScore());
+--        assertEquals(1, testStats1.getAces());
+--        assertEquals(5, testStats1.getDoubleFaults());
+--        assertEquals(2, testStats1.getWinners());
+--        assertEquals(11, testStats1.getUnforcedErrors());
+--    }
+--
+--    @Test
+--    void testEqualsIsEqual() {
+--        boolean equalsTest = testMatch1.equals(testMatch2);
+--
+--        assertTrue(equalsTest);
+--    }
+--
+--    @Test
+--    void testEqualsIsNotEqual() {
+--        boolean equalsTest1 = testMatch1.equals(testMatch3);
+--        assertFalse(equalsTest1);
+--
+--        boolean equalsTest2 = testMatch1.equals(testMatch4);
+--        assertFalse(equalsTest2);
+--    }
+--
+--    @Test
+--    void testEqualsNotInstanceOf() {
+--        boolean equalsTest = testMatch1.equals("random string");
+--
+--        assertFalse(equalsTest);
+--    }
+--
+--    @Test
+--    void testEqualsSameObject() {
+--        boolean equalsTest = testMatch1.equals(testMatch1);
+--
+--        assertTrue(equalsTest);
+--    }
+--
+--    @Test
+--    void testHashCodesAreEqual() {
+--        int matchCode1 = testMatch1.hashCode();
+--        int matchCode2 = testMatch2.hashCode();
+--
+--        assertEquals(matchCode1, matchCode2);
+--    }
+--
+--    @Test
+--    void testHashCodesAreNotEqual() {
+--        int matchCode1 = testMatch1.hashCode();
+--        int matchCode3 = testMatch3.hashCode();
+--
+--        assertNotEquals(matchCode1, matchCode3);
+--    }
+--}
+-\ No newline at end of file
+-+//package model;
+-+//
+-+//import org.junit.jupiter.api.BeforeEach;
+-+//import org.junit.jupiter.api.Test;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.*;
+-+//
+-+//class TennisMatchTest {
+-+//    TennisMatch testMatch1;
+-+//    TennisMatch testMatch2;
+-+//    TennisMatch testMatch3;
+-+//    TennisMatch testMatch4;
+-+//    MatchDetails testDetails1;
+-+//    MatchDetails testDetails2;
+-+//    MatchDetails testDetails3;
+-+//    MatchDetails testDetails4;
+-+//    MatchStats testStats1;
+-+//    MatchStats testStats2;
+-+//    MatchStats testStats3;
+-+//    MatchStats testStats4;
+-+//
+-+//    @BeforeEach
+-+//    void runBefore() {
+-+//        testDetails1 = new MatchDetails("James Blake", false, "GRASS", 70, "1/1/2020");
+-+//        testStats1 = new MatchStats("0-6 3-6", 1, 5, 2, 11);
+-+//        testMatch1 = new TennisMatch(testDetails1, testStats1);
+-+//
+-+//        testDetails2 = new MatchDetails("James Blake", false, "GRASS", 70, "1/1/2020");
+-+//        testStats2 = new MatchStats("0-6 3-6", 1, 5, 2, 11);
+-+//        testMatch2 = new TennisMatch(testDetails2, testStats2);
+-+//
+-+//        testDetails3 = new MatchDetails("Yang Lin", false, "GRASS", 70, "1/1/2020");
+-+//        testStats3 = new MatchStats("0-6 3-6", 1, 5, 2, 11);
+-+//        testMatch3 = new TennisMatch(testDetails3, testStats3);
+-+//
+-+//        testDetails4 = new MatchDetails("James Blake", false, "GRASS", 70, "1/1/2020");
+-+//        testStats4 = new MatchStats("0-6 3-6", 2, 5, 2, 11);
+-+//        testMatch4 = new TennisMatch(testDetails4, testStats4);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testConstructor() {
+-+//        assertEquals("James Blake", testDetails1.getOpponent());
+-+//        assertFalse(testDetails1.getIsWon());
+-+//        assertEquals("GRASS", testDetails1.getSurface());
+-+//        assertEquals(70, testDetails1.getDuration());
+-+//        assertEquals("1/1/2020", testDetails1.getDate());
+-+//
+-+//        assertEquals("0-6 3-6", testStats1.getScore());
+-+//        assertEquals(1, testStats1.getAces());
+-+//        assertEquals(5, testStats1.getDoubleFaults());
+-+//        assertEquals(2, testStats1.getWinners());
+-+//        assertEquals(11, testStats1.getUnforcedErrors());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsIsEqual() {
+-+//        boolean equalsTest = testMatch1.equals(testMatch2);
+-+//
+-+//        assertTrue(equalsTest);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsIsNotEqual() {
+-+//        boolean equalsTest1 = testMatch1.equals(testMatch3);
+-+//        assertFalse(equalsTest1);
+-+//
+-+//        boolean equalsTest2 = testMatch1.equals(testMatch4);
+-+//        assertFalse(equalsTest2);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsNotInstanceOf() {
+-+//        boolean equalsTest = testMatch1.equals("random string");
+-+//
+-+//        assertFalse(equalsTest);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsSameObject() {
+-+//        boolean equalsTest = testMatch1.equals(testMatch1);
+-+//
+-+//        assertTrue(equalsTest);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testHashCodesAreEqual() {
+-+//        int matchCode1 = testMatch1.hashCode();
+-+//        int matchCode2 = testMatch2.hashCode();
+-+//
+-+//        assertEquals(matchCode1, matchCode2);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testHashCodesAreNotEqual() {
+-+//        int matchCode1 = testMatch1.hashCode();
+-+//        int matchCode3 = testMatch3.hashCode();
+-+//
+-+//        assertNotEquals(matchCode1, matchCode3);
+-+//    }
+-+//}
+-\ No newline at end of file
+-Index: src/test/persistence/JsonWriterTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package persistence;\r\n\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport java.io.IOException;\r\nimport java.util.List;\r\n\r\nimport static org.junit.jupiter.api.Assertions.assertEquals;\r\nimport static org.junit.jupiter.api.Assertions.fail;\r\n\r\n// NOTE: The structure of this class and many of the methods in it are based off of\r\n//       the JsonWriterTest class in the WorkRoom application that was given to us\r\n//       on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonWriterTest extends JsonTest {\r\n    MatchDetails matchDetails1;\r\n    MatchStats matchStats1;\r\n    MatchDetails matchDetails2;\r\n    MatchStats matchStats2;\r\n    MatchDetails matchDetails3;\r\n    MatchStats matchStats3;\r\n    TennisMatch tennisMatch1;\r\n    TennisMatch tennisMatch2;\r\n    TennisMatch tennisMatch3;\r\n\r\n    @BeforeEach\r\n    void runBefore() {\r\n        matchDetails1 = new MatchDetails(\"Yang Lin\", false, \"hard\", 30, \"10/25/2020\");\r\n        matchStats1 = new MatchStats(\"0-6 0-6\", 0, 10, 0, 10);\r\n        tennisMatch1 = new TennisMatch(matchDetails1, matchStats1);\r\n\r\n        matchDetails2 = new MatchDetails(\"Rafael Nadal\", true, \"clay\", 120, \"10/25/2020\");\r\n        matchStats2 = new MatchStats(\"6-4 6-4\", 6, 2, 12, 9);\r\n        tennisMatch2 = new TennisMatch(matchDetails2, matchStats2);\r\n\r\n        matchDetails3 = new MatchDetails(\"Roger Federer\", true, \"grass\", 60, \"10/25/2020\");\r\n        matchStats3 = new MatchStats(\"7-6 7-6\", 4, 1, 15, 4);\r\n        tennisMatch3 = new TennisMatch(matchDetails3, matchStats3);\r\n    }\r\n\r\n    @Test\r\n    void testWriterInvalidFile() {\r\n        try {\r\n            TennisMatchJournal journal = new TennisMatchJournal();\r\n            JsonWriter writer = new JsonWriter(\"./data/my\\0illegal:fileName.json\");\r\n            writer.open();\r\n            fail(\"IOException was expected\"); // we are expecting to throw an IOException\r\n        } catch (IOException e) {\r\n            // our test passes\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testWriterEmptyWorkroom() {\r\n        try {\r\n            TennisMatchJournal journal = new TennisMatchJournal();\r\n            JsonWriter writer = new JsonWriter(\"./data/testWriterEmptyJournal.json\");\r\n            writer.open();\r\n            writer.write(journal);\r\n            writer.close();\r\n\r\n            JsonReader reader = new JsonReader(\"./data/testWriterEmptyJournal.json\");\r\n            journal = reader.read();\r\n            assertEquals(0, journal.journalLength());\r\n        } catch (IOException e) {\r\n            fail(\"Exception should not have been thrown\"); // we are not expecting an IOException to be thrown\r\n        }\r\n    }\r\n\r\n    @Test\r\n    void testWriterGeneralJournal() {\r\n        try {\r\n            TennisMatchJournal journal = new TennisMatchJournal();\r\n            journal.addMatch(tennisMatch1);\r\n            journal.addMatch(tennisMatch2);\r\n            journal.addMatch(tennisMatch3);\r\n\r\n            JsonWriter writer = new JsonWriter(\"./data/testWriterGeneralJournal.json\");\r\n            writer.open();\r\n            writer.write(journal);\r\n            writer.close();\r\n\r\n            JsonReader reader = new JsonReader(\"./data/testWriterGeneralJournal.json\");\r\n            journal = reader.read();\r\n            List<TennisMatch> matches = journal.getJournal();\r\n\r\n            assertEquals(3, matches.size());\r\n            checkMatch(matchDetails1, matchStats1, matches.get(0));\r\n            checkMatch(matchDetails2, matchStats2, matches.get(1));\r\n            checkMatch(matchDetails3, matchStats3, matches.get(2));\r\n        } catch (IOException e) {\r\n            fail(\"Exception should not have been thrown\"); // we are not expecting to get an IOException\r\n        }\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/persistence/JsonWriterTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/persistence/JsonWriterTest.java	(date 1621031253287)
+-@@ -1,103 +1,103 @@
+--package persistence;
+--
+--import model.MatchDetails;
+--import model.MatchStats;
+--import model.TennisMatch;
+--import model.TennisMatchJournal;
+--import org.junit.jupiter.api.BeforeEach;
+--import org.junit.jupiter.api.Test;
+--
+--import java.io.IOException;
+--import java.util.List;
+--
+--import static org.junit.jupiter.api.Assertions.assertEquals;
+--import static org.junit.jupiter.api.Assertions.fail;
+--
+--// NOTE: The structure of this class and many of the methods in it are based off of
+--//       the JsonWriterTest class in the WorkRoom application that was given to us
+--//       on GitHub.
+--//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+--public class JsonWriterTest extends JsonTest {
+--    MatchDetails matchDetails1;
+--    MatchStats matchStats1;
+--    MatchDetails matchDetails2;
+--    MatchStats matchStats2;
+--    MatchDetails matchDetails3;
+--    MatchStats matchStats3;
+--    TennisMatch tennisMatch1;
+--    TennisMatch tennisMatch2;
+--    TennisMatch tennisMatch3;
+--
+--    @BeforeEach
+--    void runBefore() {
+--        matchDetails1 = new MatchDetails("Yang Lin", false, "hard", 30, "10/25/2020");
+--        matchStats1 = new MatchStats("0-6 0-6", 0, 10, 0, 10);
+--        tennisMatch1 = new TennisMatch(matchDetails1, matchStats1);
+--
+--        matchDetails2 = new MatchDetails("Rafael Nadal", true, "clay", 120, "10/25/2020");
+--        matchStats2 = new MatchStats("6-4 6-4", 6, 2, 12, 9);
+--        tennisMatch2 = new TennisMatch(matchDetails2, matchStats2);
+--
+--        matchDetails3 = new MatchDetails("Roger Federer", true, "grass", 60, "10/25/2020");
+--        matchStats3 = new MatchStats("7-6 7-6", 4, 1, 15, 4);
+--        tennisMatch3 = new TennisMatch(matchDetails3, matchStats3);
+--    }
+--
+--    @Test
+--    void testWriterInvalidFile() {
+--        try {
+--            TennisMatchJournal journal = new TennisMatchJournal();
+--            JsonWriter writer = new JsonWriter("./data/my\0illegal:fileName.json");
+--            writer.open();
+--            fail("IOException was expected"); // we are expecting to throw an IOException
+--        } catch (IOException e) {
+--            // our test passes
+--        }
+--    }
+--
+--    @Test
+--    void testWriterEmptyWorkroom() {
+--        try {
+--            TennisMatchJournal journal = new TennisMatchJournal();
+--            JsonWriter writer = new JsonWriter("./data/testWriterEmptyJournal.json");
+--            writer.open();
+--            writer.write(journal);
+--            writer.close();
+--
+--            JsonReader reader = new JsonReader("./data/testWriterEmptyJournal.json");
+--            journal = reader.read();
+--            assertEquals(0, journal.journalLength());
+--        } catch (IOException e) {
+--            fail("Exception should not have been thrown"); // we are not expecting an IOException to be thrown
+--        }
+--    }
+--
+--    @Test
+--    void testWriterGeneralJournal() {
+--        try {
+--            TennisMatchJournal journal = new TennisMatchJournal();
+--            journal.addMatch(tennisMatch1);
+--            journal.addMatch(tennisMatch2);
+--            journal.addMatch(tennisMatch3);
+--
+--            JsonWriter writer = new JsonWriter("./data/testWriterGeneralJournal.json");
+--            writer.open();
+--            writer.write(journal);
+--            writer.close();
+--
+--            JsonReader reader = new JsonReader("./data/testWriterGeneralJournal.json");
+--            journal = reader.read();
+--            List<TennisMatch> matches = journal.getJournal();
+--
+--            assertEquals(3, matches.size());
+--            checkMatch(matchDetails1, matchStats1, matches.get(0));
+--            checkMatch(matchDetails2, matchStats2, matches.get(1));
+--            checkMatch(matchDetails3, matchStats3, matches.get(2));
+--        } catch (IOException e) {
+--            fail("Exception should not have been thrown"); // we are not expecting to get an IOException
+--        }
+--    }
+--}
+-+//package persistence;
+-+//
+-+//import model.MatchDetails;
+-+//import model.MatchStats;
+-+//import model.TennisMatch;
+-+//import model.TennisMatchJournal;
+-+//import org.junit.jupiter.api.BeforeEach;
+-+//import org.junit.jupiter.api.Test;
+-+//
+-+//import java.io.IOException;
+-+//import java.util.List;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.assertEquals;
+-+//import static org.junit.jupiter.api.Assertions.fail;
+-+//
+-+//// NOTE: The structure of this class and many of the methods in it are based off of
+-+////       the JsonWriterTest class in the WorkRoom application that was given to us
+-+////       on GitHub.
+-+////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-+//public class JsonWriterTest extends JsonTest {
+-+//    MatchDetails matchDetails1;
+-+//    MatchStats matchStats1;
+-+//    MatchDetails matchDetails2;
+-+//    MatchStats matchStats2;
+-+//    MatchDetails matchDetails3;
+-+//    MatchStats matchStats3;
+-+//    TennisMatch tennisMatch1;
+-+//    TennisMatch tennisMatch2;
+-+//    TennisMatch tennisMatch3;
+-+//
+-+//    @BeforeEach
+-+//    void runBefore() {
+-+//        matchDetails1 = new MatchDetails("Yang Lin", false, "hard", 30, "10/25/2020");
+-+//        matchStats1 = new MatchStats("0-6 0-6", 0, 10, 0, 10);
+-+//        tennisMatch1 = new TennisMatch(matchDetails1, matchStats1);
+-+//
+-+//        matchDetails2 = new MatchDetails("Rafael Nadal", true, "clay", 120, "10/25/2020");
+-+//        matchStats2 = new MatchStats("6-4 6-4", 6, 2, 12, 9);
+-+//        tennisMatch2 = new TennisMatch(matchDetails2, matchStats2);
+-+//
+-+//        matchDetails3 = new MatchDetails("Roger Federer", true, "grass", 60, "10/25/2020");
+-+//        matchStats3 = new MatchStats("7-6 7-6", 4, 1, 15, 4);
+-+//        tennisMatch3 = new TennisMatch(matchDetails3, matchStats3);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testWriterInvalidFile() {
+-+//        try {
+-+//            TennisMatchJournal journal = new TennisMatchJournal();
+-+//            JsonWriter writer = new JsonWriter("./data/my\0illegal:fileName.json");
+-+//            writer.open();
+-+//            fail("IOException was expected"); // we are expecting to throw an IOException
+-+//        } catch (IOException e) {
+-+//            // our test passes
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testWriterEmptyWorkroom() {
+-+//        try {
+-+//            TennisMatchJournal journal = new TennisMatchJournal();
+-+//            JsonWriter writer = new JsonWriter("./data/testWriterEmptyJournal.json");
+-+//            writer.open();
+-+//            writer.write(journal);
+-+//            writer.close();
+-+//
+-+//            JsonReader reader = new JsonReader("./data/testWriterEmptyJournal.json");
+-+//            journal = reader.read();
+-+//            assertEquals(0, journal.journalLength());
+-+//        } catch (IOException e) {
+-+//            fail("Exception should not have been thrown"); // we are not expecting an IOException to be thrown
+-+//        }
+-+//    }
+-+//
+-+//    @Test
+-+//    void testWriterGeneralJournal() {
+-+//        try {
+-+//            TennisMatchJournal journal = new TennisMatchJournal();
+-+//            journal.addMatch(tennisMatch1);
+-+//            journal.addMatch(tennisMatch2);
+-+//            journal.addMatch(tennisMatch3);
+-+//
+-+//            JsonWriter writer = new JsonWriter("./data/testWriterGeneralJournal.json");
+-+//            writer.open();
+-+//            writer.write(journal);
+-+//            writer.close();
+-+//
+-+//            JsonReader reader = new JsonReader("./data/testWriterGeneralJournal.json");
+-+//            journal = reader.read();
+-+//            List<TennisMatch> matches = journal.getJournal();
+-+//
+-+//            assertEquals(3, matches.size());
+-+//            checkMatch(matchDetails1, matchStats1, matches.get(0));
+-+//            checkMatch(matchDetails2, matchStats2, matches.get(1));
+-+//            checkMatch(matchDetails3, matchStats3, matches.get(2));
+-+//        } catch (IOException e) {
+-+//            fail("Exception should not have been thrown"); // we are not expecting to get an IOException
+-+//        }
+-+//    }
+-+//}
+- 
+- 
+- 
+-Index: src/test/model/MatchDetailsTest.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.Test;\r\n\r\nimport static org.junit.jupiter.api.Assertions.*;\r\n\r\npublic class MatchDetailsTest {\r\n    private MatchDetails testDetails1;\r\n    private MatchDetails testDetails2;\r\n    private MatchDetails testDetails3;\r\n    private MatchDetails testDetails4;\r\n    private MatchDetails testDetails5;\r\n    private MatchDetails testDetails6;\r\n    private MatchDetails testDetails7;\r\n\r\n    @BeforeEach\r\n    void runBefore() {\r\n        testDetails1 = new MatchDetails(\"Yang Lin\", false, \"HARD\", 45, \"1/1/2020\");\r\n        testDetails2 = new MatchDetails(\"Yang Lin\", false, \"HARD\", 45, \"1/1/2020\");\r\n        testDetails3 = new MatchDetails(\"Roger Federer\", false, \"HARD\", 45, \"1/1/2020\");\r\n        testDetails4 = new MatchDetails(\"Yang Lin\", true, \"HARD\", 45, \"1/1/2020\");\r\n        testDetails5 = new MatchDetails(\"Yang Lin\", false, \"GRASS\", 45, \"1/1/2020\");\r\n        testDetails6 = new MatchDetails(\"Yang Lin\", false, \"HARD\", 55, \"1/1/2020\");\r\n        testDetails7 = new MatchDetails(\"Yang Lin\", false, \"HARD\", 45, \"1/2/2020\");\r\n    }\r\n\r\n\r\n    @Test\r\n    void testConstructor() {\r\n        assertEquals(\"Yang Lin\", testDetails1.getOpponent());\r\n        assertFalse(testDetails1.getIsWon());\r\n        assertEquals(\"HARD\", testDetails1.getSurface());\r\n        assertEquals(45, testDetails1.getDuration());\r\n        assertEquals(\"1/1/2020\", testDetails1.getDate());\r\n    }\r\n\r\n    @Test\r\n    void testEqualsIsEqual() {\r\n        boolean isEqual = testDetails1.equals(testDetails2);\r\n\r\n        assertTrue(isEqual);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsIsNotEqual() {\r\n        boolean isEqual1 = testDetails1.equals(testDetails3);\r\n        assertFalse(isEqual1);\r\n\r\n        boolean isEqual2 = testDetails1.equals(testDetails4);\r\n        assertFalse(isEqual2);\r\n\r\n        boolean isEqual3 = testDetails1.equals(testDetails5);\r\n        assertFalse(isEqual3);\r\n\r\n        boolean isEqual4 = testDetails1.equals(testDetails6);\r\n        assertFalse(isEqual4);\r\n\r\n        boolean isEqual5 = testDetails1.equals(testDetails7);\r\n        assertFalse(isEqual5);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsNotAnInstanceOf() {\r\n        boolean isEqual = testDetails1.equals(\"random string\");\r\n\r\n        assertFalse(isEqual);\r\n    }\r\n\r\n    @Test\r\n    void testEqualsSameObject() {\r\n        MatchDetails testDetails4 = testDetails3;\r\n\r\n        boolean isEqual = testDetails3.equals(testDetails4);\r\n\r\n        assertTrue(isEqual);\r\n    }\r\n\r\n    @Test\r\n    void testHashCodesAreEqual() {\r\n        int detailsCode1 = testDetails1.hashCode();\r\n        int detailsCode2 = testDetails2.hashCode();\r\n\r\n        assertEquals(detailsCode1, detailsCode2);\r\n    }\r\n\r\n    @Test\r\n    void testHashCodesAreNotEqual() {\r\n        int detailsCode1 = testDetails1.hashCode();\r\n        int detailsCode3 = testDetails3.hashCode();\r\n\r\n        assertNotEquals(detailsCode1, detailsCode3);\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/test/model/MatchDetailsTest.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/test/model/MatchDetailsTest.java	(date 1621031253304)
+-@@ -1,94 +1,94 @@
+--package model;
+--
+--import org.junit.jupiter.api.BeforeEach;
+--import org.junit.jupiter.api.Test;
+--
+--import static org.junit.jupiter.api.Assertions.*;
+--
+--public class MatchDetailsTest {
+--    private MatchDetails testDetails1;
+--    private MatchDetails testDetails2;
+--    private MatchDetails testDetails3;
+--    private MatchDetails testDetails4;
+--    private MatchDetails testDetails5;
+--    private MatchDetails testDetails6;
+--    private MatchDetails testDetails7;
+--
+--    @BeforeEach
+--    void runBefore() {
+--        testDetails1 = new MatchDetails("Yang Lin", false, "HARD", 45, "1/1/2020");
+--        testDetails2 = new MatchDetails("Yang Lin", false, "HARD", 45, "1/1/2020");
+--        testDetails3 = new MatchDetails("Roger Federer", false, "HARD", 45, "1/1/2020");
+--        testDetails4 = new MatchDetails("Yang Lin", true, "HARD", 45, "1/1/2020");
+--        testDetails5 = new MatchDetails("Yang Lin", false, "GRASS", 45, "1/1/2020");
+--        testDetails6 = new MatchDetails("Yang Lin", false, "HARD", 55, "1/1/2020");
+--        testDetails7 = new MatchDetails("Yang Lin", false, "HARD", 45, "1/2/2020");
+--    }
+--
+--
+--    @Test
+--    void testConstructor() {
+--        assertEquals("Yang Lin", testDetails1.getOpponent());
+--        assertFalse(testDetails1.getIsWon());
+--        assertEquals("HARD", testDetails1.getSurface());
+--        assertEquals(45, testDetails1.getDuration());
+--        assertEquals("1/1/2020", testDetails1.getDate());
+--    }
+--
+--    @Test
+--    void testEqualsIsEqual() {
+--        boolean isEqual = testDetails1.equals(testDetails2);
+--
+--        assertTrue(isEqual);
+--    }
+--
+--    @Test
+--    void testEqualsIsNotEqual() {
+--        boolean isEqual1 = testDetails1.equals(testDetails3);
+--        assertFalse(isEqual1);
+--
+--        boolean isEqual2 = testDetails1.equals(testDetails4);
+--        assertFalse(isEqual2);
+--
+--        boolean isEqual3 = testDetails1.equals(testDetails5);
+--        assertFalse(isEqual3);
+--
+--        boolean isEqual4 = testDetails1.equals(testDetails6);
+--        assertFalse(isEqual4);
+--
+--        boolean isEqual5 = testDetails1.equals(testDetails7);
+--        assertFalse(isEqual5);
+--    }
+--
+--    @Test
+--    void testEqualsNotAnInstanceOf() {
+--        boolean isEqual = testDetails1.equals("random string");
+--
+--        assertFalse(isEqual);
+--    }
+--
+--    @Test
+--    void testEqualsSameObject() {
+--        MatchDetails testDetails4 = testDetails3;
+--
+--        boolean isEqual = testDetails3.equals(testDetails4);
+--
+--        assertTrue(isEqual);
+--    }
+--
+--    @Test
+--    void testHashCodesAreEqual() {
+--        int detailsCode1 = testDetails1.hashCode();
+--        int detailsCode2 = testDetails2.hashCode();
+--
+--        assertEquals(detailsCode1, detailsCode2);
+--    }
+--
+--    @Test
+--    void testHashCodesAreNotEqual() {
+--        int detailsCode1 = testDetails1.hashCode();
+--        int detailsCode3 = testDetails3.hashCode();
+--
+--        assertNotEquals(detailsCode1, detailsCode3);
+--    }
+--}
+-+//package model;
+-+//
+-+//import org.junit.jupiter.api.BeforeEach;
+-+//import org.junit.jupiter.api.Test;
+-+//
+-+//import static org.junit.jupiter.api.Assertions.*;
+-+//
+-+//public class MatchDetailsTest {
+-+//    private MatchDetails testDetails1;
+-+//    private MatchDetails testDetails2;
+-+//    private MatchDetails testDetails3;
+-+//    private MatchDetails testDetails4;
+-+//    private MatchDetails testDetails5;
+-+//    private MatchDetails testDetails6;
+-+//    private MatchDetails testDetails7;
+-+//
+-+//    @BeforeEach
+-+//    void runBefore() {
+-+//        testDetails1 = new MatchDetails("Yang Lin", false, "HARD", 45, "1/1/2020");
+-+//        testDetails2 = new MatchDetails("Yang Lin", false, "HARD", 45, "1/1/2020");
+-+//        testDetails3 = new MatchDetails("Roger Federer", false, "HARD", 45, "1/1/2020");
+-+//        testDetails4 = new MatchDetails("Yang Lin", true, "HARD", 45, "1/1/2020");
+-+//        testDetails5 = new MatchDetails("Yang Lin", false, "GRASS", 45, "1/1/2020");
+-+//        testDetails6 = new MatchDetails("Yang Lin", false, "HARD", 55, "1/1/2020");
+-+//        testDetails7 = new MatchDetails("Yang Lin", false, "HARD", 45, "1/2/2020");
+-+//    }
+-+//
+-+//
+-+//    @Test
+-+//    void testConstructor() {
+-+//        assertEquals("Yang Lin", testDetails1.getOpponent());
+-+//        assertFalse(testDetails1.getIsWon());
+-+//        assertEquals("HARD", testDetails1.getSurface());
+-+//        assertEquals(45, testDetails1.getDuration());
+-+//        assertEquals("1/1/2020", testDetails1.getDate());
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsIsEqual() {
+-+//        boolean isEqual = testDetails1.equals(testDetails2);
+-+//
+-+//        assertTrue(isEqual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsIsNotEqual() {
+-+//        boolean isEqual1 = testDetails1.equals(testDetails3);
+-+//        assertFalse(isEqual1);
+-+//
+-+//        boolean isEqual2 = testDetails1.equals(testDetails4);
+-+//        assertFalse(isEqual2);
+-+//
+-+//        boolean isEqual3 = testDetails1.equals(testDetails5);
+-+//        assertFalse(isEqual3);
+-+//
+-+//        boolean isEqual4 = testDetails1.equals(testDetails6);
+-+//        assertFalse(isEqual4);
+-+//
+-+//        boolean isEqual5 = testDetails1.equals(testDetails7);
+-+//        assertFalse(isEqual5);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsNotAnInstanceOf() {
+-+//        boolean isEqual = testDetails1.equals("random string");
+-+//
+-+//        assertFalse(isEqual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testEqualsSameObject() {
+-+//        MatchDetails testDetails4 = testDetails3;
+-+//
+-+//        boolean isEqual = testDetails3.equals(testDetails4);
+-+//
+-+//        assertTrue(isEqual);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testHashCodesAreEqual() {
+-+//        int detailsCode1 = testDetails1.hashCode();
+-+//        int detailsCode2 = testDetails2.hashCode();
+-+//
+-+//        assertEquals(detailsCode1, detailsCode2);
+-+//    }
+-+//
+-+//    @Test
+-+//    void testHashCodesAreNotEqual() {
+-+//        int detailsCode1 = testDetails1.hashCode();
+-+//        int detailsCode3 = testDetails3.hashCode();
+-+//
+-+//        assertNotEquals(detailsCode1, detailsCode3);
+-+//    }
+-+//}
+-Index: src/main/ui/controller/PurrfectHabitsGUI.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/main/ui/controller/PurrfectHabitsGUI.java	(date 1621031544346)
+-+++ src/main/ui/controller/PurrfectHabitsGUI.java	(date 1621031544346)
+-@@ -0,0 +1,26 @@
+-+package ui.controller;
+-+
+-+import javafx.application.Application;
+-+import javafx.scene.Scene;
+-+import javafx.stage.Stage;
+-+
+-+//JavaFX uses Stage, Scene, & something I forgot
+-+//Stage is container (like JFrame)
+-+//Scene is content within Stage (like JPanel)
+-+
+-+public class PurrfectHabitsGUI extends Application {
+-+
+-+    public static void main(String[] args) {
+-+        //Main optional -> passing in command line args to application
+-+        Application.launch(args);
+-+    }
+-+
+-+    @Override
+-+    public void start(Stage primaryStage) throws Exception {
+-+        primaryStage.setTitle("Purrfect Habits");
+-+        Scene scene = new Scene();
+-+        primaryStage.setScene(scene);
+-+        primaryStage.show();
+-+
+-+    }
+-+}
+-Index: src/main/model/PawsomeAchievement.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\npublic class PawsomeAchievement extends Award {\r\n}\r\n
+-===================================================================
+---- src/main/model/PawsomeAchievement.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/main/model/PawsomeAchievement.java	(date 1621031056236)
+-@@ -1,4 +1,4 @@
+--package model;
+--
+--public class PawsomeAchievement extends Award {
+--}
+-+//package model;
+-+//
+-+//public class PawsomeAchievement extends Award {
+-+//}
+-Index: src/main/model/Catastrophe.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\npublic class Catastrophe extends Award {\r\n}\r\n
+-===================================================================
+---- src/main/model/Catastrophe.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
+-+++ src/main/model/Catastrophe.java	(date 1621031056208)
+-@@ -1,4 +1,4 @@
+--package model;
+--
+--public class Catastrophe extends Award {
+--}
+-+//package model;
+-+//
+-+//public class Catastrophe extends Award {
+-+//}

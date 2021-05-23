@@ -1,0 +1,1123 @@
+Index: src/main/ui/old/JournalApp.java
+===================================================================
+diff --git a/src/main/ui/old/JournalApp.java b/src/main/ui/old/JournalApp.java
+deleted file mode 100644
+--- a/src/main/ui/old/JournalApp.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,237 +0,0 @@
+-//package ui.old;
+-//
+-//import model.MatchDetails;
+-//import model.MatchStats;
+-//import model.TennisMatch;
+-//import model.TennisMatchJournal;
+-//import persistence.JsonReader;
+-//import persistence.JsonWriter;
+-//
+-//import java.io.FileNotFoundException;
+-//import java.io.IOException;
+-//import java.util.Scanner;
+-//
+-//// Tennis match journal application
+-//// NOTE: The structure of this Class and many of the methods inside it including JournalApp,
+-////       runJournal, initialize, displayMenu, and processCommand are largely based off of
+-////       code in the TellerApp Class in the TellerApp application provided to us on GitHub.
+-////       URL: https://github.students.cs.ubc.ca/CPSC210/TellerApp
+-//public class JournalApp {
+-//    private static final String JSON_STORE = "./data/habits.json";
+-//    private TennisMatchJournal journal;
+-//    private Scanner input;
+-//    private JsonReader jsonReader;
+-//    private JsonWriter jsonWriter;
+-//
+-//    // EFFECTS: runs the journal application
+-//    public JournalApp() {
+-//        runJournal();
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: processes user input
+-//    private void runJournal() {
+-//        boolean keepGoing = true;
+-//        String command = null;
+-//
+-//        initialize();
+-//
+-//        while (keepGoing) {
+-//            displayMenu();
+-//            command = input.next();
+-//            command = command.toLowerCase();
+-//
+-//            if (command.equals("quit")) {
+-//                keepGoing = false;
+-//            } else {
+-//                processCommand(command);
+-//            }
+-//        }
+-//        System.out.println("\n<CLOSING THE JOURNAL>");
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the journal
+-//    private void initialize() {
+-//        journal = new TennisMatchJournal();
+-//        input = new Scanner(System.in);
+-//        jsonReader = new JsonReader(JSON_STORE);
+-//        jsonWriter = new JsonWriter(JSON_STORE);
+-//    }
+-//
+-//    // EFFECTS: displays menu of options to user
+-//    private void displayMenu() {
+-//        System.out.println("\n[TENNIS MATCH JOURNAL]");
+-//        System.out.println("\nChoose from the following commands:\n");
+-//        System.out.println("\tadd --> add a new tennis match to your journal");
+-//        System.out.println("\tdelete --> delete an existing tennis match from your journal");
+-//        System.out.println("\tview --> view all the tennis matches currently in your journal");
+-//        System.out.println("\tratio --> view your current win : loss ratio");
+-//        System.out.println("\tload --> load journal from file");
+-//        System.out.println("\tsave --> save the current journal to file");
+-//        System.out.println("\tquit --> close the application\n\n");
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: processes user command
+-//    private void processCommand(String command) {
+-//        if (command.equals("add")) {
+-//            add();
+-//        } else if (command.equals("delete")) {
+-//            delete();
+-//        } else if (command.equals("view")) {
+-//            viewMatches();
+-//        } else if (command.equals("ratio")) {
+-//            viewRatio();
+-//        } else if (command.equals("load")) {
+-//            loadJournal();
+-//        } else if (command.equals("save")) {
+-//            saveJournal();
+-//        } else {
+-//            System.out.println("<PLEASE ENTER IN A VALID COMMAND>");
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: processes the add command
+-//    private void add() {
+-//        MatchDetails userDetails = getUserDetails();
+-//        MatchStats userStats = getUserStats();
+-//
+-//        TennisMatch tm = new TennisMatch(userDetails, userStats);
+-//
+-//        if (!journal.containsMatch(tm)) {
+-//            journal.addMatch(tm);
+-//            System.out.println("<THE MATCH HAS BEEN ADDED>");
+-//        } else {
+-//            System.out.println("<THE JOURNAL ALREADY CONTAINS THIS MATCH>");
+-//        }
+-//    }
+-//
+-//    // EFFECTS: gets the details of the match
+-//    private MatchDetails getUserDetails() {
+-//        System.out.println("<GETTING MATCH DETAILS>");
+-//        System.out.println("\nWho was your opponent? - (First Last)");
+-//        String opponent = input.next() + input.nextLine();
+-//        System.out.println("\nWhat was the outcome of the match? - true = win, false = lose");
+-//        boolean isWon = input.nextBoolean();
+-//        System.out.println("\nWhat surface did you play on? - HARD/CLAY/GRASS");
+-//        String surface = input.next().toLowerCase();
+-//        System.out.println("\nHow long was the match (in minutes)?");
+-//        int duration = input.nextInt();
+-//        System.out.println("\nWhat is the date of this match? - (D/M/YYYY)");
+-//        String date = input.next();
+-//
+-//        return new MatchDetails(opponent, isWon, surface, duration, date);
+-//    }
+-//
+-//    // EFFECTS: gets the stats of the match
+-//    private MatchStats getUserStats() {
+-//        System.out.println("<GETTING MATCH STATS>");
+-//        System.out.println("\nWhat was the score? - (a-b c-d ...)");
+-//        String score = input.next() + input.nextLine();
+-//        System.out.println("\nHow many aces did you hit?");
+-//        int aces = input.nextInt();
+-//        System.out.println("\nHow many double faults did you hit?");
+-//        int doubleFaults = input.nextInt();
+-//        System.out.println("\nHow many winners did you hit?");
+-//        int winners = input.nextInt();
+-//        System.out.println("\nHow many unforced errors did you hit?");
+-//        int unforcedErrors = input.nextInt();
+-//
+-//        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: processes the delete command
+-//    private void delete() {
+-//        System.out.println("When did you play this match? (D/M/YYYY)");
+-//        String date = input.next();
+-//        System.out.println("\nWho was your opponent? (First Last)");
+-//        String opponent = input.next();
+-//        opponent += input.nextLine();
+-//        boolean isFound = false;
+-//
+-//        for (TennisMatch tm : journal.getJournal()) {
+-//            String d = tm.getMatchDetails().getDate();
+-//            String o = tm.getMatchDetails().getOpponent();
+-//
+-//            if (d.equals(date) && o.equals(opponent)) {
+-//                journal.deleteMatch(tm);
+-//                System.out.println("<THE MATCH HAS BEEN DELETED>");
+-//                isFound = true;
+-//                break;
+-//            }
+-//        }
+-//        if (!isFound) {
+-//            System.out.println("<COULDN'T FIND ANY MATCH ON " + date + " AGAINST " + opponent + ">");
+-//        }
+-//    }
+-//
+-//    // EFFECTS: processes the view command
+-//    private void viewMatches() {
+-//        System.out.println("<VIEWING ALL MATCHES>");
+-//        String matches = journal.viewJournal();
+-//        System.out.println(matches);
+-//    }
+-//
+-//    // EFFECTS: processes the ratio command
+-//    private void viewRatio() {
+-//        System.out.println("<VIEWING CURRENT WIN : LOSS RATIO>\n");
+-//        String ratio = journal.viewWinLossRatio();
+-//        System.out.println(ratio);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: loads journal from file
+-//    private void loadJournal() {
+-//        try {
+-//            journal = jsonReader.read();
+-//            System.out.println("<LOADED JOURNAL FROM FILE: " + JSON_STORE + ">");
+-//        } catch (IOException e) {
+-//            System.out.println("<UNABLE TO READ FROM FILE: " + JSON_STORE + ">");
+-//        }
+-//    }
+-//
+-//    // EFFECTS: saves current journal to file
+-//    private void saveJournal() {
+-//        try {
+-//            jsonWriter.open();
+-//            jsonWriter.write(journal);
+-//            jsonWriter.close();
+-//            System.out.println("<SAVED JOURNAL TO FILE: " + JSON_STORE + ">");
+-//        } catch (FileNotFoundException e) {
+-//            System.out.println("<UNABLE TO WRITE TO FILE: " + JSON_STORE + ">");
+-//        }
+-//    }
+-//}
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+-//
+Index: src/main/ui/viewer/StatsPage.java
+===================================================================
+diff --git a/src/main/ui/viewer/StatsPage.java b/src/main/ui/viewer/StatsPage.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/StatsPage.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,73 +0,0 @@
+-//package ui.viewer;
+-//
+-//import model.TennisMatch;
+-//
+-//import javax.swing.*;
+-//import java.awt.*;
+-//import java.awt.event.ActionListener;
+-//
+-//// Represents the stats page where the user can view detailed statistics about a single match
+-//public class StatsPage extends JFrame {
+-//    JTable table;
+-//    JButton backButton;
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the stats page
+-//    public StatsPage(ActionListener listener, TennisMatch match) {
+-//        initializeTable(match);
+-//        initializeButton(listener);
+-//        initializeFrame();
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the table
+-//    private void initializeTable(TennisMatch match) {
+-//        String[][] rowData = {
+-//                {"Opponent", match.getMatchDetails().getOpponent()},
+-//                {"Result", (match.getMatchDetails().getIsWon()) ? "Win" : "Loss"},
+-//                {"Surface", match.getMatchDetails().getSurface()},
+-//                {"Duration", Integer.toString(match.getMatchDetails().getDuration())},
+-//                {"Date", match.getMatchDetails().getDate()},
+-//                {"Score", match.getMatchStats().getScore()},
+-//                {"Aces", Integer.toString(match.getMatchStats().getAces())},
+-//                {"Double Faults", Integer.toString(match.getMatchStats().getDoubleFaults())},
+-//                {"Winners", Integer.toString(match.getMatchStats().getWinners())},
+-//                {"Unforced Errors", Integer.toString(match.getMatchStats().getUnforcedErrors())}
+-//        };
+-//
+-//        String[] columnData = {"1","1"};
+-//
+-//        table = new JTable(rowData, columnData);
+-//        table.setBounds(0, 0, 500, 700);
+-//        table.setFont(new Font("Arial", Font.PLAIN, 30));
+-//        table.setRowHeight(table.getRowHeight() + 30);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the back button
+-//    private void initializeButton(ActionListener listener) {
+-//        backButton = new JButton("Back");
+-//        backButton.setFocusable(false);
+-//        backButton.setBounds(140, 480, 200, 50);
+-//        backButton.addActionListener(listener);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the frame
+-//    private void initializeFrame() {
+-//        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-//        this.add(backButton);
+-//        this.add(table);
+-//        this.setSize(500, 600);
+-//        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-//        this.setLayout(null);
+-//        this.setTitle("Tennis Match Journal");
+-//        this.setIconImage(frameIcon.getImage());
+-//        this.setLocationRelativeTo(null);
+-//        this.setVisible(true);
+-//    }
+-//
+-//    public JButton getBackButton() {
+-//        return backButton;
+-//    }
+-//}
+Index: src/main/ui/viewer/DeletePage.java
+===================================================================
+diff --git a/src/main/ui/viewer/DeletePage.java b/src/main/ui/viewer/DeletePage.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/DeletePage.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,99 +0,0 @@
+-package ui.viewer;
+-
+-import javax.swing.*;
+-import java.awt.*;
+-import java.awt.event.ActionListener;
+-
+-// Represents the delete page where the user specifies the match to be deleted
+-public class DeletePage extends JFrame {
+-    private JTextField opponentField;
+-    private JTextField dateField;
+-    private JLabel opponentLabel;
+-    private JLabel dateLabel;
+-    private JButton submitButton;
+-    private JButton backButton;
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the delete page
+-    public DeletePage(ActionListener listener) {
+-        initializeTextFields();
+-        initializeLabels();
+-        initializeButtons(listener);
+-        initializeFrame();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the text fields
+-    private void initializeTextFields() {
+-        opponentField = new JTextField();
+-        opponentField.setBounds(230, 20, 350, 25);
+-
+-        dateField = new JTextField();
+-        dateField.setBounds(230, 65, 350, 25);
+-
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the labels
+-    private void initializeLabels() {
+-        opponentLabel = new JLabel();
+-        opponentLabel.setText("Opponent: (First Last)");
+-        opponentLabel.setFont(new Font("Arial", Font.BOLD, 13));
+-        opponentLabel.setBounds(10, 20, 200, 25);
+-
+-        dateLabel = new JLabel();
+-        dateLabel.setText("Date: (D/M/YYYY)");
+-        dateLabel.setBounds(10, 65, 200, 25);
+-        dateLabel.setFont(new Font("Arial", Font.BOLD, 13));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the buttons
+-    private void initializeButtons(ActionListener listener) {
+-        submitButton = new JButton("Submit");
+-        submitButton.setBounds(10, 100, 100, 50);
+-        submitButton.setFocusable(false);
+-        submitButton.addActionListener(listener);
+-
+-        backButton = new JButton("Back");
+-        backButton.setBounds(120, 100, 100, 50);
+-        backButton.setFocusable(false);
+-        backButton.addActionListener(listener);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the frame
+-    private void initializeFrame() {
+-        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-        this.add(opponentField);
+-        this.add(dateField);
+-        this.add(opponentLabel);
+-        this.add(dateLabel);
+-        this.add(submitButton);
+-        this.add(backButton);
+-        this.setSize(600, 200);
+-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-        this.setLayout(null);
+-        this.setTitle("Delete a match");
+-        this.setIconImage(frameIcon.getImage());
+-        this.setLocationRelativeTo(null);
+-        this.setResizable(false);
+-        this.setVisible(true);
+-    }
+-
+-    public JTextField getOpponentField() {
+-        return opponentField;
+-    }
+-
+-    public JTextField getDateField() {
+-        return dateField;
+-    }
+-
+-    public JButton getSubmitButton() {
+-        return submitButton;
+-    }
+-
+-    public JButton getBackButton() {
+-        return backButton;
+-    }
+-}
+Index: src/main/ui/viewer/ViewPage.java
+===================================================================
+diff --git a/src/main/ui/viewer/ViewPage.java b/src/main/ui/viewer/ViewPage.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/ViewPage.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,93 +0,0 @@
+-//package ui.viewer;
+-//
+-//import model.TennisMatch;
+-//import model.TennisMatchJournal;
+-//
+-//import javax.swing.*;
+-//import java.awt.*;
+-//import java.awt.event.ActionListener;
+-//
+-//// Represents the view page where the user can view a list of all the matches in the journal
+-//public class ViewPage extends JFrame {
+-//    private JButton backButton;
+-//    private JButton selectButton;
+-//    private JList<String> viewPanel;
+-//    private JScrollPane scrollPane;
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the view page
+-//    public ViewPage(ActionListener listener, TennisMatchJournal journal) {
+-//        initializeViewPanel(journal);
+-//        initializeScrollPane();
+-//        initializeButtons(listener);
+-//        initializeFrame();
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the view panel
+-//    private void initializeViewPanel(TennisMatchJournal journal) {
+-//        DefaultListModel<String> listModel = new DefaultListModel();
+-//
+-//        for (TennisMatch match : journal.getJournal()) {
+-//            String opponent = match.getMatchDetails().getOpponent();
+-//            String date = match.getMatchDetails().getDate();
+-//
+-//            String toAdd = "vs. " + opponent + " on " + date;
+-//            listModel.addElement(toAdd);
+-//        }
+-//
+-//        viewPanel = new JList(listModel);
+-//        viewPanel.setLayoutOrientation(JList.VERTICAL);
+-//        viewPanel.setFont(new Font("Arial", Font.PLAIN, 25));
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the scroll pane
+-//    private void initializeScrollPane() {
+-//        scrollPane = new JScrollPane();
+-//        scrollPane.setViewportView(viewPanel);
+-//        scrollPane.setBounds(500, 100, 500, 700);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the buttons
+-//    private void initializeButtons(ActionListener listener) {
+-//        backButton = new JButton("Back");
+-//        backButton.setFocusable(false);
+-//        backButton.setBounds(530, 850, 200, 50);
+-//        backButton.addActionListener(listener);
+-//
+-//        selectButton = new JButton("Select");
+-//        selectButton.setFocusable(false);
+-//        selectButton.setBounds(770, 850, 200, 50);
+-//        selectButton.addActionListener(listener);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the frame
+-//    private void initializeFrame() {
+-//        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-//        this.add(backButton);
+-//        this.add(selectButton);
+-//        this.add(scrollPane);
+-//        this.setSize(1500, 1000);
+-//        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-//        this.setLayout(null);
+-//        this.setTitle("Tennis Match Journal");
+-//        this.setIconImage(frameIcon.getImage());
+-//        this.setLocationRelativeTo(null);
+-//        this.setVisible(true);
+-//    }
+-//
+-//    public JButton getBackButton() {
+-//        return backButton;
+-//    }
+-//
+-//    public JButton getSelectButton() {
+-//        return selectButton;
+-//    }
+-//
+-//    public JList<String> getViewPanel() {
+-//        return viewPanel;
+-//    }
+-//}
+Index: src/main/ui/viewer/Graph.java
+===================================================================
+diff --git a/src/main/ui/viewer/Graph.java b/src/main/ui/viewer/Graph.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/Graph.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,62 +0,0 @@
+-//package model;
+-//
+-//
+-//import javafx.geometry.Pos;
+-//import javafx.scene.chart.LineChart;
+-//import javafx.scene.chart.NumberAxis;
+-//import javafx.scene.chart.XYChart;
+-//import javafx.scene.layout.BorderPane;
+-//import javafx.scene.layout.GridPane;
+-//
+-//public class Graph {
+-//    private BorderPane borderPane;
+-//
+-//    public Graph(BorderPane bp) {
+-//        borderPane = bp;
+-//    }
+-//
+-//        //TODO: Put graph into seperate class
+-//        //TODO: Figure out some styling/CSS for graph
+-//        //TODO: Connect real data/stats to graph
+-//
+-//        GridPane centerGridPane = new GridPane();
+-//        centerGridPane.setAlignment(Pos.CENTER);
+-//        borderPane.setCenter(centerGridPane);
+-//
+-//
+-//        //Defining the x axis
+-//        NumberAxis theXAxis = new NumberAxis(0, 10, 1);
+-//        theXAxis.setLabel("Days");
+-//        // theXAxis.setStyle("-fx-background-color: #86D0F7");
+-//
+-//
+-//
+-//        //Defining the y axis
+-//        NumberAxis theYAxis = new NumberAxis(0, 30,  1);
+-//        theYAxis.setLabel("No.of Cat Photos");
+-//        theYAxis.setStyle("-fx-background-color: #86D0F7");
+-//
+-//        //Creating the line chart
+-//        LineChart linechart = new LineChart(theXAxis, theYAxis);
+-//
+-//
+-//        //Prepare XYChart.Series objects by setting data
+-//        XYChart.Series series = new XYChart.Series();
+-//        series.setName("Cat Photos Collected");
+-//
+-//        //Test Data -> Connect Somehow with real stats
+-//        series.getData().add(new XYChart.Data(0, 0));
+-//        series.getData().add(new XYChart.Data(1, 1));
+-//        series.getData().add(new XYChart.Data(2, 4));
+-//        series.getData().add(new XYChart.Data(3, 10));
+-//        series.getData().add(new XYChart.Data(4, 5));
+-//        series.getData().add(new XYChart.Data(5, 20));
+-//
+-////        Node line = series.getNode().lookup(".chart-series-line");
+-////        line.setStyle("-fx-fill: #FF0000");
+-//
+-//        //Setting the data to Line chart
+-//        linechart.getData().add(series);
+-//
+-//        centerGridPane.getChildren().add(linechart);
+-//}
+Index: src/main/ui/viewer/LaunchPage.java
+===================================================================
+diff --git a/src/main/ui/viewer/LaunchPage.java b/src/main/ui/viewer/LaunchPage.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/LaunchPage.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,129 +0,0 @@
+-package ui.viewer;
+-
+-import javax.swing.*;
+-import java.awt.*;
+-import java.awt.event.ActionListener;
+-
+-// Represents the launch page (home screen) of the application
+-public class LaunchPage extends JFrame {
+-    private JButton addButton;
+-    private JButton deleteButton;
+-    private JButton viewButton;
+-    private JButton ratioButton;
+-    private JButton loadButton;
+-    private JButton saveButton;
+-    private JButton quitButton;
+-    private JLabel mainGraphic;
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the launch page
+-    public LaunchPage(ActionListener listener) {
+-        initializeGraphic();
+-        initializeButtons();
+-        initializeListeners(listener);
+-        initializeFrame();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the graphic
+-    private void initializeGraphic() {
+-        ImageIcon mainIcon = new ImageIcon("./data/tennis-player.png");
+-        Image image = mainIcon.getImage();
+-        Image scaledImage = image.getScaledInstance(400, 400, Image.SCALE_SMOOTH);
+-        mainIcon = new ImageIcon(scaledImage);
+-        mainGraphic = new JLabel();
+-        mainGraphic.setText("Tennis Match Journal");
+-        mainGraphic.setFont(new Font("Arial", Font.BOLD, 40));
+-        mainGraphic.setIcon(mainIcon);
+-        mainGraphic.setHorizontalTextPosition(JLabel.CENTER);
+-        mainGraphic.setVerticalTextPosition(JLabel.TOP);
+-        mainGraphic.setBounds(275, 200, 500, 500);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the buttons
+-    private void initializeButtons() {
+-        addButton = new JButton("ADD A TENNIS MATCH");
+-        addButton.setFocusable(false);
+-        addButton.setBounds(750, 270, 400, 50);
+-        deleteButton = new JButton("DELETE A TENNIS MATCH");
+-        deleteButton.setFocusable(false);
+-        deleteButton.setBounds(750, 330, 400, 50);
+-        viewButton = new JButton("VIEW ALL MATCHES");
+-        viewButton.setFocusable(false);
+-        viewButton.setBounds(750, 390, 400, 50);
+-        ratioButton = new JButton("VIEW WIN:LOSS RATIO");
+-        ratioButton.setFocusable(false);
+-        ratioButton.setBounds(750, 450, 400, 50);
+-        loadButton = new JButton("LOAD JOURNAL FROM FILE");
+-        loadButton.setFocusable(false);
+-        loadButton.setBounds(750, 510, 400, 50);
+-        saveButton = new JButton("SAVE JOURNAL TO FILE");
+-        saveButton.setFocusable(false);
+-        saveButton.setBounds(750, 570, 400, 50);
+-        quitButton = new JButton("QUIT");
+-        quitButton.setFocusable(false);
+-        quitButton.setBounds(750, 630, 400, 50);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds the same action listener to all the buttons
+-    private void initializeListeners(ActionListener listener) {
+-        addButton.addActionListener(listener);
+-        deleteButton.addActionListener(listener);
+-        viewButton.addActionListener(listener);
+-        ratioButton.addActionListener(listener);
+-        loadButton.addActionListener(listener);
+-        saveButton.addActionListener(listener);
+-        quitButton.addActionListener(listener);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the frame
+-    private void initializeFrame() {
+-        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-        this.add(addButton);
+-        this.add(deleteButton);
+-        this.add(viewButton);
+-        this.add(ratioButton);
+-        this.add(loadButton);
+-        this.add(saveButton);
+-        this.add(quitButton);
+-        this.add(mainGraphic);
+-        this.setSize(1500, 1000);
+-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-        this.setLayout(null);
+-        this.setTitle("Tennis Match Journal");
+-        this.setIconImage(frameIcon.getImage());
+-        this.setLocationRelativeTo(null);
+-        this.setVisible(true);
+-    }
+-
+-    public JButton getAddButton() {
+-        return addButton;
+-    }
+-
+-    public JButton getDeleteButton() {
+-        return deleteButton;
+-    }
+-
+-    public JButton getViewButton() {
+-        return viewButton;
+-    }
+-
+-    public JButton getRatioButton() {
+-        return ratioButton;
+-    }
+-
+-    public JButton getLoadButton() {
+-        return loadButton;
+-    }
+-
+-    public JButton getSaveButton() {
+-        return saveButton;
+-    }
+-
+-    public JButton getQuitButton() {
+-        return quitButton;
+-    }
+-}
+Index: src/main/ui/viewer/AddPage.java
+===================================================================
+diff --git a/src/main/ui/viewer/AddPage.java b/src/main/ui/viewer/AddPage.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/AddPage.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,309 +0,0 @@
+-package ui.viewer;
+-
+-import javax.swing.*;
+-import java.awt.*;
+-import java.awt.event.ActionListener;
+-
+-// Represents the add page where the user inputs the details and the stats of a
+-// match to be added into the journal
+-public class AddPage extends JFrame {
+-    JTextField opponentField;
+-    JComboBox resultOptions;
+-    JComboBox surfaceOptions;
+-    JTextField durationField;
+-    JTextField dateField;
+-    JTextField scoreField;
+-    JTextField acesField;
+-    JTextField doubleFaultsField;
+-    JTextField winnersField;
+-    JTextField unforcedErrorsField;
+-    JButton submitButton;
+-    JButton backButton;
+-    JLabel opponentLabel;
+-    JLabel resultLabel;
+-    JLabel surfaceLabel;
+-    JLabel durationLabel;
+-    JLabel dateLabel;
+-    JLabel scoreLabel;
+-    JLabel acesLabel;
+-    JLabel doubleFaultsLabel;
+-    JLabel winnersLabel;
+-    JLabel unforcedErrorsLabel;
+-    String[] results;
+-    String[] surfaces;
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the add page
+-    public AddPage(ActionListener listener) {
+-        initializeLabels();
+-        initializeFields();
+-        initializeComboBoxes();
+-        initializeButtons(listener);
+-        setAllBounds();
+-        initializeFrame();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the labels
+-    private void initializeLabels() {
+-        opponentLabel = new JLabel("Opponent: (First Last)");
+-        opponentLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        resultLabel = new JLabel("Result:");
+-        resultLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        surfaceLabel = new JLabel("Surface:");
+-        surfaceLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        durationLabel = new JLabel("Duration: (in minutes)");
+-        durationLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        dateLabel = new JLabel("Date: (D/M/YYYY)");
+-        dateLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        scoreLabel = new JLabel("Score: (A-B C-D ...)");
+-        scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        acesLabel = new JLabel("Aces:");
+-        acesLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        doubleFaultsLabel = new JLabel("Double Faults:");
+-        doubleFaultsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        winnersLabel = new JLabel("Winners:");
+-        winnersLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-
+-        unforcedErrorsLabel = new JLabel("Unforced Errors:");
+-        unforcedErrorsLabel.setFont(new Font("Arial", Font.BOLD, 16));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the text fields
+-    private void initializeFields() {
+-        opponentField = new JTextField();
+-        durationField = new JTextField();
+-        dateField = new JTextField();
+-        scoreField = new JTextField();
+-        acesField = new JTextField();
+-        doubleFaultsField = new JTextField();
+-        winnersField = new JTextField();
+-        unforcedErrorsField = new JTextField();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the combo boxes
+-    private void initializeComboBoxes() {
+-        results = new String[]{"Please select an option", "Win", "Loss"};
+-        resultOptions = new JComboBox(results);
+-
+-        surfaces = new String[]{"Please select an option", "Hard", "Grass", "Clay"};
+-        surfaceOptions = new JComboBox(surfaces);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the buttons
+-    private void initializeButtons(ActionListener listener) {
+-        submitButton = new JButton("Submit");
+-        submitButton.setFocusable(false);
+-        submitButton.addActionListener(listener);
+-
+-        backButton = new JButton("Back");
+-        backButton.setFocusable(false);
+-        backButton.addActionListener(listener);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: sets the bounds for all the components
+-    private void setAllBounds() {
+-        setLabelBounds();
+-        setTextFieldBounds();
+-        setComboBoxBounds();
+-        setButtonBounds();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: sets the bounds for all the label components
+-    private void setLabelBounds() {
+-        opponentLabel.setBounds(10, 0, 200, 50);
+-        resultLabel.setBounds(10, 40, 200, 50);
+-        surfaceLabel.setBounds(10, 80, 200, 50);
+-        durationLabel.setBounds(10, 120, 200, 50);
+-        dateLabel.setBounds(10, 160, 200, 50);
+-        scoreLabel.setBounds(10, 200, 200, 50);
+-        acesLabel.setBounds(10, 240, 200, 50);
+-        doubleFaultsLabel.setBounds(10, 280, 200, 50);
+-        winnersLabel.setBounds(10, 320, 200, 50);
+-        unforcedErrorsLabel.setBounds(10, 360, 200, 50);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: sets the bounds for all the text field components
+-    private void setTextFieldBounds() {
+-        opponentField.setBounds(200, 12, 350, 25);
+-        durationField.setBounds(200, 132, 350, 25);
+-        dateField.setBounds(200, 172, 350, 25);
+-        scoreField.setBounds(200, 212, 350, 25);
+-        acesField.setBounds(200, 252, 350, 25);
+-        doubleFaultsField.setBounds(200, 292, 350, 25);
+-        winnersField.setBounds(200, 332, 350, 25);
+-        unforcedErrorsField.setBounds(200, 372, 350, 25);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: sets the bounds for all the combo box components
+-    private void setComboBoxBounds() {
+-        resultOptions.setBounds(200, 52, 350, 25);
+-        surfaceOptions.setBounds(200, 92, 350, 25);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: sets the bounds for all the button components
+-    private void setButtonBounds() {
+-        submitButton.setBounds(10, 425, 265, 50);
+-        backButton.setBounds(285, 425, 265, 50);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the frame
+-    private void initializeFrame() {
+-        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-
+-        addAllToFrame();
+-
+-        this.setSize(570, 530);
+-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-        this.setLayout(null);
+-        this.setTitle("Add a match");
+-        this.setIconImage(frameIcon.getImage());
+-        this.setLocationRelativeTo(null);
+-        this.setResizable(false);
+-        this.setVisible(true);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds all the components to the frame
+-    private void addAllToFrame() {
+-        addLabels();
+-        addFields();
+-        addComboBoxes();
+-        addButtons();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds all the label components to the frame
+-    private void addLabels() {
+-        this.add(opponentLabel);
+-        this.add(resultLabel);
+-        this.add(surfaceLabel);
+-        this.add(durationLabel);
+-        this.add(dateLabel);
+-        this.add(scoreLabel);
+-        this.add(acesLabel);
+-        this.add(doubleFaultsLabel);
+-        this.add(winnersLabel);
+-        this.add(unforcedErrorsLabel);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds all the text field components to the frame
+-    private void addFields() {
+-        this.add(opponentField);
+-        this.add(durationField);
+-        this.add(dateField);
+-        this.add(scoreField);
+-        this.add(acesField);
+-        this.add(doubleFaultsField);
+-        this.add(winnersField);
+-        this.add(unforcedErrorsField);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds all the combo box components to the frame
+-    private void addComboBoxes() {
+-        this.add(resultOptions);
+-        this.add(surfaceOptions);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds all the button components to the frame
+-    private void addButtons() {
+-        this.add(submitButton);
+-        this.add(backButton);
+-    }
+-
+-    public JButton getSubmitButton() {
+-        return submitButton;
+-    }
+-
+-    public JButton getBackButton() {
+-        return backButton;
+-    }
+-
+-    public JComboBox getResultOptions() {
+-        return resultOptions;
+-    }
+-
+-    public JComboBox getSurfaceOptions() {
+-        return surfaceOptions;
+-    }
+-
+-    public JTextField getOpponentField() {
+-        return opponentField;
+-    }
+-
+-    public JTextField getDurationField() {
+-        return durationField;
+-    }
+-
+-    public JTextField getDateField() {
+-        return dateField;
+-    }
+-
+-    public JTextField getScoreField() {
+-        return scoreField;
+-    }
+-
+-    public JTextField getAcesField() {
+-        return acesField;
+-    }
+-
+-    public JTextField getDoubleFaultsField() {
+-        return doubleFaultsField;
+-    }
+-
+-    public JTextField getWinnersField() {
+-        return winnersField;
+-    }
+-
+-    public JTextField getUnforcedErrorsField() {
+-        return unforcedErrorsField;
+-    }
+-}
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+Index: src/main/ui/viewer/RatioPage.java
+===================================================================
+diff --git a/src/main/ui/viewer/RatioPage.java b/src/main/ui/viewer/RatioPage.java
+deleted file mode 100644
+--- a/src/main/ui/viewer/RatioPage.java	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
++++ /dev/null	(revision 1ea70e2c154576c3ecbb28a4bd0ba6be1be9ecd8)
+@@ -1,65 +0,0 @@
+-package ui.viewer;
+-
+-import javax.swing.*;
+-import java.awt.*;
+-import java.awt.event.ActionListener;
+-
+-// Represents the ratio page that displays the user's current win:loss ratio
+-public class RatioPage extends JFrame {
+-    private JButton backButton;
+-    private JLabel label;
+-    private String ratio;
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the ratio page
+-    public RatioPage(ActionListener listener, String ratio) {
+-        this.ratio = ratio;
+-        initializeRatio();
+-        initializeButton();
+-        initializeListeners(listener);
+-        initializeFrame();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the ratio to be displayed
+-    private void initializeRatio() {
+-        label = new JLabel();
+-        label.setText(ratio);
+-        label.setFont(new Font("Arial", Font.BOLD, 200));
+-        label.setBounds(550, 200, 500, 500);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the back button
+-    private void initializeButton() {
+-        backButton = new JButton();
+-        backButton.setText("Back");
+-        backButton.setFocusable(false);
+-        backButton.setBounds(550, 700, 400, 50);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: adds an action listener to the back button
+-    private void initializeListeners(ActionListener listener) {
+-        backButton.addActionListener(listener);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the frame
+-    private void initializeFrame() {
+-        ImageIcon frameIcon = new ImageIcon("./data/tennis_ball.png");
+-        this.add(backButton);
+-        this.add(label);
+-        this.setSize(1500, 1000);
+-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+-        this.setLayout(null);
+-        this.setTitle("Tennis Match Journal");
+-        this.setIconImage(frameIcon.getImage());
+-        this.setLocationRelativeTo(null);
+-        this.setVisible(true);
+-    }
+-
+-    public JButton getBackButton() {
+-        return backButton;
+-    }
+-}

@@ -1,0 +1,103 @@
+{
+    "awardsGallery": {
+        "bestStreakAwards": [
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            }
+        ],
+        "allAwards": [
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            }
+        ],
+        "felineGoodAwards": [
+            {
+                "dateReceived": "2021-05-15",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "FELINE_GOOD"
+            }
+        ],
+        "pawsomeAchievementAwards": [
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            },
+            {
+                "dateReceived": "2021-05-21",
+                "awardType": "PAWSOME_ACHIEVEMENT"
+            }
+        ]
+    },
+    "habitStats": {
+        "currentStreak": 4,
+        "dateCreated": "2021-05-21",
+        "numSetbacks": 3,
+        "longestStreak": 10,
+        "numDaysSinceStarted": 24
+    },
+    "purpose": "Look better, and feel better about myself",
+    "habitType": "MAKEABLE",
+    "title": "Exercise More",
+    "isCompleted": false
+}

@@ -1,0 +1,1773 @@
+Index: src/main/ui/controller/JournalAppGui.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.controller;\r\n\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\nimport model.exceptions.InvalidIndexException;\r\nimport persistence.JsonReader;\r\nimport persistence.JsonWriter;\r\nimport ui.viewer.*;\r\n\r\nimport javax.swing.*;\r\nimport java.awt.event.ActionEvent;\r\nimport java.awt.event.ActionListener;\r\nimport java.io.FileNotFoundException;\r\nimport java.io.IOException;\r\n\r\n// Tennis match journal application\r\npublic class JournalAppGui implements ActionListener {\r\n    private static final String JSON_STORE = \"./data/journal.json\";\r\n    private TennisMatchJournal journal;\r\n    private JsonReader jsonReader;\r\n    private JsonWriter jsonWriter;\r\n    private LaunchPage launchPage;\r\n    private AddPage addPage;\r\n    private DeletePage deletePage;\r\n    private ViewPage viewPage;\r\n    private StatsPage statsPage;\r\n    private RatioPage ratioPage;\r\n\r\n    // EFFECTS: runs the journal application\r\n    public JournalAppGui() {\r\n        initialize();\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the journal\r\n    private void initialize() {\r\n        journal = new TennisMatchJournal();\r\n        jsonReader = new JsonReader(JSON_STORE);\r\n        jsonWriter = new JsonWriter(JSON_STORE);\r\n        launchPage = new LaunchPage(this);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for all events that occur as the application\r\n    //          is running\r\n    @Override\r\n    public void actionPerformed(ActionEvent e) {\r\n        launchPageListener(e);\r\n        addPageListener(e);\r\n        deletePageListener(e);\r\n        viewPageListener(e);\r\n        ratioPageListener(e);\r\n        statsPageListener(e);\r\n    }\r\n\r\n    // =============================== LISTENERS ===============================\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for events in the LaunchPage\r\n    private void launchPageListener(ActionEvent e) {\r\n        if (e.getSource() == launchPage.getAddButton()) {\r\n            handleLaunchAdd();\r\n        }\r\n        if (e.getSource() == launchPage.getDeleteButton()) {\r\n            handleLaunchDelete();\r\n        }\r\n        if (e.getSource() == launchPage.getViewButton()) {\r\n            handleLaunchView();\r\n        }\r\n        if (e.getSource() == launchPage.getRatioButton()) {\r\n            handleLaunchRatio();\r\n        }\r\n        if (e.getSource() == launchPage.getLoadButton()) {\r\n            handleLaunchLoad();\r\n        }\r\n        if (e.getSource() == launchPage.getSaveButton()) {\r\n            handleLaunchSave();\r\n        }\r\n        if (e.getSource() == launchPage.getQuitButton()) {\r\n            handleLaunchQuit();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for events in the add page\r\n    private void addPageListener(ActionEvent e) {\r\n        if (addPage != null && e.getSource() == addPage.getSubmitButton()) {\r\n            handleAddAdd();\r\n        } else if (addPage != null && e.getSource() == addPage.getBackButton()) {\r\n            handleAddBack();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for events in the delete page\r\n    private void deletePageListener(ActionEvent e) {\r\n        if (deletePage != null && e.getSource() == deletePage.getSubmitButton()) {\r\n            handleDeleteDelete();\r\n        }\r\n        if (deletePage != null && e.getSource() == deletePage.getBackButton()) {\r\n            handleDeleteBack();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for events in the view page\r\n    private void viewPageListener(ActionEvent e) {\r\n        if (viewPage != null && e.getSource() == viewPage.getBackButton()) {\r\n            handleViewBack();\r\n        }\r\n        if (viewPage != null && e.getSource() == viewPage.getSelectButton()) {\r\n            handleViewSelect();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for events in the ratio page\r\n    private void ratioPageListener(ActionEvent e) {\r\n        if (ratioPage != null && e.getSource() == ratioPage.getBackButton()) {\r\n            handleRatioBack();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: listens for events in the stats page\r\n    private void statsPageListener(ActionEvent e) {\r\n        if (statsPage != null && e.getSource() == statsPage.getBackButton()) {\r\n            handleStatsBack();\r\n        }\r\n    }\r\n\r\n    // =============================== LAUNCH PAGE HANDLERS ===============================\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: creates an add page\r\n    private void handleLaunchAdd() {\r\n        addPage = new AddPage(this);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: creates a new delete page\r\n    private void handleLaunchDelete() {\r\n        deletePage = new DeletePage(this);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the launch page and creates the view page\r\n    private void handleLaunchView() {\r\n        launchPage.dispose();\r\n        viewPage = new ViewPage(this, journal);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the launch page and creates the ratio page\r\n    private void handleLaunchRatio() {\r\n        launchPage.dispose();\r\n        ratioPage = new RatioPage(this, journal.viewWinLossRatio());\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: loads journal from file\r\n    private void handleLaunchLoad() {\r\n        try {\r\n            journal = jsonReader.read();\r\n            showLoadingConfirmation();\r\n        } catch (IOException e) {\r\n            showLoadingFailure();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: saves the journal to file\r\n    private void handleLaunchSave() {\r\n        try {\r\n            jsonWriter.open();\r\n            jsonWriter.write(journal);\r\n            jsonWriter.close();\r\n            showSaveConfirmation();\r\n        } catch (FileNotFoundException e) {\r\n            showSaveFailure();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the launch page (quits the program)\r\n    private void handleLaunchQuit() {\r\n        launchPage.dispose();\r\n    }\r\n\r\n    // =============================== ADD PAGE HANDLERS ===============================\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: creates a match from the user's input and adds it into the journal\r\n    //          if the journal does not already contain the match\r\n    //          (doesn't add if the journal already contains the match)\r\n    private void handleAddAdd() {\r\n        MatchDetails userDetails = getSubmittedDetails();\r\n        MatchStats userStats = getSubmittedStats();\r\n\r\n        TennisMatch tm = new TennisMatch(userDetails, userStats);\r\n\r\n        if (!journal.containsMatch(tm)) {\r\n            journal.addMatch(tm);\r\n            displayAddConfirmation();\r\n            addPage.dispose();\r\n        } else {\r\n            displayAddError();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the add page and returns the user to the launch page\r\n    private void handleAddBack() {\r\n        addPage.dispose();\r\n    }\r\n\r\n    // =============================== DELETE PAGE HANDLERS ===============================\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: deleted the specified match from the journal\r\n    //          (does nothing if journal does not contain the match)\r\n    private void handleDeleteDelete() {\r\n        String opponent = deletePage.getOpponentField().getText();\r\n        String date = deletePage.getDateField().getText();\r\n\r\n        boolean isFound = false;\r\n\r\n        for (TennisMatch tm : journal.getJournal()) {\r\n            String d = tm.getMatchDetails().getDate();\r\n            String o = tm.getMatchDetails().getOpponent();\r\n\r\n            if (d.equals(date) && o.equals(opponent)) {\r\n                journal.deleteMatch(tm);\r\n                showDeletionConfirmation();\r\n                deletePage.dispose();\r\n                isFound = true;\r\n                break;\r\n            }\r\n        }\r\n\r\n        if (!isFound) {\r\n            showDeletionError();\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the delete page and returns the user to the launch page\r\n    private void handleDeleteBack() {\r\n        deletePage.dispose();\r\n    }\r\n\r\n    // =============================== VIEW PAGE HANDLERS ===============================\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: creates a stats page displaying the stats of the selected match\r\n    private void handleViewSelect() {\r\n        TennisMatch match;\r\n\r\n        JList<String> list = viewPage.getViewPanel();\r\n        int index = list.getSelectedIndex();\r\n\r\n        try {\r\n            match = journal.getMatchAt(index);\r\n            statsPage = new StatsPage(this, match);\r\n        } catch (InvalidIndexException e) {\r\n            JOptionPane.showMessageDialog(null,\r\n                    \"Please select a valid match\",\r\n                    \"Tennis Match Journal\",\r\n                    JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the view page and returns the user to the launch page\r\n    private void handleViewBack() {\r\n        viewPage.dispose();\r\n        launchPage = new LaunchPage(this);\r\n    }\r\n\r\n    // =============================== STATS PAGE HANDLERS ===============================\r\n\r\n    private void handleStatsBack() {\r\n        statsPage.dispose();\r\n    }\r\n\r\n    // =============================== RATIO PAGE HANDLERS ===============================\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes the ratio page and returns the user to the launch page\r\n    private void handleRatioBack() {\r\n        ratioPage.dispose();\r\n        launchPage = new LaunchPage(this);\r\n    }\r\n\r\n    // =============================== MISCELLANEOUS HELPERS ===============================\r\n\r\n    // EFFECTS: gets submitted match details from add page and returns\r\n    //          a match details object consisting of those details\r\n    private MatchDetails getSubmittedDetails() {\r\n        int selectedResult = addPage.getResultOptions().getSelectedIndex();\r\n        int selectedSurface = addPage.getSurfaceOptions().getSelectedIndex();\r\n\r\n        String opponent = addPage.getOpponentField().getText();\r\n        boolean isWon = convertResult(selectedResult);\r\n        String surface = convertSurface(selectedSurface);\r\n        int duration = Integer.parseInt(addPage.getDurationField().getText());\r\n        String date = addPage.getDateField().getText();\r\n\r\n        return new MatchDetails(opponent, isWon, surface, duration, date);\r\n    }\r\n\r\n    // EFFECTS: converts the selected result into a boolean that represents\r\n    //          the outcome of the match\r\n    private boolean convertResult(int selectedResult) {\r\n        return selectedResult == 1;\r\n    }\r\n\r\n    // EFFECTS: converts the selected surface into a string that represents\r\n    //          the surface that the match was played on\r\n    private String convertSurface(int selectedSurface) {\r\n        if (selectedSurface == 1) {\r\n            return \"Hard\";\r\n        } else if (selectedSurface == 2) {\r\n            return \"Grass\";\r\n        } else {\r\n            return \"Clay\";\r\n        }\r\n    }\r\n\r\n    // EFFECTS: gets the submitted match stats from the add page and returns\r\n    //          a match stats object consisting of those stats\r\n    private MatchStats getSubmittedStats() {\r\n        String score = addPage.getScoreField().getText();\r\n        int aces = Integer.parseInt(addPage.getAcesField().getText());\r\n        int doubleFaults = Integer.parseInt(addPage.getDoubleFaultsField().getText());\r\n        int winners = Integer.parseInt(addPage.getWinnersField().getText());\r\n        int unforcedErrors = Integer.parseInt(addPage.getUnforcedErrorsField().getText());\r\n\r\n        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);\r\n    }\r\n\r\n    // EFFECTS: displays an adding error message to user\r\n    private void displayAddError() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"The journal already contains this match\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.ERROR_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays an adding confirmation message to user\r\n    private void displayAddConfirmation() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"The match has been successfully added\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.INFORMATION_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays a loading confirmation message\r\n    private void showLoadingConfirmation() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"Your journal has been loaded\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.INFORMATION_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays a loading failure message\r\n    private void showLoadingFailure() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"An error occurred - the journal was not loaded\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.INFORMATION_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays a saving confirmation message\r\n    private void showSaveConfirmation() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"You journal has been saved\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.INFORMATION_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays a saving failure message\r\n    private void showSaveFailure() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"An error occurred - the journal was not saved\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.ERROR_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays a deleting confirmation message\r\n    private void showDeletionConfirmation() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"The specified match has been successfully deleted\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.INFORMATION_MESSAGE);\r\n    }\r\n\r\n    // EFFECTS: displays a deleting error message\r\n    private void showDeletionError() {\r\n        JOptionPane.showMessageDialog(null,\r\n                \"Can't find the specified match\",\r\n                \"Tennis Match Journal\",\r\n                JOptionPane.ERROR_MESSAGE);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/ui/controller/JournalAppGui.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/ui/controller/OldSwingGUI.java	(date 1621031056217)
+@@ -1,407 +1,408 @@
+-package ui.controller;
+-
+-import model.MatchDetails;
+-import model.MatchStats;
+-import model.TennisMatch;
+-import model.TennisMatchJournal;
+-import model.exceptions.InvalidIndexException;
+-import persistence.JsonReader;
+-import persistence.JsonWriter;
+-import ui.viewer.*;
+-
+-import javax.swing.*;
+-import java.awt.event.ActionEvent;
+-import java.awt.event.ActionListener;
+-import java.io.FileNotFoundException;
+-import java.io.IOException;
+-
+-// Tennis match journal application
+-public class JournalAppGui implements ActionListener {
+-    private static final String JSON_STORE = "./data/journal.json";
+-    private TennisMatchJournal journal;
+-    private JsonReader jsonReader;
+-    private JsonWriter jsonWriter;
+-    private LaunchPage launchPage;
+-    private AddPage addPage;
+-    private DeletePage deletePage;
+-    private ViewPage viewPage;
+-    private StatsPage statsPage;
+-    private RatioPage ratioPage;
+-
+-    // EFFECTS: runs the journal application
+-    public JournalAppGui() {
+-        initialize();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the journal
+-    private void initialize() {
+-        journal = new TennisMatchJournal();
+-        jsonReader = new JsonReader(JSON_STORE);
+-        jsonWriter = new JsonWriter(JSON_STORE);
+-        launchPage = new LaunchPage(this);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for all events that occur as the application
+-    //          is running
+-    @Override
+-    public void actionPerformed(ActionEvent e) {
+-        launchPageListener(e);
+-        addPageListener(e);
+-        deletePageListener(e);
+-        viewPageListener(e);
+-        ratioPageListener(e);
+-        statsPageListener(e);
+-    }
+-
+-    // =============================== LISTENERS ===============================
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for events in the LaunchPage
+-    private void launchPageListener(ActionEvent e) {
+-        if (e.getSource() == launchPage.getAddButton()) {
+-            handleLaunchAdd();
+-        }
+-        if (e.getSource() == launchPage.getDeleteButton()) {
+-            handleLaunchDelete();
+-        }
+-        if (e.getSource() == launchPage.getViewButton()) {
+-            handleLaunchView();
+-        }
+-        if (e.getSource() == launchPage.getRatioButton()) {
+-            handleLaunchRatio();
+-        }
+-        if (e.getSource() == launchPage.getLoadButton()) {
+-            handleLaunchLoad();
+-        }
+-        if (e.getSource() == launchPage.getSaveButton()) {
+-            handleLaunchSave();
+-        }
+-        if (e.getSource() == launchPage.getQuitButton()) {
+-            handleLaunchQuit();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for events in the add page
+-    private void addPageListener(ActionEvent e) {
+-        if (addPage != null && e.getSource() == addPage.getSubmitButton()) {
+-            handleAddAdd();
+-        } else if (addPage != null && e.getSource() == addPage.getBackButton()) {
+-            handleAddBack();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for events in the delete page
+-    private void deletePageListener(ActionEvent e) {
+-        if (deletePage != null && e.getSource() == deletePage.getSubmitButton()) {
+-            handleDeleteDelete();
+-        }
+-        if (deletePage != null && e.getSource() == deletePage.getBackButton()) {
+-            handleDeleteBack();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for events in the view page
+-    private void viewPageListener(ActionEvent e) {
+-        if (viewPage != null && e.getSource() == viewPage.getBackButton()) {
+-            handleViewBack();
+-        }
+-        if (viewPage != null && e.getSource() == viewPage.getSelectButton()) {
+-            handleViewSelect();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for events in the ratio page
+-    private void ratioPageListener(ActionEvent e) {
+-        if (ratioPage != null && e.getSource() == ratioPage.getBackButton()) {
+-            handleRatioBack();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: listens for events in the stats page
+-    private void statsPageListener(ActionEvent e) {
+-        if (statsPage != null && e.getSource() == statsPage.getBackButton()) {
+-            handleStatsBack();
+-        }
+-    }
+-
+-    // =============================== LAUNCH PAGE HANDLERS ===============================
+-
+-    // MODIFIES: this
+-    // EFFECTS: creates an add page
+-    private void handleLaunchAdd() {
+-        addPage = new AddPage(this);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: creates a new delete page
+-    private void handleLaunchDelete() {
+-        deletePage = new DeletePage(this);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the launch page and creates the view page
+-    private void handleLaunchView() {
+-        launchPage.dispose();
+-        viewPage = new ViewPage(this, journal);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the launch page and creates the ratio page
+-    private void handleLaunchRatio() {
+-        launchPage.dispose();
+-        ratioPage = new RatioPage(this, journal.viewWinLossRatio());
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: loads journal from file
+-    private void handleLaunchLoad() {
+-        try {
+-            journal = jsonReader.read();
+-            showLoadingConfirmation();
+-        } catch (IOException e) {
+-            showLoadingFailure();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: saves the journal to file
+-    private void handleLaunchSave() {
+-        try {
+-            jsonWriter.open();
+-            jsonWriter.write(journal);
+-            jsonWriter.close();
+-            showSaveConfirmation();
+-        } catch (FileNotFoundException e) {
+-            showSaveFailure();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the launch page (quits the program)
+-    private void handleLaunchQuit() {
+-        launchPage.dispose();
+-    }
+-
+-    // =============================== ADD PAGE HANDLERS ===============================
+-
+-    // MODIFIES: this
+-    // EFFECTS: creates a match from the user's input and adds it into the journal
+-    //          if the journal does not already contain the match
+-    //          (doesn't add if the journal already contains the match)
+-    private void handleAddAdd() {
+-        MatchDetails userDetails = getSubmittedDetails();
+-        MatchStats userStats = getSubmittedStats();
+-
+-        TennisMatch tm = new TennisMatch(userDetails, userStats);
+-
+-        if (!journal.containsMatch(tm)) {
+-            journal.addMatch(tm);
+-            displayAddConfirmation();
+-            addPage.dispose();
+-        } else {
+-            displayAddError();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the add page and returns the user to the launch page
+-    private void handleAddBack() {
+-        addPage.dispose();
+-    }
+-
+-    // =============================== DELETE PAGE HANDLERS ===============================
+-
+-    // MODIFIES: this
+-    // EFFECTS: deleted the specified match from the journal
+-    //          (does nothing if journal does not contain the match)
+-    private void handleDeleteDelete() {
+-        String opponent = deletePage.getOpponentField().getText();
+-        String date = deletePage.getDateField().getText();
+-
+-        boolean isFound = false;
+-
+-        for (TennisMatch tm : journal.getJournal()) {
+-            String d = tm.getMatchDetails().getDate();
+-            String o = tm.getMatchDetails().getOpponent();
+-
+-            if (d.equals(date) && o.equals(opponent)) {
+-                journal.deleteMatch(tm);
+-                showDeletionConfirmation();
+-                deletePage.dispose();
+-                isFound = true;
+-                break;
+-            }
+-        }
+-
+-        if (!isFound) {
+-            showDeletionError();
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the delete page and returns the user to the launch page
+-    private void handleDeleteBack() {
+-        deletePage.dispose();
+-    }
+-
+-    // =============================== VIEW PAGE HANDLERS ===============================
+-
+-    // MODIFIES: this
+-    // EFFECTS: creates a stats page displaying the stats of the selected match
+-    private void handleViewSelect() {
+-        TennisMatch match;
+-
+-        JList<String> list = viewPage.getViewPanel();
+-        int index = list.getSelectedIndex();
+-
+-        try {
+-            match = journal.getMatchAt(index);
+-            statsPage = new StatsPage(this, match);
+-        } catch (InvalidIndexException e) {
+-            JOptionPane.showMessageDialog(null,
+-                    "Please select a valid match",
+-                    "Tennis Match Journal",
+-                    JOptionPane.ERROR_MESSAGE);
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the view page and returns the user to the launch page
+-    private void handleViewBack() {
+-        viewPage.dispose();
+-        launchPage = new LaunchPage(this);
+-    }
+-
+-    // =============================== STATS PAGE HANDLERS ===============================
+-
+-    private void handleStatsBack() {
+-        statsPage.dispose();
+-    }
+-
+-    // =============================== RATIO PAGE HANDLERS ===============================
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes the ratio page and returns the user to the launch page
+-    private void handleRatioBack() {
+-        ratioPage.dispose();
+-        launchPage = new LaunchPage(this);
+-    }
+-
+-    // =============================== MISCELLANEOUS HELPERS ===============================
+-
+-    // EFFECTS: gets submitted match details from add page and returns
+-    //          a match details object consisting of those details
+-    private MatchDetails getSubmittedDetails() {
+-        int selectedResult = addPage.getResultOptions().getSelectedIndex();
+-        int selectedSurface = addPage.getSurfaceOptions().getSelectedIndex();
+-
+-        String opponent = addPage.getOpponentField().getText();
+-        boolean isWon = convertResult(selectedResult);
+-        String surface = convertSurface(selectedSurface);
+-        int duration = Integer.parseInt(addPage.getDurationField().getText());
+-        String date = addPage.getDateField().getText();
+-
+-        return new MatchDetails(opponent, isWon, surface, duration, date);
+-    }
+-
+-    // EFFECTS: converts the selected result into a boolean that represents
+-    //          the outcome of the match
+-    private boolean convertResult(int selectedResult) {
+-        return selectedResult == 1;
+-    }
+-
+-    // EFFECTS: converts the selected surface into a string that represents
+-    //          the surface that the match was played on
+-    private String convertSurface(int selectedSurface) {
+-        if (selectedSurface == 1) {
+-            return "Hard";
+-        } else if (selectedSurface == 2) {
+-            return "Grass";
+-        } else {
+-            return "Clay";
+-        }
+-    }
+-
+-    // EFFECTS: gets the submitted match stats from the add page and returns
+-    //          a match stats object consisting of those stats
+-    private MatchStats getSubmittedStats() {
+-        String score = addPage.getScoreField().getText();
+-        int aces = Integer.parseInt(addPage.getAcesField().getText());
+-        int doubleFaults = Integer.parseInt(addPage.getDoubleFaultsField().getText());
+-        int winners = Integer.parseInt(addPage.getWinnersField().getText());
+-        int unforcedErrors = Integer.parseInt(addPage.getUnforcedErrorsField().getText());
+-
+-        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
+-    }
+-
+-    // EFFECTS: displays an adding error message to user
+-    private void displayAddError() {
+-        JOptionPane.showMessageDialog(null,
+-                "The journal already contains this match",
+-                "Tennis Match Journal",
+-                JOptionPane.ERROR_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays an adding confirmation message to user
+-    private void displayAddConfirmation() {
+-        JOptionPane.showMessageDialog(null,
+-                "The match has been successfully added",
+-                "Tennis Match Journal",
+-                JOptionPane.INFORMATION_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays a loading confirmation message
+-    private void showLoadingConfirmation() {
+-        JOptionPane.showMessageDialog(null,
+-                "Your journal has been loaded",
+-                "Tennis Match Journal",
+-                JOptionPane.INFORMATION_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays a loading failure message
+-    private void showLoadingFailure() {
+-        JOptionPane.showMessageDialog(null,
+-                "An error occurred - the journal was not loaded",
+-                "Tennis Match Journal",
+-                JOptionPane.INFORMATION_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays a saving confirmation message
+-    private void showSaveConfirmation() {
+-        JOptionPane.showMessageDialog(null,
+-                "You journal has been saved",
+-                "Tennis Match Journal",
+-                JOptionPane.INFORMATION_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays a saving failure message
+-    private void showSaveFailure() {
+-        JOptionPane.showMessageDialog(null,
+-                "An error occurred - the journal was not saved",
+-                "Tennis Match Journal",
+-                JOptionPane.ERROR_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays a deleting confirmation message
+-    private void showDeletionConfirmation() {
+-        JOptionPane.showMessageDialog(null,
+-                "The specified match has been successfully deleted",
+-                "Tennis Match Journal",
+-                JOptionPane.INFORMATION_MESSAGE);
+-    }
+-
+-    // EFFECTS: displays a deleting error message
+-    private void showDeletionError() {
+-        JOptionPane.showMessageDialog(null,
+-                "Can't find the specified match",
+-                "Tennis Match Journal",
+-                JOptionPane.ERROR_MESSAGE);
+-    }
+-}
++//package ui.controller;
++//
++//import model.exceptions.InvalidIndexException;
++//import persistence.JsonReader;
++//import persistence.JsonWriter;
++//import ui.viewer.*;
++//
++//import javax.swing.*;
++//import java.awt.event.ActionEvent;
++//import java.awt.event.ActionListener;
++//import java.io.FileNotFoundException;
++//import java.io.IOException;
++//
++////Purrfect Habit Imports
++//import java.awt.event.ActionListener;
++//
++//// Purrfect Habits Application (Bridge between Front-end and Back-end)
++//
++////Swing version of Project -> Just testing stuff here do not take too seriously
++//public class OldSwingGUI implements ActionListener {
++//    private static final String JSON_STORE = "./data/journal.json";
++//    private TennisMatchJournal journal;
++//    private JsonReader jsonReader;
++//    private JsonWriter jsonWriter;
++//    private LaunchPage launchPage;
++//    private AddPage addPage;
++//    private DeletePage deletePage;
++//    private ViewPage viewPage;
++//    private StatsPage statsPage;
++//    private RatioPage ratioPage;
++//
++//    // EFFECTS: runs the application
++//    public OldSwingGUI() {
++//        initialize();
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: initializes the journal
++//    private void initialize() {
++//        journal = new TennisMatchJournal();
++//        jsonReader = new JsonReader(JSON_STORE);
++//        jsonWriter = new JsonWriter(JSON_STORE);
++//        launchPage = new LaunchPage(this);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for all events that occur as the application
++//    //          is running
++//    @Override
++//    public void actionPerformed(ActionEvent e) {
++//        launchPageListener(e);
++//        addPageListener(e);
++//        deletePageListener(e);
++//        viewPageListener(e);
++//        ratioPageListener(e);
++//        statsPageListener(e);
++//    }
++//
++//    // =============================== LISTENERS ===============================
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for events in the LaunchPage
++//    private void launchPageListener(ActionEvent e) {
++//        if (e.getSource() == launchPage.getAddButton()) {
++//            handleLaunchAdd();
++//        }
++//        if (e.getSource() == launchPage.getDeleteButton()) {
++//            handleLaunchDelete();
++//        }
++//        if (e.getSource() == launchPage.getViewButton()) {
++//            handleLaunchView();
++//        }
++//        if (e.getSource() == launchPage.getRatioButton()) {
++//            handleLaunchRatio();
++//        }
++//        if (e.getSource() == launchPage.getLoadButton()) {
++//            handleLaunchLoad();
++//        }
++//        if (e.getSource() == launchPage.getSaveButton()) {
++//            handleLaunchSave();
++//        }
++//        if (e.getSource() == launchPage.getQuitButton()) {
++//            handleLaunchQuit();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for events in the add page
++//    private void addPageListener(ActionEvent e) {
++//        if (addPage != null && e.getSource() == addPage.getSubmitButton()) {
++//            handleAddAdd();
++//        } else if (addPage != null && e.getSource() == addPage.getBackButton()) {
++//            handleAddBack();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for events in the delete page
++//    private void deletePageListener(ActionEvent e) {
++//        if (deletePage != null && e.getSource() == deletePage.getSubmitButton()) {
++//            handleDeleteDelete();
++//        }
++//        if (deletePage != null && e.getSource() == deletePage.getBackButton()) {
++//            handleDeleteBack();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for events in the view page
++//    private void viewPageListener(ActionEvent e) {
++//        if (viewPage != null && e.getSource() == viewPage.getBackButton()) {
++//            handleViewBack();
++//        }
++//        if (viewPage != null && e.getSource() == viewPage.getSelectButton()) {
++//            handleViewSelect();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for events in the ratio page
++//    private void ratioPageListener(ActionEvent e) {
++//        if (ratioPage != null && e.getSource() == ratioPage.getBackButton()) {
++//            handleRatioBack();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: listens for events in the stats page
++//    private void statsPageListener(ActionEvent e) {
++//        if (statsPage != null && e.getSource() == statsPage.getBackButton()) {
++//            handleStatsBack();
++//        }
++//    }
++//
++//    // =============================== LAUNCH PAGE HANDLERS ===============================
++//
++//    // MODIFIES: this
++//    // EFFECTS: creates an add page
++//    private void handleLaunchAdd() {
++//        addPage = new AddPage(this);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: creates a new delete page
++//    private void handleLaunchDelete() {
++//        deletePage = new DeletePage(this);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the launch page and creates the view page
++//    private void handleLaunchView() {
++//        launchPage.dispose();
++//        viewPage = new ViewPage(this, journal);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the launch page and creates the ratio page
++//    private void handleLaunchRatio() {
++//        launchPage.dispose();
++//        ratioPage = new RatioPage(this, journal.viewWinLossRatio());
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: loads journal from file
++//    private void handleLaunchLoad() {
++//        try {
++//            journal = jsonReader.read();
++//            showLoadingConfirmation();
++//        } catch (IOException e) {
++//            showLoadingFailure();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: saves the journal to file
++//    private void handleLaunchSave() {
++//        try {
++//            jsonWriter.open();
++//            jsonWriter.write(journal);
++//            jsonWriter.close();
++//            showSaveConfirmation();
++//        } catch (FileNotFoundException e) {
++//            showSaveFailure();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the launch page (quits the program)
++//    private void handleLaunchQuit() {
++//        launchPage.dispose();
++//    }
++//
++//    // =============================== ADD PAGE HANDLERS ===============================
++//
++//    // MODIFIES: this
++//    // EFFECTS: creates a match from the user's input and adds it into the journal
++//    //          if the journal does not already contain the match
++//    //          (doesn't add if the journal already contains the match)
++//    private void handleAddAdd() {
++//        MatchDetails userDetails = getSubmittedDetails();
++//        MatchStats userStats = getSubmittedStats();
++//
++//        TennisMatch tm = new TennisMatch(userDetails, userStats);
++//
++//        if (!journal.containsMatch(tm)) {
++//            journal.addMatch(tm);
++//            displayAddConfirmation();
++//            addPage.dispose();
++//        } else {
++//            displayAddError();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the add page and returns the user to the launch page
++//    private void handleAddBack() {
++//        addPage.dispose();
++//    }
++//
++//    // =============================== DELETE PAGE HANDLERS ===============================
++//
++//    // MODIFIES: this
++//    // EFFECTS: deleted the specified match from the journal
++//    //          (does nothing if journal does not contain the match)
++//    private void handleDeleteDelete() {
++//        String opponent = deletePage.getOpponentField().getText();
++//        String date = deletePage.getDateField().getText();
++//
++//        boolean isFound = false;
++//
++//        for (TennisMatch tm : journal.getJournal()) {
++//            String d = tm.getMatchDetails().getDate();
++//            String o = tm.getMatchDetails().getOpponent();
++//
++//            if (d.equals(date) && o.equals(opponent)) {
++//                journal.deleteMatch(tm);
++//                showDeletionConfirmation();
++//                deletePage.dispose();
++//                isFound = true;
++//                break;
++//            }
++//        }
++//
++//        if (!isFound) {
++//            showDeletionError();
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the delete page and returns the user to the launch page
++//    private void handleDeleteBack() {
++//        deletePage.dispose();
++//    }
++//
++//    // =============================== VIEW PAGE HANDLERS ===============================
++//
++//    // MODIFIES: this
++//    // EFFECTS: creates a stats page displaying the stats of the selected match
++//    private void handleViewSelect() {
++//        TennisMatch match;
++//
++//        JList<String> list = viewPage.getViewPanel();
++//        int index = list.getSelectedIndex();
++//
++//        try {
++//            match = journal.getMatchAt(index);
++//            statsPage = new StatsPage(this, match);
++//        } catch (InvalidIndexException e) {
++//            JOptionPane.showMessageDialog(null,
++//                    "Please select a valid match",
++//                    "Tennis Match Journal",
++//                    JOptionPane.ERROR_MESSAGE);
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the view page and returns the user to the launch page
++//    private void handleViewBack() {
++//        viewPage.dispose();
++//        launchPage = new LaunchPage(this);
++//    }
++//
++//    // =============================== STATS PAGE HANDLERS ===============================
++//
++//    private void handleStatsBack() {
++//        statsPage.dispose();
++//    }
++//
++//    // =============================== RATIO PAGE HANDLERS ===============================
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes the ratio page and returns the user to the launch page
++//    private void handleRatioBack() {
++//        ratioPage.dispose();
++//        launchPage = new LaunchPage(this);
++//    }
++//
++//    // =============================== MISCELLANEOUS HELPERS ===============================
++//
++//    // EFFECTS: gets submitted match details from add page and returns
++//    //          a match details object consisting of those details
++//    private MatchDetails getSubmittedDetails() {
++//        int selectedResult = addPage.getResultOptions().getSelectedIndex();
++//        int selectedSurface = addPage.getSurfaceOptions().getSelectedIndex();
++//
++//        String opponent = addPage.getOpponentField().getText();
++//        boolean isWon = convertResult(selectedResult);
++//        String surface = convertSurface(selectedSurface);
++//        int duration = Integer.parseInt(addPage.getDurationField().getText());
++//        String date = addPage.getDateField().getText();
++//
++//        return new MatchDetails(opponent, isWon, surface, duration, date);
++//    }
++//
++//    // EFFECTS: converts the selected result into a boolean that represents
++//    //          the outcome of the match
++//    private boolean convertResult(int selectedResult) {
++//        return selectedResult == 1;
++//    }
++//
++//    // EFFECTS: converts the selected surface into a string that represents
++//    //          the surface that the match was played on
++//    private String convertSurface(int selectedSurface) {
++//        if (selectedSurface == 1) {
++//            return "Hard";
++//        } else if (selectedSurface == 2) {
++//            return "Grass";
++//        } else {
++//            return "Clay";
++//        }
++//    }
++//
++//    // EFFECTS: gets the submitted match stats from the add page and returns
++//    //          a match stats object consisting of those stats
++//    private MatchStats getSubmittedStats() {
++//        String score = addPage.getScoreField().getText();
++//        int aces = Integer.parseInt(addPage.getAcesField().getText());
++//        int doubleFaults = Integer.parseInt(addPage.getDoubleFaultsField().getText());
++//        int winners = Integer.parseInt(addPage.getWinnersField().getText());
++//        int unforcedErrors = Integer.parseInt(addPage.getUnforcedErrorsField().getText());
++//
++//        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
++//    }
++//
++//    // EFFECTS: displays an adding error message to user
++//    private void displayAddError() {
++//        JOptionPane.showMessageDialog(null,
++//                "The journal already contains this match",
++//                "Tennis Match Journal",
++//                JOptionPane.ERROR_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays an adding confirmation message to user
++//    private void displayAddConfirmation() {
++//        JOptionPane.showMessageDialog(null,
++//                "The match has been successfully added",
++//                "Tennis Match Journal",
++//                JOptionPane.INFORMATION_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays a loading confirmation message
++//    private void showLoadingConfirmation() {
++//        JOptionPane.showMessageDialog(null,
++//                "Your journal has been loaded",
++//                "Tennis Match Journal",
++//                JOptionPane.INFORMATION_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays a loading failure message
++//    private void showLoadingFailure() {
++//        JOptionPane.showMessageDialog(null,
++//                "An error occurred - the journal was not loaded",
++//                "Tennis Match Journal",
++//                JOptionPane.INFORMATION_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays a saving confirmation message
++//    private void showSaveConfirmation() {
++//        JOptionPane.showMessageDialog(null,
++//                "You journal has been saved",
++//                "Tennis Match Journal",
++//                JOptionPane.INFORMATION_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays a saving failure message
++//    private void showSaveFailure() {
++//        JOptionPane.showMessageDialog(null,
++//                "An error occurred - the journal was not saved",
++//                "Tennis Match Journal",
++//                JOptionPane.ERROR_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays a deleting confirmation message
++//    private void showDeletionConfirmation() {
++//        JOptionPane.showMessageDialog(null,
++//                "The specified match has been successfully deleted",
++//                "Tennis Match Journal",
++//                JOptionPane.INFORMATION_MESSAGE);
++//    }
++//
++//    // EFFECTS: displays a deleting error message
++//    private void showDeletionError() {
++//        JOptionPane.showMessageDialog(null,
++//                "Can't find the specified match",
++//                "Tennis Match Journal",
++//                JOptionPane.ERROR_MESSAGE);
++//    }
++//}
+Index: src/main/ui/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\r\n\r\nimport ui.controller.JournalAppGui;\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        new JournalAppGui();\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/ui/Main.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/ui/Main.java	(date 1621031145274)
+@@ -1,10 +1,10 @@
+-package ui;
+-
+-import ui.controller.JournalAppGui;
+-
+-public class Main {
+-    public static void main(String[] args) {
+-        new JournalAppGui();
+-    }
+-}
++//package ui;
++//
++//import ui.controller.OldSwingGUI;
++//
++//public class Main {
++//    public static void main(String[] args) {
++//        new OldSwingGUI();
++//    }
++//}
+ 
+Index: src/main/model/Award.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\npublic abstract class Award {\r\n    String awardTitle;\r\n    PNG awardImage;\r\n    Date dateReceieved;\r\n}\r\n\r\n// habit: trying to exercise more\r\n// goal: 30 mins per day\r\n// everytime you meet the goal, add1 to the currentStreak\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/model/Award.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/model/Award.java	(date 1621031019222)
+@@ -1,10 +1,10 @@
+-package model;
+-
+-public abstract class Award {
+-    String awardTitle;
+-    PNG awardImage;
+-    Date dateReceieved;
+-}
++//package model;
++//
++//public abstract class Award {
++//    String awardTitle;
++//    PNG awardImage;
++//    Date dateReceieved;
++//}
+ 
+ // habit: trying to exercise more
+ // goal: 30 mins per day
+Index: src/main/model/Dashboard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n// represents a dashboard where the user can look at all their current habits\r\npublic class Dashboard {\r\n    private List<HabitToBreak> habitsToBreak;\r\n    private List<HabitToMake> habitsToMake;\r\n    private List<Habit> allHabits;\r\n\r\n    public Dashboard() {\r\n        habitsToBreak = new ArrayList<HabitToBreak>();\r\n        habitsToMake = new ArrayList<HabitToMake>();\r\n        allHabits = new ArrayList<Habit>();\r\n    }\r\n\r\n    public List<HabitToBreak> getHabitsToBreak() {\r\n        return habitsToBreak;\r\n    }\r\n\r\n    public List<HabitToMake> getHabitsToMake() {\r\n        return habitsToMake;\r\n    }\r\n\r\n    public List<Habit> getAllHabits() {\r\n        return allHabits;\r\n    }\r\n\r\n    public void addHabit(Habit habit, String habitType) {\r\n\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/model/Dashboard.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/model/Dashboard.java	(date 1621031072129)
+@@ -1,33 +1,33 @@
+-package model;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-// represents a dashboard where the user can look at all their current habits
+-public class Dashboard {
+-    private List<HabitToBreak> habitsToBreak;
+-    private List<HabitToMake> habitsToMake;
+-    private List<Habit> allHabits;
+-
+-    public Dashboard() {
+-        habitsToBreak = new ArrayList<HabitToBreak>();
+-        habitsToMake = new ArrayList<HabitToMake>();
+-        allHabits = new ArrayList<Habit>();
+-    }
+-
+-    public List<HabitToBreak> getHabitsToBreak() {
+-        return habitsToBreak;
+-    }
+-
+-    public List<HabitToMake> getHabitsToMake() {
+-        return habitsToMake;
+-    }
+-
+-    public List<Habit> getAllHabits() {
+-        return allHabits;
+-    }
+-
+-    public void addHabit(Habit habit, String habitType) {
+-
+-    }
+-}
++//package model;
++//
++//import java.util.ArrayList;
++//import java.util.List;
++//
++//// represents a dashboard where the user can look at all their current habits
++//public class Dashboard {
++//    private List<HabitToBreak> habitsToBreak;
++//    private List<HabitToMake> habitsToMake;
++//    private List<Habit> allHabits;
++//
++//    public Dashboard() {
++//        habitsToBreak = new ArrayList<HabitToBreak>();
++//        habitsToMake = new ArrayList<HabitToMake>();
++//        allHabits = new ArrayList<Habit>();
++//    }
++//
++//    public List<HabitToBreak> getHabitsToBreak() {
++//        return habitsToBreak;
++//    }
++//
++//    public List<HabitToMake> getHabitsToMake() {
++//        return habitsToMake;
++//    }
++//
++//    public List<Habit> getAllHabits() {
++//        return allHabits;
++//    }
++//
++//    public void addHabit(Habit habit, String habitType) {
++//
++//    }
++//}
+Index: src/main/model/Stats.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\n// TODO: figure out date stuff later\r\n\r\npublic class Stats {\r\n    int currentStreak;\r\n    int longestStreak;\r\n    Date startDate;\r\n    int numDaysSinceStarted;\r\n\r\n    public Stats(Date startDate) {\r\n        this.startDate = startDate;\r\n        currentStreak = 0;\r\n        longestStreak = 0;\r\n        numDaysSinceStarted = 0;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/model/Stats.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/model/Stats.java	(date 1621031094197)
+@@ -5,13 +5,13 @@
+ public class Stats {
+     int currentStreak;
+     int longestStreak;
+-    Date startDate;
++    //Date startDate;
+     int numDaysSinceStarted;
+ 
+-    public Stats(Date startDate) {
+-        this.startDate = startDate;
+-        currentStreak = 0;
+-        longestStreak = 0;
+-        numDaysSinceStarted = 0;
+-    }
++//    public Stats(Date startDate) {
++//        this.startDate = startDate;
++//        currentStreak = 0;
++//        longestStreak = 0;
++//        numDaysSinceStarted = 0;
++//    }
+ }
+Index: src/main/model/Habit.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\npublic abstract class Habit {\r\n    public enum HabitType {\r\n        MAKEABLE, BREAKABLE\r\n    }\r\n\r\n    private String title;\r\n    private String purpose;\r\n    private boolean isCompleted;\r\n    private Stats habitStats; // encapsulates current streak, longest streak, start date, etc (to be updated)\r\n    HabitType habitType;\r\n\r\n\r\n    public Habit(String title, String purpose, HabitType habitType) {\r\n        this.title = title;\r\n        this.purpose = purpose;\r\n        this.habitType = habitType;\r\n        isCompleted = false;\r\n        habitStats = new Stats(); // maybe pass in the date or something to this constructor\r\n    }\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/model/Habit.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/model/Habit.java	(date 1621031056227)
+@@ -17,7 +17,7 @@
+         this.purpose = purpose;
+         this.habitType = habitType;
+         isCompleted = false;
+-        habitStats = new Stats(); // maybe pass in the date or something to this constructor
++        //habitStats = new Stats(); // maybe pass in the date or something to this constructor
+     }
+ }
+ 
+Index: src/main/ui/old/JournalApp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.old;\r\n\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\nimport persistence.JsonReader;\r\nimport persistence.JsonWriter;\r\n\r\nimport java.io.FileNotFoundException;\r\nimport java.io.IOException;\r\nimport java.util.Scanner;\r\n\r\n// Tennis match journal application\r\n// NOTE: The structure of this Class and many of the methods inside it including JournalApp,\r\n//       runJournal, initialize, displayMenu, and processCommand are largely based off of\r\n//       code in the TellerApp Class in the TellerApp application provided to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/TellerApp\r\npublic class JournalApp {\r\n    private static final String JSON_STORE = \"./data/journal.json\";\r\n    private TennisMatchJournal journal;\r\n    private Scanner input;\r\n    private JsonReader jsonReader;\r\n    private JsonWriter jsonWriter;\r\n\r\n    // EFFECTS: runs the journal application\r\n    public JournalApp() {\r\n        runJournal();\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: processes user input\r\n    private void runJournal() {\r\n        boolean keepGoing = true;\r\n        String command = null;\r\n\r\n        initialize();\r\n\r\n        while (keepGoing) {\r\n            displayMenu();\r\n            command = input.next();\r\n            command = command.toLowerCase();\r\n\r\n            if (command.equals(\"quit\")) {\r\n                keepGoing = false;\r\n            } else {\r\n                processCommand(command);\r\n            }\r\n        }\r\n        System.out.println(\"\\n<CLOSING THE JOURNAL>\");\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: initializes the journal\r\n    private void initialize() {\r\n        journal = new TennisMatchJournal();\r\n        input = new Scanner(System.in);\r\n        jsonReader = new JsonReader(JSON_STORE);\r\n        jsonWriter = new JsonWriter(JSON_STORE);\r\n    }\r\n\r\n    // EFFECTS: displays menu of options to user\r\n    private void displayMenu() {\r\n        System.out.println(\"\\n[TENNIS MATCH JOURNAL]\");\r\n        System.out.println(\"\\nChoose from the following commands:\\n\");\r\n        System.out.println(\"\\tadd --> add a new tennis match to your journal\");\r\n        System.out.println(\"\\tdelete --> delete an existing tennis match from your journal\");\r\n        System.out.println(\"\\tview --> view all the tennis matches currently in your journal\");\r\n        System.out.println(\"\\tratio --> view your current win : loss ratio\");\r\n        System.out.println(\"\\tload --> load journal from file\");\r\n        System.out.println(\"\\tsave --> save the current journal to file\");\r\n        System.out.println(\"\\tquit --> close the application\\n\\n\");\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: processes user command\r\n    private void processCommand(String command) {\r\n        if (command.equals(\"add\")) {\r\n            add();\r\n        } else if (command.equals(\"delete\")) {\r\n            delete();\r\n        } else if (command.equals(\"view\")) {\r\n            viewMatches();\r\n        } else if (command.equals(\"ratio\")) {\r\n            viewRatio();\r\n        } else if (command.equals(\"load\")) {\r\n            loadJournal();\r\n        } else if (command.equals(\"save\")) {\r\n            saveJournal();\r\n        } else {\r\n            System.out.println(\"<PLEASE ENTER IN A VALID COMMAND>\");\r\n        }\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: processes the add command\r\n    private void add() {\r\n        MatchDetails userDetails = getUserDetails();\r\n        MatchStats userStats = getUserStats();\r\n\r\n        TennisMatch tm = new TennisMatch(userDetails, userStats);\r\n\r\n        if (!journal.containsMatch(tm)) {\r\n            journal.addMatch(tm);\r\n            System.out.println(\"<THE MATCH HAS BEEN ADDED>\");\r\n        } else {\r\n            System.out.println(\"<THE JOURNAL ALREADY CONTAINS THIS MATCH>\");\r\n        }\r\n    }\r\n\r\n    // EFFECTS: gets the details of the match\r\n    private MatchDetails getUserDetails() {\r\n        System.out.println(\"<GETTING MATCH DETAILS>\");\r\n        System.out.println(\"\\nWho was your opponent? - (First Last)\");\r\n        String opponent = input.next() + input.nextLine();\r\n        System.out.println(\"\\nWhat was the outcome of the match? - true = win, false = lose\");\r\n        boolean isWon = input.nextBoolean();\r\n        System.out.println(\"\\nWhat surface did you play on? - HARD/CLAY/GRASS\");\r\n        String surface = input.next().toLowerCase();\r\n        System.out.println(\"\\nHow long was the match (in minutes)?\");\r\n        int duration = input.nextInt();\r\n        System.out.println(\"\\nWhat is the date of this match? - (D/M/YYYY)\");\r\n        String date = input.next();\r\n\r\n        return new MatchDetails(opponent, isWon, surface, duration, date);\r\n    }\r\n\r\n    // EFFECTS: gets the stats of the match\r\n    private MatchStats getUserStats() {\r\n        System.out.println(\"<GETTING MATCH STATS>\");\r\n        System.out.println(\"\\nWhat was the score? - (a-b c-d ...)\");\r\n        String score = input.next() + input.nextLine();\r\n        System.out.println(\"\\nHow many aces did you hit?\");\r\n        int aces = input.nextInt();\r\n        System.out.println(\"\\nHow many double faults did you hit?\");\r\n        int doubleFaults = input.nextInt();\r\n        System.out.println(\"\\nHow many winners did you hit?\");\r\n        int winners = input.nextInt();\r\n        System.out.println(\"\\nHow many unforced errors did you hit?\");\r\n        int unforcedErrors = input.nextInt();\r\n\r\n        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: processes the delete command\r\n    private void delete() {\r\n        System.out.println(\"When did you play this match? (D/M/YYYY)\");\r\n        String date = input.next();\r\n        System.out.println(\"\\nWho was your opponent? (First Last)\");\r\n        String opponent = input.next();\r\n        opponent += input.nextLine();\r\n        boolean isFound = false;\r\n\r\n        for (TennisMatch tm : journal.getJournal()) {\r\n            String d = tm.getMatchDetails().getDate();\r\n            String o = tm.getMatchDetails().getOpponent();\r\n\r\n            if (d.equals(date) && o.equals(opponent)) {\r\n                journal.deleteMatch(tm);\r\n                System.out.println(\"<THE MATCH HAS BEEN DELETED>\");\r\n                isFound = true;\r\n                break;\r\n            }\r\n        }\r\n        if (!isFound) {\r\n            System.out.println(\"<COULDN'T FIND ANY MATCH ON \" + date + \" AGAINST \" + opponent + \">\");\r\n        }\r\n    }\r\n\r\n    // EFFECTS: processes the view command\r\n    private void viewMatches() {\r\n        System.out.println(\"<VIEWING ALL MATCHES>\");\r\n        String matches = journal.viewJournal();\r\n        System.out.println(matches);\r\n    }\r\n\r\n    // EFFECTS: processes the ratio command\r\n    private void viewRatio() {\r\n        System.out.println(\"<VIEWING CURRENT WIN : LOSS RATIO>\\n\");\r\n        String ratio = journal.viewWinLossRatio();\r\n        System.out.println(ratio);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: loads journal from file\r\n    private void loadJournal() {\r\n        try {\r\n            journal = jsonReader.read();\r\n            System.out.println(\"<LOADED JOURNAL FROM FILE: \" + JSON_STORE + \">\");\r\n        } catch (IOException e) {\r\n            System.out.println(\"<UNABLE TO READ FROM FILE: \" + JSON_STORE + \">\");\r\n        }\r\n    }\r\n\r\n    // EFFECTS: saves current journal to file\r\n    private void saveJournal() {\r\n        try {\r\n            jsonWriter.open();\r\n            jsonWriter.write(journal);\r\n            jsonWriter.close();\r\n            System.out.println(\"<SAVED JOURNAL TO FILE: \" + JSON_STORE + \">\");\r\n        } catch (FileNotFoundException e) {\r\n            System.out.println(\"<UNABLE TO WRITE TO FILE: \" + JSON_STORE + \">\");\r\n        }\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/ui/old/JournalApp.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/ui/old/JournalApp.java	(date 1621031145305)
+@@ -1,210 +1,210 @@
+-package ui.old;
+-
+-import model.MatchDetails;
+-import model.MatchStats;
+-import model.TennisMatch;
+-import model.TennisMatchJournal;
+-import persistence.JsonReader;
+-import persistence.JsonWriter;
+-
+-import java.io.FileNotFoundException;
+-import java.io.IOException;
+-import java.util.Scanner;
+-
+-// Tennis match journal application
+-// NOTE: The structure of this Class and many of the methods inside it including JournalApp,
+-//       runJournal, initialize, displayMenu, and processCommand are largely based off of
+-//       code in the TellerApp Class in the TellerApp application provided to us on GitHub.
+-//       URL: https://github.students.cs.ubc.ca/CPSC210/TellerApp
+-public class JournalApp {
+-    private static final String JSON_STORE = "./data/journal.json";
+-    private TennisMatchJournal journal;
+-    private Scanner input;
+-    private JsonReader jsonReader;
+-    private JsonWriter jsonWriter;
+-
+-    // EFFECTS: runs the journal application
+-    public JournalApp() {
+-        runJournal();
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: processes user input
+-    private void runJournal() {
+-        boolean keepGoing = true;
+-        String command = null;
+-
+-        initialize();
+-
+-        while (keepGoing) {
+-            displayMenu();
+-            command = input.next();
+-            command = command.toLowerCase();
+-
+-            if (command.equals("quit")) {
+-                keepGoing = false;
+-            } else {
+-                processCommand(command);
+-            }
+-        }
+-        System.out.println("\n<CLOSING THE JOURNAL>");
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: initializes the journal
+-    private void initialize() {
+-        journal = new TennisMatchJournal();
+-        input = new Scanner(System.in);
+-        jsonReader = new JsonReader(JSON_STORE);
+-        jsonWriter = new JsonWriter(JSON_STORE);
+-    }
+-
+-    // EFFECTS: displays menu of options to user
+-    private void displayMenu() {
+-        System.out.println("\n[TENNIS MATCH JOURNAL]");
+-        System.out.println("\nChoose from the following commands:\n");
+-        System.out.println("\tadd --> add a new tennis match to your journal");
+-        System.out.println("\tdelete --> delete an existing tennis match from your journal");
+-        System.out.println("\tview --> view all the tennis matches currently in your journal");
+-        System.out.println("\tratio --> view your current win : loss ratio");
+-        System.out.println("\tload --> load journal from file");
+-        System.out.println("\tsave --> save the current journal to file");
+-        System.out.println("\tquit --> close the application\n\n");
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: processes user command
+-    private void processCommand(String command) {
+-        if (command.equals("add")) {
+-            add();
+-        } else if (command.equals("delete")) {
+-            delete();
+-        } else if (command.equals("view")) {
+-            viewMatches();
+-        } else if (command.equals("ratio")) {
+-            viewRatio();
+-        } else if (command.equals("load")) {
+-            loadJournal();
+-        } else if (command.equals("save")) {
+-            saveJournal();
+-        } else {
+-            System.out.println("<PLEASE ENTER IN A VALID COMMAND>");
+-        }
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: processes the add command
+-    private void add() {
+-        MatchDetails userDetails = getUserDetails();
+-        MatchStats userStats = getUserStats();
+-
+-        TennisMatch tm = new TennisMatch(userDetails, userStats);
+-
+-        if (!journal.containsMatch(tm)) {
+-            journal.addMatch(tm);
+-            System.out.println("<THE MATCH HAS BEEN ADDED>");
+-        } else {
+-            System.out.println("<THE JOURNAL ALREADY CONTAINS THIS MATCH>");
+-        }
+-    }
+-
+-    // EFFECTS: gets the details of the match
+-    private MatchDetails getUserDetails() {
+-        System.out.println("<GETTING MATCH DETAILS>");
+-        System.out.println("\nWho was your opponent? - (First Last)");
+-        String opponent = input.next() + input.nextLine();
+-        System.out.println("\nWhat was the outcome of the match? - true = win, false = lose");
+-        boolean isWon = input.nextBoolean();
+-        System.out.println("\nWhat surface did you play on? - HARD/CLAY/GRASS");
+-        String surface = input.next().toLowerCase();
+-        System.out.println("\nHow long was the match (in minutes)?");
+-        int duration = input.nextInt();
+-        System.out.println("\nWhat is the date of this match? - (D/M/YYYY)");
+-        String date = input.next();
+-
+-        return new MatchDetails(opponent, isWon, surface, duration, date);
+-    }
+-
+-    // EFFECTS: gets the stats of the match
+-    private MatchStats getUserStats() {
+-        System.out.println("<GETTING MATCH STATS>");
+-        System.out.println("\nWhat was the score? - (a-b c-d ...)");
+-        String score = input.next() + input.nextLine();
+-        System.out.println("\nHow many aces did you hit?");
+-        int aces = input.nextInt();
+-        System.out.println("\nHow many double faults did you hit?");
+-        int doubleFaults = input.nextInt();
+-        System.out.println("\nHow many winners did you hit?");
+-        int winners = input.nextInt();
+-        System.out.println("\nHow many unforced errors did you hit?");
+-        int unforcedErrors = input.nextInt();
+-
+-        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: processes the delete command
+-    private void delete() {
+-        System.out.println("When did you play this match? (D/M/YYYY)");
+-        String date = input.next();
+-        System.out.println("\nWho was your opponent? (First Last)");
+-        String opponent = input.next();
+-        opponent += input.nextLine();
+-        boolean isFound = false;
+-
+-        for (TennisMatch tm : journal.getJournal()) {
+-            String d = tm.getMatchDetails().getDate();
+-            String o = tm.getMatchDetails().getOpponent();
+-
+-            if (d.equals(date) && o.equals(opponent)) {
+-                journal.deleteMatch(tm);
+-                System.out.println("<THE MATCH HAS BEEN DELETED>");
+-                isFound = true;
+-                break;
+-            }
+-        }
+-        if (!isFound) {
+-            System.out.println("<COULDN'T FIND ANY MATCH ON " + date + " AGAINST " + opponent + ">");
+-        }
+-    }
+-
+-    // EFFECTS: processes the view command
+-    private void viewMatches() {
+-        System.out.println("<VIEWING ALL MATCHES>");
+-        String matches = journal.viewJournal();
+-        System.out.println(matches);
+-    }
+-
+-    // EFFECTS: processes the ratio command
+-    private void viewRatio() {
+-        System.out.println("<VIEWING CURRENT WIN : LOSS RATIO>\n");
+-        String ratio = journal.viewWinLossRatio();
+-        System.out.println(ratio);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: loads journal from file
+-    private void loadJournal() {
+-        try {
+-            journal = jsonReader.read();
+-            System.out.println("<LOADED JOURNAL FROM FILE: " + JSON_STORE + ">");
+-        } catch (IOException e) {
+-            System.out.println("<UNABLE TO READ FROM FILE: " + JSON_STORE + ">");
+-        }
+-    }
+-
+-    // EFFECTS: saves current journal to file
+-    private void saveJournal() {
+-        try {
+-            jsonWriter.open();
+-            jsonWriter.write(journal);
+-            jsonWriter.close();
+-            System.out.println("<SAVED JOURNAL TO FILE: " + JSON_STORE + ">");
+-        } catch (FileNotFoundException e) {
+-            System.out.println("<UNABLE TO WRITE TO FILE: " + JSON_STORE + ">");
+-        }
+-    }
+-}
++//package ui.old;
++//
++//import model.MatchDetails;
++//import model.MatchStats;
++//import model.TennisMatch;
++//import model.TennisMatchJournal;
++//import persistence.JsonReader;
++//import persistence.JsonWriter;
++//
++//import java.io.FileNotFoundException;
++//import java.io.IOException;
++//import java.util.Scanner;
++//
++//// Tennis match journal application
++//// NOTE: The structure of this Class and many of the methods inside it including JournalApp,
++////       runJournal, initialize, displayMenu, and processCommand are largely based off of
++////       code in the TellerApp Class in the TellerApp application provided to us on GitHub.
++////       URL: https://github.students.cs.ubc.ca/CPSC210/TellerApp
++//public class JournalApp {
++//    private static final String JSON_STORE = "./data/journal.json";
++//    private TennisMatchJournal journal;
++//    private Scanner input;
++//    private JsonReader jsonReader;
++//    private JsonWriter jsonWriter;
++//
++//    // EFFECTS: runs the journal application
++//    public JournalApp() {
++//        runJournal();
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: processes user input
++//    private void runJournal() {
++//        boolean keepGoing = true;
++//        String command = null;
++//
++//        initialize();
++//
++//        while (keepGoing) {
++//            displayMenu();
++//            command = input.next();
++//            command = command.toLowerCase();
++//
++//            if (command.equals("quit")) {
++//                keepGoing = false;
++//            } else {
++//                processCommand(command);
++//            }
++//        }
++//        System.out.println("\n<CLOSING THE JOURNAL>");
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: initializes the journal
++//    private void initialize() {
++//        journal = new TennisMatchJournal();
++//        input = new Scanner(System.in);
++//        jsonReader = new JsonReader(JSON_STORE);
++//        jsonWriter = new JsonWriter(JSON_STORE);
++//    }
++//
++//    // EFFECTS: displays menu of options to user
++//    private void displayMenu() {
++//        System.out.println("\n[TENNIS MATCH JOURNAL]");
++//        System.out.println("\nChoose from the following commands:\n");
++//        System.out.println("\tadd --> add a new tennis match to your journal");
++//        System.out.println("\tdelete --> delete an existing tennis match from your journal");
++//        System.out.println("\tview --> view all the tennis matches currently in your journal");
++//        System.out.println("\tratio --> view your current win : loss ratio");
++//        System.out.println("\tload --> load journal from file");
++//        System.out.println("\tsave --> save the current journal to file");
++//        System.out.println("\tquit --> close the application\n\n");
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: processes user command
++//    private void processCommand(String command) {
++//        if (command.equals("add")) {
++//            add();
++//        } else if (command.equals("delete")) {
++//            delete();
++//        } else if (command.equals("view")) {
++//            viewMatches();
++//        } else if (command.equals("ratio")) {
++//            viewRatio();
++//        } else if (command.equals("load")) {
++//            loadJournal();
++//        } else if (command.equals("save")) {
++//            saveJournal();
++//        } else {
++//            System.out.println("<PLEASE ENTER IN A VALID COMMAND>");
++//        }
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: processes the add command
++//    private void add() {
++//        MatchDetails userDetails = getUserDetails();
++//        MatchStats userStats = getUserStats();
++//
++//        TennisMatch tm = new TennisMatch(userDetails, userStats);
++//
++//        if (!journal.containsMatch(tm)) {
++//            journal.addMatch(tm);
++//            System.out.println("<THE MATCH HAS BEEN ADDED>");
++//        } else {
++//            System.out.println("<THE JOURNAL ALREADY CONTAINS THIS MATCH>");
++//        }
++//    }
++//
++//    // EFFECTS: gets the details of the match
++//    private MatchDetails getUserDetails() {
++//        System.out.println("<GETTING MATCH DETAILS>");
++//        System.out.println("\nWho was your opponent? - (First Last)");
++//        String opponent = input.next() + input.nextLine();
++//        System.out.println("\nWhat was the outcome of the match? - true = win, false = lose");
++//        boolean isWon = input.nextBoolean();
++//        System.out.println("\nWhat surface did you play on? - HARD/CLAY/GRASS");
++//        String surface = input.next().toLowerCase();
++//        System.out.println("\nHow long was the match (in minutes)?");
++//        int duration = input.nextInt();
++//        System.out.println("\nWhat is the date of this match? - (D/M/YYYY)");
++//        String date = input.next();
++//
++//        return new MatchDetails(opponent, isWon, surface, duration, date);
++//    }
++//
++//    // EFFECTS: gets the stats of the match
++//    private MatchStats getUserStats() {
++//        System.out.println("<GETTING MATCH STATS>");
++//        System.out.println("\nWhat was the score? - (a-b c-d ...)");
++//        String score = input.next() + input.nextLine();
++//        System.out.println("\nHow many aces did you hit?");
++//        int aces = input.nextInt();
++//        System.out.println("\nHow many double faults did you hit?");
++//        int doubleFaults = input.nextInt();
++//        System.out.println("\nHow many winners did you hit?");
++//        int winners = input.nextInt();
++//        System.out.println("\nHow many unforced errors did you hit?");
++//        int unforcedErrors = input.nextInt();
++//
++//        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: processes the delete command
++//    private void delete() {
++//        System.out.println("When did you play this match? (D/M/YYYY)");
++//        String date = input.next();
++//        System.out.println("\nWho was your opponent? (First Last)");
++//        String opponent = input.next();
++//        opponent += input.nextLine();
++//        boolean isFound = false;
++//
++//        for (TennisMatch tm : journal.getJournal()) {
++//            String d = tm.getMatchDetails().getDate();
++//            String o = tm.getMatchDetails().getOpponent();
++//
++//            if (d.equals(date) && o.equals(opponent)) {
++//                journal.deleteMatch(tm);
++//                System.out.println("<THE MATCH HAS BEEN DELETED>");
++//                isFound = true;
++//                break;
++//            }
++//        }
++//        if (!isFound) {
++//            System.out.println("<COULDN'T FIND ANY MATCH ON " + date + " AGAINST " + opponent + ">");
++//        }
++//    }
++//
++//    // EFFECTS: processes the view command
++//    private void viewMatches() {
++//        System.out.println("<VIEWING ALL MATCHES>");
++//        String matches = journal.viewJournal();
++//        System.out.println(matches);
++//    }
++//
++//    // EFFECTS: processes the ratio command
++//    private void viewRatio() {
++//        System.out.println("<VIEWING CURRENT WIN : LOSS RATIO>\n");
++//        String ratio = journal.viewWinLossRatio();
++//        System.out.println(ratio);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: loads journal from file
++//    private void loadJournal() {
++//        try {
++//            journal = jsonReader.read();
++//            System.out.println("<LOADED JOURNAL FROM FILE: " + JSON_STORE + ">");
++//        } catch (IOException e) {
++//            System.out.println("<UNABLE TO READ FROM FILE: " + JSON_STORE + ">");
++//        }
++//    }
++//
++//    // EFFECTS: saves current journal to file
++//    private void saveJournal() {
++//        try {
++//            jsonWriter.open();
++//            jsonWriter.write(journal);
++//            jsonWriter.close();
++//            System.out.println("<SAVED JOURNAL TO FILE: " + JSON_STORE + ">");
++//        } catch (FileNotFoundException e) {
++//            System.out.println("<UNABLE TO WRITE TO FILE: " + JSON_STORE + ">");
++//        }
++//    }
++//}
+ 
+ 
+ 
+Index: src/main/persistence/JsonReader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package persistence;\r\n\r\nimport model.MatchDetails;\r\nimport model.MatchStats;\r\nimport model.TennisMatch;\r\nimport model.TennisMatchJournal;\r\nimport org.json.JSONArray;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.IOException;\r\nimport java.nio.charset.StandardCharsets;\r\nimport java.nio.file.Files;\r\nimport java.nio.file.Paths;\r\nimport java.util.stream.Stream;\r\n\r\n// Represents a reader that reads journal from JSON data stored in file\r\n// Note: The structure of this Class and all of the methods inside it are largely\r\n//       based off the WorkRoom application that was given to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonReader {\r\n    private String source;\r\n\r\n    // EFFECTS: constructs reader to read from source file\r\n    public JsonReader(String source) {\r\n        this.source = source;\r\n    }\r\n\r\n    // EFFECTS: reads journal from file and returns it;\r\n    //          throws IOException if an error occurs when reading data from file\r\n    public TennisMatchJournal read() throws IOException {\r\n        String jsonData = readFile(source);\r\n        JSONObject jsonObject = new JSONObject(jsonData);\r\n        return parseJournal(jsonObject);\r\n    }\r\n\r\n    // EFFECTS: reads source file as string and returns it\r\n    private String readFile(String source) throws IOException {\r\n        StringBuilder contentBuilder = new StringBuilder();\r\n\r\n        try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {\r\n            stream.forEach(s -> contentBuilder.append(s));\r\n        }\r\n\r\n        return contentBuilder.toString();\r\n    }\r\n\r\n    // EFFECTS: parses journal from JSON object and returns it\r\n    private TennisMatchJournal parseJournal(JSONObject jsonObject) {\r\n        TennisMatchJournal journal = new TennisMatchJournal();\r\n        addMatches(journal, jsonObject);\r\n        return journal;\r\n    }\r\n\r\n    // MODIFIES: journal\r\n    // EFFECTS: parses matches from JSON object and adds them to journal\r\n    private void addMatches(TennisMatchJournal journal, JSONObject jsonObject) {\r\n        JSONArray jsonArray = jsonObject.getJSONArray(\"matches\");\r\n\r\n        for (Object json : jsonArray) {\r\n            JSONObject nextMatch = (JSONObject) json;\r\n            addMatch(journal, nextMatch);\r\n        }\r\n    }\r\n\r\n    // MODIFIES: journal\r\n    // EFFECTS: parses match from JSON object and adds it to journal\r\n    private void addMatch(TennisMatchJournal journal, JSONObject jsonObject) {\r\n        MatchDetails matchDetails = getMatchDetails(jsonObject);\r\n        MatchStats matchStats = getMatchStats(jsonObject);\r\n        TennisMatch tennisMatch = new TennisMatch(matchDetails, matchStats);\r\n\r\n        journal.addMatch(tennisMatch);\r\n    }\r\n\r\n    // EFFECTS: gets the match details from JSON object\r\n    private MatchDetails getMatchDetails(JSONObject jsonObject) {\r\n        String opponent = jsonObject.getString(\"opponent\");\r\n        boolean isWon = jsonObject.getBoolean(\"isWon\");\r\n        String surface = jsonObject.getString(\"surface\");\r\n        int duration = jsonObject.getInt(\"duration\");\r\n        String date = jsonObject.getString(\"date\");\r\n\r\n        return new MatchDetails(opponent, isWon, surface, duration, date);\r\n    }\r\n\r\n    // EFFECTS: gets the match stats from JSON object\r\n    private MatchStats getMatchStats(JSONObject jsonObject) {\r\n        String score = jsonObject.getString(\"score\");\r\n        int aces = jsonObject.getInt(\"aces\");\r\n        int doubleFaults = jsonObject.getInt(\"doubleFaults\");\r\n        int winners = jsonObject.getInt(\"winners\");\r\n        int unforcedErrors = jsonObject.getInt(\"unforcedErrors\");\r\n\r\n        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);\r\n    }\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/persistence/JsonReader.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/persistence/JsonReader.java	(date 1621031145295)
+@@ -1,99 +1,99 @@
+-package persistence;
+-
+-import model.MatchDetails;
+-import model.MatchStats;
+-import model.TennisMatch;
+-import model.TennisMatchJournal;
+-import org.json.JSONArray;
+-import org.json.JSONObject;
+-
+-import java.io.IOException;
+-import java.nio.charset.StandardCharsets;
+-import java.nio.file.Files;
+-import java.nio.file.Paths;
+-import java.util.stream.Stream;
+-
+-// Represents a reader that reads journal from JSON data stored in file
+-// Note: The structure of this Class and all of the methods inside it are largely
+-//       based off the WorkRoom application that was given to us on GitHub.
+-//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-public class JsonReader {
+-    private String source;
+-
+-    // EFFECTS: constructs reader to read from source file
+-    public JsonReader(String source) {
+-        this.source = source;
+-    }
+-
+-    // EFFECTS: reads journal from file and returns it;
+-    //          throws IOException if an error occurs when reading data from file
+-    public TennisMatchJournal read() throws IOException {
+-        String jsonData = readFile(source);
+-        JSONObject jsonObject = new JSONObject(jsonData);
+-        return parseJournal(jsonObject);
+-    }
+-
+-    // EFFECTS: reads source file as string and returns it
+-    private String readFile(String source) throws IOException {
+-        StringBuilder contentBuilder = new StringBuilder();
+-
+-        try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {
+-            stream.forEach(s -> contentBuilder.append(s));
+-        }
+-
+-        return contentBuilder.toString();
+-    }
+-
+-    // EFFECTS: parses journal from JSON object and returns it
+-    private TennisMatchJournal parseJournal(JSONObject jsonObject) {
+-        TennisMatchJournal journal = new TennisMatchJournal();
+-        addMatches(journal, jsonObject);
+-        return journal;
+-    }
+-
+-    // MODIFIES: journal
+-    // EFFECTS: parses matches from JSON object and adds them to journal
+-    private void addMatches(TennisMatchJournal journal, JSONObject jsonObject) {
+-        JSONArray jsonArray = jsonObject.getJSONArray("matches");
+-
+-        for (Object json : jsonArray) {
+-            JSONObject nextMatch = (JSONObject) json;
+-            addMatch(journal, nextMatch);
+-        }
+-    }
+-
+-    // MODIFIES: journal
+-    // EFFECTS: parses match from JSON object and adds it to journal
+-    private void addMatch(TennisMatchJournal journal, JSONObject jsonObject) {
+-        MatchDetails matchDetails = getMatchDetails(jsonObject);
+-        MatchStats matchStats = getMatchStats(jsonObject);
+-        TennisMatch tennisMatch = new TennisMatch(matchDetails, matchStats);
+-
+-        journal.addMatch(tennisMatch);
+-    }
+-
+-    // EFFECTS: gets the match details from JSON object
+-    private MatchDetails getMatchDetails(JSONObject jsonObject) {
+-        String opponent = jsonObject.getString("opponent");
+-        boolean isWon = jsonObject.getBoolean("isWon");
+-        String surface = jsonObject.getString("surface");
+-        int duration = jsonObject.getInt("duration");
+-        String date = jsonObject.getString("date");
+-
+-        return new MatchDetails(opponent, isWon, surface, duration, date);
+-    }
+-
+-    // EFFECTS: gets the match stats from JSON object
+-    private MatchStats getMatchStats(JSONObject jsonObject) {
+-        String score = jsonObject.getString("score");
+-        int aces = jsonObject.getInt("aces");
+-        int doubleFaults = jsonObject.getInt("doubleFaults");
+-        int winners = jsonObject.getInt("winners");
+-        int unforcedErrors = jsonObject.getInt("unforcedErrors");
+-
+-        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
+-    }
+-}
++//package persistence;
++//
++////import model.MatchDetails;
++////import model.MatchStats;
++////import model.TennisMatch;
++////import model.TennisMatchJournal;
++//import org.json.JSONArray;
++//import org.json.JSONObject;
++//
++//import java.io.IOException;
++//import java.nio.charset.StandardCharsets;
++//import java.nio.file.Files;
++//import java.nio.file.Paths;
++//import java.util.stream.Stream;
++//
++//// Represents a reader that reads journal from JSON data stored in file
++//// Note: The structure of this Class and all of the methods inside it are largely
++////       based off the WorkRoom application that was given to us on GitHub.
++////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
++//public class JsonReader {
++//    private String source;
++//
++//    // EFFECTS: constructs reader to read from source file
++//    public JsonReader(String source) {
++//        this.source = source;
++//    }
++//
++//    // EFFECTS: reads journal from file and returns it;
++//    //          throws IOException if an error occurs when reading data from file
++//    public TennisMatchJournal read() throws IOException {
++//        String jsonData = readFile(source);
++//        JSONObject jsonObject = new JSONObject(jsonData);
++//        return parseJournal(jsonObject);
++//    }
++//
++//    // EFFECTS: reads source file as string and returns it
++//    private String readFile(String source) throws IOException {
++//        StringBuilder contentBuilder = new StringBuilder();
++//
++//        try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {
++//            stream.forEach(s -> contentBuilder.append(s));
++//        }
++//
++//        return contentBuilder.toString();
++//    }
++//
++//    // EFFECTS: parses journal from JSON object and returns it
++//    private TennisMatchJournal parseJournal(JSONObject jsonObject) {
++//        TennisMatchJournal journal = new TennisMatchJournal();
++//        addMatches(journal, jsonObject);
++//        return journal;
++//    }
++//
++//    // MODIFIES: journal
++//    // EFFECTS: parses matches from JSON object and adds them to journal
++//    private void addMatches(TennisMatchJournal journal, JSONObject jsonObject) {
++//        JSONArray jsonArray = jsonObject.getJSONArray("matches");
++//
++//        for (Object json : jsonArray) {
++//            JSONObject nextMatch = (JSONObject) json;
++//            addMatch(journal, nextMatch);
++//        }
++//    }
++//
++//    // MODIFIES: journal
++//    // EFFECTS: parses match from JSON object and adds it to journal
++//    private void addMatch(TennisMatchJournal journal, JSONObject jsonObject) {
++//        MatchDetails matchDetails = getMatchDetails(jsonObject);
++//        MatchStats matchStats = getMatchStats(jsonObject);
++//        TennisMatch tennisMatch = new TennisMatch(matchDetails, matchStats);
++//
++//        journal.addMatch(tennisMatch);
++//    }
++//
++//    // EFFECTS: gets the match details from JSON object
++//    private MatchDetails getMatchDetails(JSONObject jsonObject) {
++//        String opponent = jsonObject.getString("opponent");
++//        boolean isWon = jsonObject.getBoolean("isWon");
++//        String surface = jsonObject.getString("surface");
++//        int duration = jsonObject.getInt("duration");
++//        String date = jsonObject.getString("date");
++//
++//        return new MatchDetails(opponent, isWon, surface, duration, date);
++//    }
++//
++//    // EFFECTS: gets the match stats from JSON object
++//    private MatchStats getMatchStats(JSONObject jsonObject) {
++//        String score = jsonObject.getString("score");
++//        int aces = jsonObject.getInt("aces");
++//        int doubleFaults = jsonObject.getInt("doubleFaults");
++//        int winners = jsonObject.getInt("winners");
++//        int unforcedErrors = jsonObject.getInt("unforcedErrors");
++//
++//        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
++//    }
++//}
+ 
+ 
+ 
+Index: src/main/model/Gallery.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport java.util.List;\r\n\r\npublic class Gallery {\r\n    List<Award> catastrophies; // snake? images\r\n    List<Award> pawsomeAchievements; // cat images\r\n    List<Award> allAwards;\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/model/Gallery.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/model/Gallery.java	(date 1621031082649)
+@@ -1,9 +1,9 @@
+-package model;
+-
+-import java.util.List;
+-
+-public class Gallery {
+-    List<Award> catastrophies; // snake? images
+-    List<Award> pawsomeAchievements; // cat images
+-    List<Award> allAwards;
+-}
++//package model;
++//
++//import java.util.List;
++//
++//public class Gallery {
++//    List<Award> catastrophies; // snake? images
++//    List<Award> pawsomeAchievements; // cat images
++//    List<Award> allAwards;
++//}
+Index: src/main/persistence/JsonWriter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package persistence;\r\n\r\nimport model.TennisMatchJournal;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.File;\r\nimport java.io.FileNotFoundException;\r\nimport java.io.PrintWriter;\r\n\r\n// Represents a writer that writes JSON representation of journal to file\r\n// Note: The structure of this class and all of the methods inside it are\r\n//       largely based off the WorkRoom application provided to us on GitHub.\r\n//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo\r\npublic class JsonWriter {\r\n    private static final int TAB = 4;\r\n    private PrintWriter writer;\r\n    private String destination;\r\n\r\n    // EFFECTS: constructs writer to write to destination file\r\n    public JsonWriter(String destination) {\r\n        this.destination = destination;\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: opens writer; throws FileNotFoundException if destination file\r\n    //          cannot be opened for writing\r\n    public void open() throws FileNotFoundException {\r\n        writer = new PrintWriter(new File(destination));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: writes JSON representation of journal to file\r\n    public void write(TennisMatchJournal journal) {\r\n        JSONObject json = journal.toJson();\r\n        saveToFile(json.toString(TAB));\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: writes string to file\r\n    private void saveToFile(String json) {\r\n        writer.print(json);\r\n    }\r\n\r\n    // MODIFIES: this\r\n    // EFFECTS: closes writer\r\n    public void close() {\r\n        writer.close();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/persistence/JsonWriter.java	(revision faa5254232692d5c95a63ce28e5eabbeeb6554cd)
++++ src/main/persistence/JsonWriter.java	(date 1621031145285)
+@@ -1,49 +1,49 @@
+-package persistence;
+-
+-import model.TennisMatchJournal;
+-import org.json.JSONObject;
+-
+-import java.io.File;
+-import java.io.FileNotFoundException;
+-import java.io.PrintWriter;
+-
+-// Represents a writer that writes JSON representation of journal to file
+-// Note: The structure of this class and all of the methods inside it are
+-//       largely based off the WorkRoom application provided to us on GitHub.
+-//       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
+-public class JsonWriter {
+-    private static final int TAB = 4;
+-    private PrintWriter writer;
+-    private String destination;
+-
+-    // EFFECTS: constructs writer to write to destination file
+-    public JsonWriter(String destination) {
+-        this.destination = destination;
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: opens writer; throws FileNotFoundException if destination file
+-    //          cannot be opened for writing
+-    public void open() throws FileNotFoundException {
+-        writer = new PrintWriter(new File(destination));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: writes JSON representation of journal to file
+-    public void write(TennisMatchJournal journal) {
+-        JSONObject json = journal.toJson();
+-        saveToFile(json.toString(TAB));
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: writes string to file
+-    private void saveToFile(String json) {
+-        writer.print(json);
+-    }
+-
+-    // MODIFIES: this
+-    // EFFECTS: closes writer
+-    public void close() {
+-        writer.close();
+-    }
+-}
++//package persistence;
++//
++//import model.TennisMatchJournal;
++//import org.json.JSONObject;
++//
++//import java.io.File;
++//import java.io.FileNotFoundException;
++//import java.io.PrintWriter;
++//
++//// Represents a writer that writes JSON representation of journal to file
++//// Note: The structure of this class and all of the methods inside it are
++////       largely based off the WorkRoom application provided to us on GitHub.
++////       URL: https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo
++//public class JsonWriter {
++//    private static final int TAB = 4;
++//    private PrintWriter writer;
++//    private String destination;
++//
++//    // EFFECTS: constructs writer to write to destination file
++//    public JsonWriter(String destination) {
++//        this.destination = destination;
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: opens writer; throws FileNotFoundException if destination file
++//    //          cannot be opened for writing
++//    public void open() throws FileNotFoundException {
++//        writer = new PrintWriter(new File(destination));
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: writes JSON representation of journal to file
++//    public void write(TennisMatchJournal journal) {
++//        JSONObject json = journal.toJson();
++//        saveToFile(json.toString(TAB));
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: writes string to file
++//    private void saveToFile(String json) {
++//        writer.print(json);
++//    }
++//
++//    // MODIFIES: this
++//    // EFFECTS: closes writer
++//    public void close() {
++//        writer.close();
++//    }
++//}

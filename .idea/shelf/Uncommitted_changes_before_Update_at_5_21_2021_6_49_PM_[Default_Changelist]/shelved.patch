@@ -1,0 +1,64 @@
+Index: src/main/ui/controller/Dashboard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/Dashboard.java b/src/main/ui/controller/HabitsApp.java
+rename from src/main/ui/controller/Dashboard.java
+rename to src/main/ui/controller/HabitsApp.java
+--- a/src/main/ui/controller/Dashboard.java	(revision 56342e848050070582094a78d78e74c8c28333ac)
++++ b/src/main/ui/controller/HabitsApp.java	(date 1621561326961)
+@@ -14,14 +14,20 @@
+ import javafx.scene.layout.*;
+ import javafx.scene.text.Font;
+ import javafx.stage.Stage;
++import model.Award;
++import model.CatImageDownloader;
++import model.CatImageURLRetriever;
++import model.Habit;
+ 
++import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.FileNotFoundException;
++import java.time.LocalDate;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+ 
+-public class Dashboard extends Application {
++public class HabitsApp extends Application {
+     BorderPane borderPane;
+     VBox leftVBox;
+ 
+@@ -54,10 +60,29 @@
+         topHBox.setAlignment(Pos.TOP_CENTER);
+ 
+         //Image Stuff
+-        FileInputStream stream = new FileInputStream("data/catLogo.png");
++        LocalDate date = LocalDate.now();
++        Award award = new Award(date, Award.AwardType.FELINE_GOOD);
++        CatImageURLRetriever urlRetriever = new CatImageURLRetriever(award.getAwardType());
++        String link = urlRetriever.getCatImageURL();
++        String directory = "C:\\Users\\ylynn\\OneDrive\\Documents\\Coding Projects\\PurrfectHabits\\data\\";
++        String fileExtension = (award.getAwardType() == Award.AwardType.FELINE_GOOD) ? ".jpg" : ".gif";
++        String nameAndExtension = award.getDateReceived().toString() + fileExtension;
++        String filePath = directory + nameAndExtension;
++        File outputFile = new File(filePath);
++        CatImageDownloader downloader = new CatImageDownloader(link, outputFile);
++        new Thread(downloader).start();
++
++        while (downloader.getCompletionStatus() != true) {
++            System.out.println("inside of polling loop");
++        }
++
++        String inputStreamPath = "data/" + award.getDateReceived() + fileExtension;
++//        String inputStreamPath = "data/" + "Cat_Fist_Bump.gif";
++        FileInputStream stream = new FileInputStream(inputStreamPath);
+         Image image = new Image(stream);
+         ImageView logo = new ImageView(image);
+-        logo.setFitWidth(100);
++        logo.setFitWidth(500);
++        logo.setFitHeight(500);
+         logo.setPreserveRatio(true);
+ 
+         //Label Stuff

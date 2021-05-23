@@ -1,0 +1,739 @@
+Index: src/main/ui/controller/Dashboard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/Dashboard.java b/src/main/ui/controller/DashboardPage.java
+rename from src/main/ui/controller/Dashboard.java
+rename to src/main/ui/controller/DashboardPage.java
+--- a/src/main/ui/controller/Dashboard.java	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
++++ b/src/main/ui/controller/DashboardPage.java	(date 1621407602970)
+@@ -21,10 +21,15 @@
+ import java.util.List;
+ 
+ 
+-public class Dashboard extends Application {
++public class DashboardPage extends Application {
+     BorderPane borderPane;
+     VBox leftVBox;
+ 
++    public DashboardPage() {
++        LoginPage loginPage = new LoginPage();
++
++    }
++
+     public static void main(String[] args) {
+         launch(args);
+     }
+@@ -50,11 +55,12 @@
+ 
+     private void createTopHBox() throws FileNotFoundException {
+         HBox topHBox = new HBox();
+-        topHBox.setStyle("-fx-background-color: #86D0F7FF");
++        topHBox.setStyle("-fx-background-color: #86D0F7");
+         topHBox.setAlignment(Pos.TOP_CENTER);
+ 
+         //Image Stuff
+         FileInputStream stream = new FileInputStream("data/catLogo.png");
++        //FileInputStream stream = new FileInputStream("https://cdn2.thecatapi.com/images/hi.jpg");
+         Image image = new Image(stream);
+         ImageView logo = new ImageView(image);
+         logo.setFitWidth(100);
+@@ -108,7 +114,7 @@
+         buttons.add(myHabits);
+         buttons.add(addHabit);
+         buttons.add(deleteHabit);
+-        for (Button b: buttons) {
++        for (Button b : buttons) {
+             b.setFont(new Font("Dosis Bold", 20));
+             b.setStyle("-fx-background-color: #86D0F7");
+ 
+@@ -118,6 +124,7 @@
+     }
+ 
+     private void createCenterGridPane() {
++       // Graph graph = new Graph(borderPane);
+         //TODO: Put graph into seperate class
+         //TODO: Figure out some styling/CSS for graph
+         //TODO: Connect real data/stats to graph
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM_[Default_Changelist]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM_[Default_Changelist]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM_[Default_Changelist]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM_[Default_Changelist]/shelved.patch	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
++++ /dev/null	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
+@@ -1,35 +0,0 @@
+-Index: src/main/model/MatchStats.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\nimport java.util.Objects;\r\n// YANG WAS HERE\r\n// Represents common stats for a tennis match\r\npublic class MatchStats {\r\n    private String score;\r\n    private int aces;\r\n    private int doubleFaults;\r\n    private int winners;\r\n    private int unforcedErrors;\r\n\r\n    // EFFECTS: Initializes the stats of a tennis match.\r\n    public MatchStats(String score, int aces, int doubleFaults, int winners, int unforcedErrors) {\r\n        this.score = score;\r\n        this.aces = aces;\r\n        this.doubleFaults = doubleFaults;\r\n        this.winners = winners;\r\n        this.unforcedErrors = unforcedErrors;\r\n    }\r\n\r\n    public String getScore() {\r\n        return score;\r\n    }\r\n\r\n    public int getAces() {\r\n        return aces;\r\n    }\r\n\r\n    public int getDoubleFaults() {\r\n        return doubleFaults;\r\n    }\r\n\r\n    public int getWinners() {\r\n        return winners;\r\n    }\r\n\r\n    public int getUnforcedErrors() {\r\n        return unforcedErrors;\r\n    }\r\n\r\n    @Override\r\n    public boolean equals(Object o) {\r\n        if (this == o) {\r\n            return true;\r\n        }\r\n        if (!(o instanceof MatchStats)) {\r\n            return false;\r\n        }\r\n        MatchStats that = (MatchStats) o;\r\n        return getAces() == that.getAces()\r\n                &&\r\n                getDoubleFaults() == that.getDoubleFaults()\r\n                &&\r\n                getWinners() == that.getWinners()\r\n                &&\r\n                getUnforcedErrors() == that.getUnforcedErrors()\r\n                &&\r\n                Objects.equals(getScore(), that.getScore());\r\n    }\r\n\r\n    @Override\r\n    public int hashCode() {\r\n        return Objects.hash(getScore(), getAces(), getDoubleFaults(), getWinners(), getUnforcedErrors());\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/main/model/MatchStats.java	(revision e587e6f39d65b161621fa11b6b7b7fec42dbf87e)
+-+++ src/main/model/MatchStats.java	(date 1620709728516)
+-@@ -3,6 +3,7 @@
+- import java.util.Objects;
+- // YANG WAS HERE
+- // Represents common stats for a tennis match
+-+
+- public class MatchStats {
+-     private String score;
+-     private int aces;
+-Index: src/main/model/TennisMatch.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package model;\r\n\r\nimport org.json.JSONObject;\r\nimport persistence.Writable;\r\n\r\nimport java.util.Objects;\r\n\r\n// Represents the details and statistics of a tennis match\r\n// Note: The toJson() method in this class is largely based on the\r\n//       method with the same name found in the Thingy class in the\r\n//       WorkRoom application provided to us on GitHub.\r\npublic class TennisMatch implements Writable {\r\n    private MatchDetails matchDetails;\r\n    private MatchStats matchStats;\r\n\r\n    // EFFECTS: initializes a tennis match; sets up its details and stats\r\n    public TennisMatch(MatchDetails md, MatchStats ms) {\r\n        matchDetails = md;\r\n        matchStats = ms;\r\n    }\r\n\r\n    public MatchDetails getMatchDetails() {\r\n        return matchDetails;\r\n    }\r\n\r\n    public MatchStats getMatchStats() {\r\n        return matchStats;\r\n    }\r\n\r\n    @Override\r\n    // EFFECTS: returns tennis match as a JSON object\r\n    public JSONObject toJson() {\r\n        JSONObject json = new JSONObject();\r\n\r\n        json.put(\"opponent\", matchDetails.getOpponent());\r\n        json.put(\"isWon\", matchDetails.getIsWon());\r\n        json.put(\"surface\", matchDetails.getSurface());\r\n        json.put(\"duration\", matchDetails.getDuration());\r\n        json.put(\"date\", matchDetails.getDate());\r\n\r\n        json.put(\"score\", matchStats.getScore());\r\n        json.put(\"aces\", matchStats.getAces());\r\n        json.put(\"doubleFaults\", matchStats.getDoubleFaults());\r\n        json.put(\"winners\", matchStats.getWinners());\r\n        json.put(\"unforcedErrors\", matchStats.getUnforcedErrors());\r\n\r\n        return json;\r\n    }\r\n\r\n    @Override\r\n    public boolean equals(Object o) {\r\n        if (this == o) {\r\n            return true;\r\n        }\r\n        if (!(o instanceof TennisMatch)) {\r\n            return false;\r\n        }\r\n        TennisMatch that = (TennisMatch) o;\r\n        return Objects.equals(getMatchDetails(), that.getMatchDetails())\r\n                &&\r\n                Objects.equals(getMatchStats(), that.getMatchStats());\r\n    }\r\n\r\n    @Override\r\n    public int hashCode() {\r\n        return Objects.hash(getMatchDetails(), getMatchStats());\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- src/main/model/TennisMatch.java	(revision e587e6f39d65b161621fa11b6b7b7fec42dbf87e)
+-+++ src/main/model/TennisMatch.java	(date 1620709728527)
+-@@ -9,6 +9,8 @@
+- // Note: The toJson() method in this class is largely based on the
+- //       method with the same name found in the Thingy class in the
+- //       WorkRoom application provided to us on GitHub.
+-+
+-+//Jessicaaaaaaaaaaaa
+- public class TennisMatch implements Writable {
+-     private MatchDetails matchDetails;
+-     private MatchStats matchStats;
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM__Default_Changelist_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM__Default_Changelist_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM__Default_Changelist_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM__Default_Changelist_.xml	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
++++ /dev/null	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM_[Default_Changelist]" date="1620709737404" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_10_2021_10_08_PM_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 5/10/2021 10:08 PM [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: src/main/ui/controller/JournalAppGui.java
+===================================================================
+diff --git a/src/main/ui/controller/JournalAppGui.java b/src/main/ui/controller/JournalAppGui.java
+deleted file mode 100644
+--- a/src/main/ui/controller/JournalAppGui.java	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
++++ /dev/null	(revision f04b0ec916f97af71964c74d59113bf0b116c51b)
+@@ -1,407 +0,0 @@
+-//package ui.controller;
+-//
+-//import model.MatchDetails;
+-//import model.MatchStats;
+-//import model.TennisMatch;
+-//import model.TennisMatchJournal;
+-//import model.exceptions.InvalidIndexException;
+-//import persistence.JsonReader;
+-//import persistence.JsonWriter;
+-//import ui.viewer.*;
+-//
+-//import javax.swing.*;
+-//import java.awt.event.ActionEvent;
+-//import java.awt.event.ActionListener;
+-//import java.io.FileNotFoundException;
+-//import java.io.IOException;
+-//
+-//// Tennis match journal application
+-//public class JournalAppGui implements ActionListener {
+-//    private static final String JSON_STORE = "./data/habits.json";
+-//    private TennisMatchJournal journal;
+-//    private JsonReader jsonReader;
+-//    private JsonWriter jsonWriter;
+-//    private LaunchPage launchPage;
+-//    private AddPage addPage;
+-//    private DeletePage deletePage;
+-//    private ViewPage viewPage;
+-//    private StatsPage statsPage;
+-//    private RatioPage ratioPage;
+-//
+-//    // EFFECTS: runs the journal application
+-//    public JournalAppGui() {
+-//        initialize();
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: initializes the journal
+-//    private void initialize() {
+-//        journal = new TennisMatchJournal();
+-//        jsonReader = new JsonReader(JSON_STORE);
+-//        jsonWriter = new JsonWriter(JSON_STORE);
+-//        launchPage = new LaunchPage(this);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for all events that occur as the application
+-//    //          is running
+-//    @Override
+-//    public void actionPerformed(ActionEvent e) {
+-//        launchPageListener(e);
+-//        addPageListener(e);
+-//        deletePageListener(e);
+-//        viewPageListener(e);
+-//        ratioPageListener(e);
+-//        statsPageListener(e);
+-//    }
+-//
+-//    // =============================== LISTENERS ===============================
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for events in the LaunchPage
+-//    private void launchPageListener(ActionEvent e) {
+-//        if (e.getSource() == launchPage.getAddButton()) {
+-//            handleLaunchAdd();
+-//        }
+-//        if (e.getSource() == launchPage.getDeleteButton()) {
+-//            handleLaunchDelete();
+-//        }
+-//        if (e.getSource() == launchPage.getViewButton()) {
+-//            handleLaunchView();
+-//        }
+-//        if (e.getSource() == launchPage.getRatioButton()) {
+-//            handleLaunchRatio();
+-//        }
+-//        if (e.getSource() == launchPage.getLoadButton()) {
+-//            handleLaunchLoad();
+-//        }
+-//        if (e.getSource() == launchPage.getSaveButton()) {
+-//            handleLaunchSave();
+-//        }
+-//        if (e.getSource() == launchPage.getQuitButton()) {
+-//            handleLaunchQuit();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for events in the add page
+-//    private void addPageListener(ActionEvent e) {
+-//        if (addPage != null && e.getSource() == addPage.getSubmitButton()) {
+-//            handleAddAdd();
+-//        } else if (addPage != null && e.getSource() == addPage.getBackButton()) {
+-//            handleAddBack();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for events in the delete page
+-//    private void deletePageListener(ActionEvent e) {
+-//        if (deletePage != null && e.getSource() == deletePage.getSubmitButton()) {
+-//            handleDeleteDelete();
+-//        }
+-//        if (deletePage != null && e.getSource() == deletePage.getBackButton()) {
+-//            handleDeleteBack();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for events in the view page
+-//    private void viewPageListener(ActionEvent e) {
+-//        if (viewPage != null && e.getSource() == viewPage.getBackButton()) {
+-//            handleViewBack();
+-//        }
+-//        if (viewPage != null && e.getSource() == viewPage.getSelectButton()) {
+-//            handleViewSelect();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for events in the ratio page
+-//    private void ratioPageListener(ActionEvent e) {
+-//        if (ratioPage != null && e.getSource() == ratioPage.getBackButton()) {
+-//            handleRatioBack();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: listens for events in the stats page
+-//    private void statsPageListener(ActionEvent e) {
+-//        if (statsPage != null && e.getSource() == statsPage.getBackButton()) {
+-//            handleStatsBack();
+-//        }
+-//    }
+-//
+-//    // =============================== LAUNCH PAGE HANDLERS ===============================
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: creates an add page
+-//    private void handleLaunchAdd() {
+-//        addPage = new AddPage(this);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: creates a new delete page
+-//    private void handleLaunchDelete() {
+-//        deletePage = new DeletePage(this);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the launch page and creates the view page
+-//    private void handleLaunchView() {
+-//        launchPage.dispose();
+-//        viewPage = new ViewPage(this, journal);
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the launch page and creates the ratio page
+-//    private void handleLaunchRatio() {
+-//        launchPage.dispose();
+-//        ratioPage = new RatioPage(this, journal.viewWinLossRatio());
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: loads journal from file
+-//    private void handleLaunchLoad() {
+-//        try {
+-//            journal = jsonReader.read();
+-//            showLoadingConfirmation();
+-//        } catch (IOException e) {
+-//            showLoadingFailure();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: saves the journal to file
+-//    private void handleLaunchSave() {
+-//        try {
+-//            jsonWriter.open();
+-//            jsonWriter.write(journal);
+-//            jsonWriter.close();
+-//            showSaveConfirmation();
+-//        } catch (FileNotFoundException e) {
+-//            showSaveFailure();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the launch page (quits the program)
+-//    private void handleLaunchQuit() {
+-//        launchPage.dispose();
+-//    }
+-//
+-//    // =============================== ADD PAGE HANDLERS ===============================
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: creates a match from the user's input and adds it into the journal
+-//    //          if the journal does not already contain the match
+-//    //          (doesn't add if the journal already contains the match)
+-//    private void handleAddAdd() {
+-//        MatchDetails userDetails = getSubmittedDetails();
+-//        MatchStats userStats = getSubmittedStats();
+-//
+-//        TennisMatch tm = new TennisMatch(userDetails, userStats);
+-//
+-//        if (!journal.containsMatch(tm)) {
+-//            journal.addMatch(tm);
+-//            displayAddConfirmation();
+-//            addPage.dispose();
+-//        } else {
+-//            displayAddError();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the add page and returns the user to the launch page
+-//    private void handleAddBack() {
+-//        addPage.dispose();
+-//    }
+-//
+-//    // =============================== DELETE PAGE HANDLERS ===============================
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: deleted the specified match from the journal
+-//    //          (does nothing if journal does not contain the match)
+-//    private void handleDeleteDelete() {
+-//        String opponent = deletePage.getOpponentField().getText();
+-//        String date = deletePage.getDateField().getText();
+-//
+-//        boolean isFound = false;
+-//
+-//        for (TennisMatch tm : journal.getJournal()) {
+-//            String d = tm.getMatchDetails().getDate();
+-//            String o = tm.getMatchDetails().getOpponent();
+-//
+-//            if (d.equals(date) && o.equals(opponent)) {
+-//                journal.deleteMatch(tm);
+-//                showDeletionConfirmation();
+-//                deletePage.dispose();
+-//                isFound = true;
+-//                break;
+-//            }
+-//        }
+-//
+-//        if (!isFound) {
+-//            showDeletionError();
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the delete page and returns the user to the launch page
+-//    private void handleDeleteBack() {
+-//        deletePage.dispose();
+-//    }
+-//
+-//    // =============================== VIEW PAGE HANDLERS ===============================
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: creates a stats page displaying the stats of the selected match
+-//    private void handleViewSelect() {
+-//        TennisMatch match;
+-//
+-//        JList<String> list = viewPage.getViewPanel();
+-//        int index = list.getSelectedIndex();
+-//
+-//        try {
+-//            match = journal.getMatchAt(index);
+-//            statsPage = new StatsPage(this, match);
+-//        } catch (InvalidIndexException e) {
+-//            JOptionPane.showMessageDialog(null,
+-//                    "Please select a valid match",
+-//                    "Tennis Match Journal",
+-//                    JOptionPane.ERROR_MESSAGE);
+-//        }
+-//    }
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the view page and returns the user to the launch page
+-//    private void handleViewBack() {
+-//        viewPage.dispose();
+-//        launchPage = new LaunchPage(this);
+-//    }
+-//
+-//    // =============================== STATS PAGE HANDLERS ===============================
+-//
+-//    private void handleStatsBack() {
+-//        statsPage.dispose();
+-//    }
+-//
+-//    // =============================== RATIO PAGE HANDLERS ===============================
+-//
+-//    // MODIFIES: this
+-//    // EFFECTS: closes the ratio page and returns the user to the launch page
+-//    private void handleRatioBack() {
+-//        ratioPage.dispose();
+-//        launchPage = new LaunchPage(this);
+-//    }
+-//
+-//    // =============================== MISCELLANEOUS HELPERS ===============================
+-//
+-//    // EFFECTS: gets submitted match details from add page and returns
+-//    //          a match details object consisting of those details
+-//    private MatchDetails getSubmittedDetails() {
+-//        int selectedResult = addPage.getResultOptions().getSelectedIndex();
+-//        int selectedSurface = addPage.getSurfaceOptions().getSelectedIndex();
+-//
+-//        String opponent = addPage.getOpponentField().getText();
+-//        boolean isWon = convertResult(selectedResult);
+-//        String surface = convertSurface(selectedSurface);
+-//        int duration = Integer.parseInt(addPage.getDurationField().getText());
+-//        String date = addPage.getDateField().getText();
+-//
+-//        return new MatchDetails(opponent, isWon, surface, duration, date);
+-//    }
+-//
+-//    // EFFECTS: converts the selected result into a boolean that represents
+-//    //          the outcome of the match
+-//    private boolean convertResult(int selectedResult) {
+-//        return selectedResult == 1;
+-//    }
+-//
+-//    // EFFECTS: converts the selected surface into a string that represents
+-//    //          the surface that the match was played on
+-//    private String convertSurface(int selectedSurface) {
+-//        if (selectedSurface == 1) {
+-//            return "Hard";
+-//        } else if (selectedSurface == 2) {
+-//            return "Grass";
+-//        } else {
+-//            return "Clay";
+-//        }
+-//    }
+-//
+-//    // EFFECTS: gets the submitted match stats from the add page and returns
+-//    //          a match stats object consisting of those stats
+-//    private MatchStats getSubmittedStats() {
+-//        String score = addPage.getScoreField().getText();
+-//        int aces = Integer.parseInt(addPage.getAcesField().getText());
+-//        int doubleFaults = Integer.parseInt(addPage.getDoubleFaultsField().getText());
+-//        int winners = Integer.parseInt(addPage.getWinnersField().getText());
+-//        int unforcedErrors = Integer.parseInt(addPage.getUnforcedErrorsField().getText());
+-//
+-//        return new MatchStats(score, aces, doubleFaults, winners, unforcedErrors);
+-//    }
+-//
+-//    // EFFECTS: displays an adding error message to user
+-//    private void displayAddError() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "The journal already contains this match",
+-//                "Tennis Match Journal",
+-//                JOptionPane.ERROR_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays an adding confirmation message to user
+-//    private void displayAddConfirmation() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "The match has been successfully added",
+-//                "Tennis Match Journal",
+-//                JOptionPane.INFORMATION_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays a loading confirmation message
+-//    private void showLoadingConfirmation() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "Your journal has been loaded",
+-//                "Tennis Match Journal",
+-//                JOptionPane.INFORMATION_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays a loading failure message
+-//    private void showLoadingFailure() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "An error occurred - the journal was not loaded",
+-//                "Tennis Match Journal",
+-//                JOptionPane.INFORMATION_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays a saving confirmation message
+-//    private void showSaveConfirmation() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "You journal has been saved",
+-//                "Tennis Match Journal",
+-//                JOptionPane.INFORMATION_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays a saving failure message
+-//    private void showSaveFailure() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "An error occurred - the journal was not saved",
+-//                "Tennis Match Journal",
+-//                JOptionPane.ERROR_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays a deleting confirmation message
+-//    private void showDeletionConfirmation() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "The specified match has been successfully deleted",
+-//                "Tennis Match Journal",
+-//                JOptionPane.INFORMATION_MESSAGE);
+-//    }
+-//
+-//    // EFFECTS: displays a deleting error message
+-//    private void showDeletionError() {
+-//        JOptionPane.showMessageDialog(null,
+-//                "Can't find the specified match",
+-//                "Tennis Match Journal",
+-//                JOptionPane.ERROR_MESSAGE);
+-//    }
+-//}
+Index: src/main/ui/controller/LoginPage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/LoginPage.java b/src/main/ui/controller/LoginPage.java
+new file mode 100644
+--- /dev/null	(date 1621561154456)
++++ b/src/main/ui/controller/LoginPage.java	(date 1621561154456)
+@@ -0,0 +1,49 @@
++package ui.controller;
++
++import javafx.event.ActionEvent;
++
++import javafx.event.EventHandler;
++import javafx.geometry.Pos;
++import javafx.scene.control.Button;
++import javafx.scene.control.Label;
++import javafx.scene.layout.VBox;
++import javafx.scene.text.Font;
++
++
++
++public class LoginPage {
++    VBox loginVbox;
++
++    public LoginPage() {
++        loginVbox = new VBox();
++        loginVbox.setAlignment(Pos.CENTER);
++        loginVbox.setStyle("-fx-background-color: #86D0F7");
++
++        //Label Stuff
++        Label label = new Label("Welcome to Purrfect Habits!");
++        label.setFont(new Font("Showcard Gothic", 24));
++        Label firstTime = new Label("First Time?");
++        firstTime.setFont(new Font("Dosis Bold", 20));
++
++        //Button Stuff
++        Button yes = new Button("Yes");
++        Button no = new Button("No");
++
++        yes.setOnAction(new EventHandler<ActionEvent>() {
++            @Override
++            public void handle(ActionEvent event) {
++                //TODO: Open Account Page
++            }
++        });
++
++        no.setOnAction(new EventHandler<ActionEvent>() {
++            @Override
++            public void handle(ActionEvent event) {
++                //TODO: Open Dashboard
++            }
++        });
++
++        loginVbox.getChildren().addAll(label, firstTime, yes, no);
++    }
++
++}
+Index: src/main/ui/controller/SceneController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/SceneController.java b/src/main/ui/controller/SceneController.java
+new file mode 100644
+--- /dev/null	(date 1621403030546)
++++ b/src/main/ui/controller/SceneController.java	(date 1621403030546)
+@@ -0,0 +1,27 @@
++package ui.controller;
++
++import javafx.event.ActionEvent;
++import javafx.scene.Node;
++import javafx.scene.Scene;
++import javafx.stage.Stage;
++
++public class SceneController {
++    private Stage stage;
++    private Scene scene;
++
++    public void switchToNewAccScene(ActionEvent event) {
++       // TODO: WTFFFF  Parent root = ???
++        stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
++        scene = new Scene(root);
++        stage.setScene(scene);
++        stage.show();
++    }
++
++    public void switchToDashboardScene(ActionEvent event) {
++        // TODO: WTFFFF  Parent root = ???
++        stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
++        scene = new Scene(root);
++        stage.setScene(scene);
++        stage.show();
++    }
++}
+Index: src/main/ui/controller/NewAccountPage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/NewAccountPage.java b/src/main/ui/controller/NewAccountPage.java
+new file mode 100644
+--- /dev/null	(date 1621402419108)
++++ b/src/main/ui/controller/NewAccountPage.java	(date 1621402419108)
+@@ -0,0 +1,4 @@
++package ui.controller;
++
++public class NewAccountPage {
++}
+Index: src/main/ui/viewer/Graph.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/viewer/Graph.java b/src/main/ui/viewer/Graph.java
+new file mode 100644
+--- /dev/null	(date 1621407668851)
++++ b/src/main/ui/viewer/Graph.java	(date 1621407668851)
+@@ -0,0 +1,62 @@
++//package model;
++//
++//
++//import javafx.geometry.Pos;
++//import javafx.scene.chart.LineChart;
++//import javafx.scene.chart.NumberAxis;
++//import javafx.scene.chart.XYChart;
++//import javafx.scene.layout.BorderPane;
++//import javafx.scene.layout.GridPane;
++//
++//public class Graph {
++//    private BorderPane borderPane;
++//
++//    public Graph(BorderPane bp) {
++//        borderPane = bp;
++//    }
++//
++//        //TODO: Put graph into seperate class
++//        //TODO: Figure out some styling/CSS for graph
++//        //TODO: Connect real data/stats to graph
++//
++//        GridPane centerGridPane = new GridPane();
++//        centerGridPane.setAlignment(Pos.CENTER);
++//        borderPane.setCenter(centerGridPane);
++//
++//
++//        //Defining the x axis
++//        NumberAxis theXAxis = new NumberAxis(0, 10, 1);
++//        theXAxis.setLabel("Days");
++//        // theXAxis.setStyle("-fx-background-color: #86D0F7");
++//
++//
++//
++//        //Defining the y axis
++//        NumberAxis theYAxis = new NumberAxis(0, 30,  1);
++//        theYAxis.setLabel("No.of Cat Photos");
++//        theYAxis.setStyle("-fx-background-color: #86D0F7");
++//
++//        //Creating the line chart
++//        LineChart linechart = new LineChart(theXAxis, theYAxis);
++//
++//
++//        //Prepare XYChart.Series objects by setting data
++//        XYChart.Series series = new XYChart.Series();
++//        series.setName("Cat Photos Collected");
++//
++//        //Test Data -> Connect Somehow with real stats
++//        series.getData().add(new XYChart.Data(0, 0));
++//        series.getData().add(new XYChart.Data(1, 1));
++//        series.getData().add(new XYChart.Data(2, 4));
++//        series.getData().add(new XYChart.Data(3, 10));
++//        series.getData().add(new XYChart.Data(4, 5));
++//        series.getData().add(new XYChart.Data(5, 20));
++//
++////        Node line = series.getNode().lookup(".chart-series-line");
++////        line.setStyle("-fx-fill: #FF0000");
++//
++//        //Setting the data to Line chart
++//        linechart.getData().add(series);
++//
++//        centerGridPane.getChildren().add(linechart);
++//}
+Index: src/main/ui/controller/GUIMain.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/GUIMain.java b/src/main/ui/controller/GUIMain.java
+new file mode 100644
+--- /dev/null	(date 1621561453315)
++++ b/src/main/ui/controller/GUIMain.java	(date 1621561453315)
+@@ -0,0 +1,21 @@
++package ui.controller;
++
++import javafx.application.Application;
++import javafx.stage.Stage;
++
++public class GUIMain extends Application {
++    LoginPage loginPage;
++
++    public static void main(String[] args) {
++        launch(args);
++
++    }
++
++    @Override
++    public void start(Stage primaryStage) throws Exception {
++        loginPage = new LoginPage();
++        primaryStage.setTitle("Purrfect Habits");
++       // primaryStage.setScene(loginPage.loginVbox);
++        primaryStage.show();
++    }
++}

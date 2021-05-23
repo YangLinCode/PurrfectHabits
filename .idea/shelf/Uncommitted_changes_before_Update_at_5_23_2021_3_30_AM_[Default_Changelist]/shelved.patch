@@ -1,0 +1,39 @@
+Index: src/main/ui/controller/DashboardPage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.controller;\r\n\r\nimport javafx.event.EventHandler;\r\nimport javafx.geometry.Insets;\r\nimport javafx.geometry.Orientation;\r\nimport javafx.geometry.Pos;\r\nimport javafx.geometry.VerticalDirection;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.chart.LineChart;\r\nimport javafx.scene.chart.NumberAxis;\r\nimport javafx.scene.chart.XYChart;\r\nimport javafx.scene.control.Button;\r\nimport javafx.scene.control.Label;\r\nimport javafx.scene.control.Separator;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.image.ImageView;\r\nimport javafx.scene.layout.*;\r\nimport javafx.scene.text.Font;\r\nimport javafx.stage.Stage;\r\nimport model.Quote;\r\nimport model.QuoteOfTheDay;\r\n\r\nimport java.io.FileInputStream;\r\nimport java.io.FileNotFoundException;\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\n\r\n\r\npublic class DashboardPage  {\r\n    private static final String yellow = \"-fx-background-color: #FFCB3D\";\r\n    private static final String blue = \"-fx-background-color: #86D0F7\";\r\n    private BorderPane borderPane;\r\n    private VBox leftPane;\r\n    private HBox topPane;\r\n    private Quote quoteOfTheDay;\r\n    private Button settingsButton;\r\n    private Button profileButton;\r\n    private Button friendsButton;\r\n    private Button logoutButton;\r\n    private Button leaderboardButton;\r\n\r\n    public DashboardPage(Stage primaryStage, EventHandler eventHandler) throws Exception {\r\n        borderPane = new BorderPane();\r\n        borderPane.setPrefSize(1000, 500);\r\n        createLeftPane();\r\n        createTopPane();\r\n        createBigPane();\r\n        Scene scene = new Scene(borderPane);\r\n        primaryStage.setScene(scene);\r\n        primaryStage.show();\r\n    }\r\n\r\n    public void createLeftPane() {\r\n        leftPane = new VBox(45);\r\n        leftPane.setStyle(yellow);\r\n        leftPane.setPadding(new Insets(10, 10, 10, 10));\r\n        borderPane.setLeft(leftPane);\r\n        try {\r\n            FileInputStream profileStream = new FileInputStream(\"data/misc/profile.png\");\r\n            FileInputStream logoutStream = new FileInputStream(\"data/misc/logout.png\");\r\n            FileInputStream leaderboardStream = new FileInputStream(\"data/misc/leaderboard.png\");\r\n            FileInputStream friendsStream = new FileInputStream(\"data/misc/friends.png\");\r\n            FileInputStream settingsStream = new FileInputStream(\"data/misc/settings.png\");\r\n            ImageView settingsImage = new ImageView(new Image(settingsStream));\r\n            ImageView friendsImage = new ImageView(new Image(friendsStream));\r\n            ImageView leaderboardImage = new ImageView(new Image(leaderboardStream));\r\n            ImageView logoutImage = new ImageView(new Image(logoutStream));\r\n            ImageView profileImage = new ImageView(new Image(profileStream));\r\n\r\n            List<ImageView> images = Arrays.asList(profileImage, friendsImage, leaderboardImage, settingsImage, logoutImage);\r\n            for (ImageView im : images) {\r\n                im.setFitWidth(50);\r\n                im.setFitHeight(50);\r\n            }\r\n\r\n            settingsButton = new Button(\"\", settingsImage);\r\n            settingsButton.setFocusTraversable(false);\r\n            profileButton = new Button(\"\", profileImage);\r\n            profileButton.setFocusTraversable(false);\r\n            logoutButton = new Button(\"\", logoutImage);\r\n            logoutButton.setFocusTraversable(false);\r\n            friendsButton = new Button(\"\", friendsImage);\r\n            friendsButton.setFocusTraversable(false);\r\n            leaderboardButton = new Button(\"\", leaderboardImage);\r\n            leaderboardButton.setFocusTraversable(false);\r\n\r\n            leftPane.getChildren().addAll(profileButton, friendsButton, leaderboardButton, settingsButton, logoutButton);\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n\r\n    public void createTopPane() {\r\n        topPane = new HBox(10);\r\n        topPane.setStyle(blue);\r\n        topPane.setPadding(new Insets(10, 10, 10, 10));\r\n        borderPane.setTop(topPane);\r\n\r\n        try {\r\n            FileInputStream inputStream = new FileInputStream(\"data/misc/anonCat.png\");\r\n            ImageView imageView = new ImageView(new Image(inputStream));\r\n            imageView.setFitWidth(70);\r\n            imageView.setFitHeight(70);\r\n            topPane.getChildren().add(imageView);\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n\r\n        QuoteOfTheDay generator = new QuoteOfTheDay();\r\n        quoteOfTheDay = generator.getQuoteOfTheDay();\r\n\r\n        Label dashboardLabel = new Label(\"Dashboard\");\r\n        dashboardLabel.setFont(new Font(\"Century Gothic Bold\", 55));\r\n        topPane.getChildren().add(dashboardLabel);\r\n\r\n        Separator separator = new Separator(Orientation.VERTICAL);\r\n        topPane.getChildren().add(separator);\r\n\r\n        Label sayingLabel = new Label(\"\\\"\" + quoteOfTheDay.getSaying() + \"\\\"\" + \"\\n\" + \"- \" + quoteOfTheDay.getAuthor());\r\n        sayingLabel.setFont(new Font(\"Century Gothic\", 20));\r\n        sayingLabel.setWrapText(true);\r\n        sayingLabel.setMaxWidth(570);\r\n        topPane.getChildren().add(sayingLabel);\r\n    }\r\n\r\n    public void createBigPane() {\r\n\r\n    }\r\n}\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/DashboardPage.java b/src/main/ui/controller/DashboardPage.java
+--- a/src/main/ui/controller/DashboardPage.java	(revision 8bd90a438e1427469dbba368246b8d1dbba5ee8a)
++++ b/src/main/ui/controller/DashboardPage.java	(date 1621763995203)
+@@ -120,7 +120,7 @@
+         Label sayingLabel = new Label("\"" + quoteOfTheDay.getSaying() + "\"" + "\n" + "- " + quoteOfTheDay.getAuthor());
+         sayingLabel.setFont(new Font("Century Gothic", 20));
+         sayingLabel.setWrapText(true);
+-        sayingLabel.setMaxWidth(570);
++        sayingLabel.setMaxWidth(575);
+         topPane.getChildren().add(sayingLabel);
+     }
+ 
+Index: data/misc/account.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\r\n    \"password\": \"\",\r\n    \"name\": \"\",\r\n    \"email\": \"\"\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/data/misc/account.json b/data/misc/account.json
+--- a/data/misc/account.json	(revision 8bd90a438e1427469dbba368246b8d1dbba5ee8a)
++++ b/data/misc/account.json	(date 1621765638113)
+@@ -1,5 +1,5 @@
+ {
+-    "password": "",
+-    "name": "",
+-    "email": ""
++    "password": "hack",
++    "name": "Yang Lin",
++    "email": "ylynn00@gmail.com"
+ }
+\ No newline at end of file

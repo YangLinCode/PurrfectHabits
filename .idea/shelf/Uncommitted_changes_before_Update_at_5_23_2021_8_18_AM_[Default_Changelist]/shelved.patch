@@ -1,0 +1,234 @@
+Index: src/main/ui/controller/DashboardPage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.controller;\r\n\r\nimport javafx.event.EventHandler;\r\nimport javafx.geometry.Insets;\r\nimport javafx.geometry.Orientation;\r\nimport javafx.geometry.Pos;\r\nimport javafx.geometry.VerticalDirection;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.chart.LineChart;\r\nimport javafx.scene.chart.NumberAxis;\r\nimport javafx.scene.chart.XYChart;\r\nimport javafx.scene.control.Button;\r\nimport javafx.scene.control.Label;\r\nimport javafx.scene.control.Separator;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.image.ImageView;\r\nimport javafx.scene.layout.*;\r\nimport javafx.scene.text.Font;\r\nimport javafx.stage.Stage;\r\nimport model.*;\r\n\r\nimport java.io.FileInputStream;\r\nimport java.io.FileNotFoundException;\r\nimport java.time.LocalDate;\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\n\r\n\r\npublic class DashboardPage  {\r\n    private static final String yellow = \"-fx-background-color: #FFCB3D\";\r\n    private static final String blue = \"-fx-background-color: #86D0F7\";\r\n    private static final String grey = \"-fx-background-color: #BEC2C4\";\r\n    private BorderPane borderPane;\r\n    private BorderPane centerBorderPane;\r\n    private VBox leftPane;\r\n    private HBox topPane;\r\n    private Quote quoteOfTheDay;\r\n    private Button settingsButton;\r\n    private Button profileButton;\r\n    private Button friendsButton;\r\n    private Button logoutButton;\r\n    private Button leaderboardButton;\r\n\r\n    public DashboardPage(Stage primaryStage, EventHandler eventHandler, Dashboard dashboard) throws Exception {\r\n        borderPane = new BorderPane();\r\n        borderPane.setPrefSize(1000, 500);\r\n        createLeftPane();\r\n        createTopPane();\r\n        createCenterPane(dashboard);\r\n        Scene scene = new Scene(borderPane);\r\n        primaryStage.setScene(scene);\r\n        primaryStage.show();\r\n    }\r\n\r\n    public void createLeftPane() {\r\n        leftPane = new VBox(45);\r\n        leftPane.setStyle(yellow);\r\n        leftPane.setPadding(new Insets(10, 10, 10, 10));\r\n        borderPane.setLeft(leftPane);\r\n        try {\r\n            FileInputStream profileStream = new FileInputStream(\"data/misc/profile.png\");\r\n            FileInputStream logoutStream = new FileInputStream(\"data/misc/logout.png\");\r\n            FileInputStream leaderboardStream = new FileInputStream(\"data/misc/leaderboard.png\");\r\n            FileInputStream friendsStream = new FileInputStream(\"data/misc/friends.png\");\r\n            FileInputStream settingsStream = new FileInputStream(\"data/misc/settings.png\");\r\n            ImageView settingsImage = new ImageView(new Image(settingsStream));\r\n            ImageView friendsImage = new ImageView(new Image(friendsStream));\r\n            ImageView leaderboardImage = new ImageView(new Image(leaderboardStream));\r\n            ImageView logoutImage = new ImageView(new Image(logoutStream));\r\n            ImageView profileImage = new ImageView(new Image(profileStream));\r\n\r\n            List<ImageView> images = Arrays.asList(profileImage, friendsImage, leaderboardImage, settingsImage, logoutImage);\r\n            for (ImageView im : images) {\r\n                im.setFitWidth(50);\r\n                im.setFitHeight(50);\r\n            }\r\n\r\n            settingsButton = new Button(\"\", settingsImage);\r\n            settingsButton.setFocusTraversable(false);\r\n            profileButton = new Button(\"\", profileImage);\r\n            profileButton.setFocusTraversable(false);\r\n            logoutButton = new Button(\"\", logoutImage);\r\n            logoutButton.setFocusTraversable(false);\r\n            friendsButton = new Button(\"\", friendsImage);\r\n            friendsButton.setFocusTraversable(false);\r\n            leaderboardButton = new Button(\"\", leaderboardImage);\r\n            leaderboardButton.setFocusTraversable(false);\r\n\r\n            leftPane.getChildren().addAll(profileButton, friendsButton, leaderboardButton, settingsButton, logoutButton);\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n\r\n    public void createTopPane() {\r\n        topPane = new HBox(10);\r\n        topPane.setStyle(blue);\r\n        topPane.setPadding(new Insets(10, 10, 10, 10));\r\n        borderPane.setTop(topPane);\r\n\r\n        try {\r\n            FileInputStream inputStream = new FileInputStream(\"data/misc/anonCat.png\");\r\n            ImageView imageView = new ImageView(new Image(inputStream));\r\n            imageView.setFitWidth(70);\r\n            imageView.setFitHeight(70);\r\n            topPane.getChildren().add(imageView);\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n\r\n        QuoteOfTheDay generator = new QuoteOfTheDay();\r\n        quoteOfTheDay = generator.getQuoteOfTheDay();\r\n\r\n        Label dashboardLabel = new Label(\"Dashboard\");\r\n        dashboardLabel.setFont(new Font(\"Century Gothic Bold\", 55));\r\n        topPane.getChildren().add(dashboardLabel);\r\n\r\n        Separator separator = new Separator(Orientation.VERTICAL);\r\n        topPane.getChildren().add(separator);\r\n\r\n        Label sayingLabel = new Label(\"\\\"\" + quoteOfTheDay.getSaying() + \"\\\"\" + \"\\n\" + \"- \" + quoteOfTheDay.getAuthor());\r\n        sayingLabel.setFont(new Font(\"Century Gothic\", 20));\r\n        sayingLabel.setWrapText(true);\r\n        sayingLabel.setMaxWidth(575);\r\n        topPane.getChildren().add(sayingLabel);\r\n    }\r\n\r\n    public void createCenterPane(Dashboard dashboard) {\r\n        centerBorderPane = new BorderPane();\r\n\r\n        createCenterTopPane();\r\n        createCenterCenterPane(dashboard);\r\n        createCenterBotPane(dashboard);\r\n\r\n        borderPane.setCenter(centerBorderPane);\r\n    }\r\n\r\n    public void createCenterTopPane() {\r\n        HBox hBox = new HBox(10);\r\n        hBox.setPadding(new Insets(10));\r\n\r\n        Button add = new Button(\"Add\");\r\n        Button remove = new Button(\"Remove\");\r\n        List<Button> buttons = Arrays.asList(add, remove);\r\n        for (Button b: buttons) {\r\n            b.setStyle(grey);\r\n            b.setFont(new Font(\"Dosis\", 20));\r\n            b.setPrefSize(100, 20);\r\n        }\r\n        hBox.getChildren().addAll(buttons);\r\n        centerBorderPane.setTop(hBox);\r\n    }\r\n\r\n    public void createCenterCenterPane(Dashboard dashboard) {\r\n        GridPane gridPane = new GridPane();\r\n\r\n        for (Habit habit : dashboard.getAllHabits()) {\r\n            List<Award> allAwards = habit.getAwardsGallery().getAllAwards();\r\n\r\n            if (allAwards.size() == 0) {\r\n                try {\r\n                    FileInputStream inputStream = new FileInputStream(\"data/misc/catLogo.png\");\r\n                    ImageView imageView = new ImageView(new Image(inputStream));\r\n                    Button button = new Button(habit.getTitle(), imageView);\r\n                    gridPane.getChildren().add(button);\r\n                } catch (FileNotFoundException e) {\r\n                    e.printStackTrace();\r\n                }\r\n            } else {\r\n                Award lastAwardReceived = allAwards.get(allAwards.size() - 1);\r\n                String lastAwardReceivedDate = lastAwardReceived.getDateReceived().toString();\r\n                String extension = (lastAwardReceived.getAwardType() == Award.AwardType.PAWSOME_ACHIEVEMENT) ? \".gif\" : \".png\";\r\n                try {\r\n                    FileInputStream inputStream = new FileInputStream(\"data/habits/\" + habit.getTitle() + \"/\" + habit.getTitle() + \"_Gallery/\" + lastAwardReceivedDate + extension);\r\n                    ImageView imageView = new ImageView(new Image(inputStream));\r\n                    Button button = new Button(habit.getTitle(), imageView);\r\n                    gridPane.getChildren().add(button);\r\n                } catch (FileNotFoundException e) {\r\n                    e.printStackTrace();\r\n                }\r\n            }\r\n        }\r\n\r\n        centerBorderPane.setCenter(gridPane);\r\n    }\r\n\r\n    public void createCenterBotPane(Dashboard dashboard) {\r\n\r\n    }\r\n}\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/DashboardPage.java b/src/main/ui/controller/DashboardPage.java
+--- a/src/main/ui/controller/DashboardPage.java	(revision faf39aeb979a2c6798e07d9460a964e94aa072f6)
++++ b/src/main/ui/controller/DashboardPage.java	(date 1621776384677)
+@@ -6,15 +6,15 @@
+ import javafx.geometry.Pos;
+ import javafx.geometry.VerticalDirection;
+ import javafx.scene.Scene;
+-import javafx.scene.chart.LineChart;
+-import javafx.scene.chart.NumberAxis;
+-import javafx.scene.chart.XYChart;
++import javafx.scene.chart.*;
+ import javafx.scene.control.Button;
+ import javafx.scene.control.Label;
+ import javafx.scene.control.Separator;
+ import javafx.scene.image.Image;
+ import javafx.scene.image.ImageView;
+ import javafx.scene.layout.*;
++import javafx.scene.paint.Color;
++import javafx.scene.shape.Rectangle;
+ import javafx.scene.text.Font;
+ import javafx.stage.Stage;
+ import model.*;
+@@ -30,7 +30,9 @@
+ public class DashboardPage  {
+     private static final String yellow = "-fx-background-color: #FFCB3D";
+     private static final String blue = "-fx-background-color: #86D0F7";
+-    private static final String grey = "-fx-background-color: #BEC2C4";
++    private static final String grey = "-fx-background-color: #E1E2E3";
++//    private static final String backgroundGrey = "-fx-background-color: #E9F3F9";
++    private static final String backgroundGrey = "-fx-background-color: #F5F9FC";
+     private BorderPane borderPane;
+     private BorderPane centerBorderPane;
+     private VBox leftPane;
+@@ -41,13 +43,15 @@
+     private Button friendsButton;
+     private Button logoutButton;
+     private Button leaderboardButton;
++    private Button addHabitButton;
++    private Button removeHabitButton;
+ 
+     public DashboardPage(Stage primaryStage, EventHandler eventHandler, Dashboard dashboard) throws Exception {
+         borderPane = new BorderPane();
+-        borderPane.setPrefSize(1000, 500);
++        borderPane.setPrefSize(1664, 1000);
+         createLeftPane();
+         createTopPane();
+-        createCenterPane(dashboard);
++        createCenterPane(dashboard, eventHandler);
+         Scene scene = new Scene(borderPane);
+         primaryStage.setScene(scene);
+         primaryStage.show();
+@@ -120,28 +124,31 @@
+         topPane.getChildren().add(separator);
+ 
+         Label sayingLabel = new Label("\"" + quoteOfTheDay.getSaying() + "\"" + "\n" + "- " + quoteOfTheDay.getAuthor());
+-        sayingLabel.setFont(new Font("Century Gothic", 20));
++        sayingLabel.setFont(new Font("Century Gothic", 25));
+         sayingLabel.setWrapText(true);
+-        sayingLabel.setMaxWidth(575);
++        sayingLabel.setMaxWidth(1200);
+         topPane.getChildren().add(sayingLabel);
+     }
+ 
+-    public void createCenterPane(Dashboard dashboard) {
++    public void createCenterPane(Dashboard dashboard, EventHandler eventHandler) {
+         centerBorderPane = new BorderPane();
++        centerBorderPane.setStyle(backgroundGrey);
+ 
+-        createCenterTopPane();
++        createCenterTopPane(eventHandler);
+         createCenterCenterPane(dashboard);
+         createCenterBotPane(dashboard);
+ 
+         borderPane.setCenter(centerBorderPane);
+     }
+ 
+-    public void createCenterTopPane() {
++    public void createCenterTopPane(EventHandler eventHandler) {
+         HBox hBox = new HBox(10);
+         hBox.setPadding(new Insets(10));
+ 
+         Button add = new Button("Add");
+         Button remove = new Button("Remove");
++        add.setOnAction(eventHandler);
++        remove.setOnAction(eventHandler);
+         List<Button> buttons = Arrays.asList(add, remove);
+         for (Button b: buttons) {
+             b.setStyle(grey);
+@@ -156,8 +163,9 @@
+         GridPane gridPane = new GridPane();
+ 
+         for (Habit habit : dashboard.getAllHabits()) {
++            System.out.println(habit.getTitle());
+             List<Award> allAwards = habit.getAwardsGallery().getAllAwards();
+-
++            System.out.println(allAwards.size());
+             if (allAwards.size() == 0) {
+                 try {
+                     FileInputStream inputStream = new FileInputStream("data/misc/catLogo.png");
+@@ -186,7 +194,54 @@
+     }
+ 
+     public void createCenterBotPane(Dashboard dashboard) {
++        HBox hBox = new HBox(20);
++        hBox.setPadding(new Insets(10, 10, 10, 10));
++
++        NumberAxis xAxisLineGraph = new NumberAxis();
++        xAxisLineGraph.setLabel("Day #");
++        NumberAxis yAxisLineGraph = new NumberAxis();
++        yAxisLineGraph.setLabel("Total # of Awards");
++        LineChart lineChart = new LineChart(xAxisLineGraph, yAxisLineGraph);
++        XYChart.Series dataSeriesLineGraph = new XYChart.Series();
++        dataSeriesLineGraph.setName("Total # of Awards Over Time");
++        dataSeriesLineGraph.getData().add(new XYChart.Data(0, 0));
++        dataSeriesLineGraph.getData().add(new XYChart.Data(1, 1));
++        dataSeriesLineGraph.getData().add(new XYChart.Data(2, 4));
++        dataSeriesLineGraph.getData().add(new XYChart.Data(3, 10));
++        dataSeriesLineGraph.getData().add(new XYChart.Data(4, 5));
++        dataSeriesLineGraph.getData().add(new XYChart.Data(5, 20));
++        lineChart.getData().add(dataSeriesLineGraph);
++        hBox.getChildren().add(lineChart);
+ 
++        PieChart pieChart = new PieChart();
++        PieChart.Data slice1 = new PieChart.Data("# Total Relapses", 4);
++        PieChart.Data slice2 = new PieChart.Data("# Pawsome Achievements", 7);
++        pieChart.getData().add(slice1);
++        pieChart.getData().add(slice2);
++        hBox.getChildren().add(pieChart);
++
++        CategoryAxis xAxisBarGraph = new CategoryAxis();
++        xAxisBarGraph.setLabel("Habits");
++        NumberAxis yAxisBarGraph = new NumberAxis();
++        yAxisBarGraph.setLabel("# of Awards");
++        BarChart barChart = new BarChart(xAxisBarGraph, yAxisBarGraph);
++        XYChart.Series dataSeriesBarGraph = new XYChart.Series();
++        dataSeriesBarGraph.setName("# of Awards For Select Habits");
++        dataSeriesBarGraph.getData().add(new XYChart.Data("Exercise More", 20));
++        dataSeriesBarGraph.getData().add(new XYChart.Data("Read Everyday", 13));
++        dataSeriesBarGraph.getData().add(new XYChart.Data("Go To Bed On Time", 23));
++        barChart.getData().add(dataSeriesBarGraph);
++        hBox.getChildren().add(barChart);
++
++        centerBorderPane.setBottom(hBox);
++    }
++
++    public Button getAddHabitButton() {
++        return addHabitButton;
++    }
++
++    public Button getRemoveHabitButton() {
++        return removeHabitButton;
+     }
+ }
+ 
+Index: src/main/ui/HabitsApp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\r\n\r\nimport javafx.event.ActionEvent;\r\nimport javafx.event.EventHandler;\r\nimport javafx.scene.control.CheckBox;\r\nimport javafx.scene.control.TextField;\r\nimport javafx.scene.image.Image;\r\nimport javafx.stage.Stage;\r\nimport model.Dashboard;\r\nimport persistence.JsonReader;\r\nimport persistence.JsonWriter;\r\nimport ui.controller.*;\r\n\r\nimport java.io.FileInputStream;\r\nimport java.io.FileNotFoundException;\r\n\r\npublic class HabitsApp implements EventHandler<ActionEvent> {\r\n    private static final String habitsFolderDirectory = \"./data/habits\";\r\n    private static final String isInitialDirectory = \"./data/misc/launch.json\";\r\n    private static final String signInDirectory = \"./data/misc/signIn.json\";\r\n    private static final String accountDirectory = \"./data/misc/account.json\";\r\n    private Dashboard dashboard;\r\n    private JsonReader jsonReader;\r\n    private JsonReader isInitialReader;\r\n    private JsonReader rememberMeReader;\r\n    private JsonReader accountReader;\r\n    private JsonWriter jsonWriter;\r\n    private JsonWriter isInitialWriter;\r\n    private JsonWriter rememberMeWriter;\r\n    private JsonWriter accountWriter;\r\n    private WelcomePage welcomePage;\r\n    private LoginPage loginPage;\r\n    private DashboardPage dashboardPage;\r\n    private AboutUsPage aboutUsPage;\r\n    private CreateAccountPage createAccountPage;\r\n    private Stage primaryStage;\r\n\r\n    public HabitsApp(Stage primaryStage) {\r\n        this.primaryStage = primaryStage;\r\n        try {\r\n            FileInputStream inputStream = new FileInputStream(\"data/misc/anonCat.png\");\r\n            Image icon = new Image(inputStream);\r\n            primaryStage.getIcons().add(icon);\r\n            primaryStage.setTitle(\"PurrfectHabits\");\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n        dashboard = new Dashboard();\r\n        jsonReader = new JsonReader(habitsFolderDirectory);\r\n        jsonWriter = new JsonWriter(habitsFolderDirectory);\r\n        isInitialReader = new JsonReader(isInitialDirectory);\r\n        rememberMeReader = new JsonReader(signInDirectory);\r\n        if (isInitialReader.readIsInitial()) {\r\n            try {\r\n                welcomePage = new WelcomePage(primaryStage, this);\r\n                isInitialWriter = new JsonWriter(isInitialDirectory);\r\n                isInitialWriter.setIsInitialLaunchFalse();\r\n            } catch (FileNotFoundException e) {\r\n                e.printStackTrace();\r\n            }\r\n        } else {\r\n            if (!rememberMeReader.readShouldRemember()) {\r\n                try {\r\n                    loginPage = new LoginPage(primaryStage, this);\r\n                } catch (Exception e) {\r\n                    e.printStackTrace();\r\n                }\r\n            } else {\r\n                try {\r\n                    dashboardPage = new DashboardPage(primaryStage, this, dashboard);\r\n                } catch (Exception e) {\r\n                    e.printStackTrace();\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public void handle(ActionEvent event) {\r\n        welcomePageListener(event);\r\n        aboutUsPageListener(event);\r\n        createAccountPageListener(event);\r\n        loginPageListener(event);\r\n    }\r\n\r\n    private void welcomePageListener(ActionEvent event) {\r\n        if (welcomePage != null && event.getSource() == welcomePage.getGetStartedButton()) {\r\n            try {\r\n                aboutUsPage = new AboutUsPage(primaryStage, this);\r\n            } catch (FileNotFoundException e) {\r\n                e.printStackTrace();\r\n            }\r\n        }\r\n    }\r\n\r\n    private void aboutUsPageListener(ActionEvent event) {\r\n        if (aboutUsPage != null && event.getSource() == aboutUsPage.getContinueButton()) {\r\n            try {\r\n                createAccountPage = new CreateAccountPage(primaryStage, this);\r\n            } catch (FileNotFoundException e) {\r\n                e.printStackTrace();\r\n            }\r\n        }\r\n    }\r\n\r\n    private void createAccountPageListener(ActionEvent event) {\r\n        if (createAccountPage != null && event.getSource() == createAccountPage.getCreateButton()) {\r\n            TextField name = createAccountPage.getNameField();\r\n            TextField email = createAccountPage.getEmailField();\r\n            TextField password = createAccountPage.getPasswordField();\r\n            TextField confirmPassword = createAccountPage.getConfirmPasswordField();\r\n\r\n            if (!password.getText().equals(confirmPassword.getText())) {\r\n                AlertBox.display(\"PurrfectHabits\", \"Passwords do not match.\");\r\n            } else if (!password.getText().equals(\"\")) {\r\n                accountWriter = new JsonWriter(accountDirectory);\r\n                accountWriter.saveAccountDetails(name.getText(), email.getText(), password.getText());\r\n                AlertBox.display(\"PurrfectHabits\", \"Account was successfully created. Please log in.\");\r\n                try {\r\n                    loginPage = new LoginPage(primaryStage, this);\r\n                } catch (Exception e) {\r\n                    e.printStackTrace();\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    private void loginPageListener(ActionEvent event) {\r\n        if (loginPage != null && event.getSource() == loginPage.getSignInButton()) {\r\n            CheckBox rememberMe = loginPage.getRememberMe();\r\n            TextField email = loginPage.getEmail();\r\n            TextField password = loginPage.getPassword();\r\n\r\n            accountReader = new JsonReader(accountDirectory);\r\n            if (email.getText().equals(accountReader.readEmail()) && password.getText().equals(accountReader.readPassword())) {\r\n                if (rememberMe.isSelected()) {\r\n                    rememberMeWriter = new JsonWriter(signInDirectory);\r\n                    rememberMeWriter.setRememberMeTrue();\r\n                }\r\n\r\n                try {\r\n                    dashboardPage = new DashboardPage(primaryStage, this, dashboard);\r\n                } catch (Exception e) {\r\n                    e.printStackTrace();\r\n                }\r\n            } else {\r\n                AlertBox.display(\"PurrfectHabits\", \"Email or password is incorrect.\");\r\n            }\r\n\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/HabitsApp.java b/src/main/ui/HabitsApp.java
+--- a/src/main/ui/HabitsApp.java	(revision faf39aeb979a2c6798e07d9460a964e94aa072f6)
++++ b/src/main/ui/HabitsApp.java	(date 1621782892877)
+@@ -33,6 +33,9 @@
+     private DashboardPage dashboardPage;
+     private AboutUsPage aboutUsPage;
+     private CreateAccountPage createAccountPage;
++    private AddHabitPage addHabitPage;
++    private RemoveHabitPage removeHabitPage;
++    private GalleryPage
+     private Stage primaryStage;
+ 
+     public HabitsApp(Stage primaryStage) {
+@@ -81,6 +84,9 @@
+         aboutUsPageListener(event);
+         createAccountPageListener(event);
+         loginPageListener(event);
++        dashboardPageListener(event);
++        addHabitPageListener(event);
++        removeHabitPageListener(event);
+     }
+ 
+     private void welcomePageListener(ActionEvent event) {
+@@ -146,7 +152,22 @@
+             } else {
+                 AlertBox.display("PurrfectHabits", "Email or password is incorrect.");
+             }
++        }
++    }
++
++    private void dashboardPageListener(ActionEvent event) {
++        if (dashboardPage != null && event.getSource() == dashboardPage.getAddHabitButton()) {
++            addHabitPage = new AddHabitPage(this);
++        } else if (dashboardPage != null && event.getSource() == dashboardPage.getRemoveHabitButton()) {
++            removeHabitPage = new RemoveHabitPage(this);
++        }
++    }
++
++    private void addHabitPageListener(ActionEvent event) {
+ 
+-        }
++    }
++
++    private void removeHabitPageListener(ActionEvent event) {
++
+     }
+ }
+Index: src/main/model/QuoteOfTheDay.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport org.json.JSONArray;\r\nimport org.json.JSONObject;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.IOException;\r\nimport java.io.InputStreamReader;\r\nimport java.net.HttpURLConnection;\r\nimport java.net.MalformedURLException;\r\nimport java.net.URL;\r\n\r\n// represents the quote of the day\r\n// code based off of https://www.youtube.com/watch?v=qzRKa8I36Ww&list=PL-K6CIX0_zzgzI0sfBrvkjgP369jRrE3j&index=1\r\npublic class QuoteOfTheDay {\r\n    Quote quoteOfTheDay;\r\n    HttpURLConnection connection;\r\n\r\n    public QuoteOfTheDay() {\r\n        quoteOfTheDay = getQuoteFromAPI();\r\n    }\r\n\r\n    private Quote getQuoteFromAPI() {\r\n        BufferedReader reader;\r\n        String line;\r\n        StringBuffer responseContent = new StringBuffer();\r\n\r\n        try {\r\n            URL url = new URL(\"https://zenquotes.io/api/random\");\r\n            connection = (HttpURLConnection) url.openConnection();\r\n\r\n            // Request Setup\r\n            connection.setRequestMethod(\"GET\");\r\n            connection.setConnectTimeout(5000);\r\n            connection.setReadTimeout(5000);\r\n\r\n            int status = connection.getResponseCode();\r\n            // you can print the status out after if you want (a certain number means it was successful)\r\n\r\n            if (status > 299) {\r\n                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));\r\n                while ((line = reader.readLine()) != null) {\r\n                    responseContent.append(line);\r\n                }\r\n                reader.close();\r\n            } else {\r\n                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));\r\n                while ((line = reader.readLine()) != null) {\r\n                    responseContent.append(line);\r\n                }\r\n                reader.close();\r\n            }\r\n        } catch (MalformedURLException e) {\r\n            e.printStackTrace();\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n        } finally {\r\n            connection.disconnect();\r\n        }\r\n\r\n        return parse(responseContent.toString());\r\n    }\r\n\r\n    private Quote parse(String responseBody) {\r\n        JSONArray jsonArray = new JSONArray(responseBody);\r\n        JSONObject jsonObject = jsonArray.getJSONObject(0);\r\n        String saying = jsonObject.getString(\"q\");\r\n        saying = saying.substring(0, saying.length() - 1);\r\n        String author = jsonObject.getString(\"a\");\r\n        Quote quote = new Quote(saying, author);\r\n        return quote;\r\n    }\r\n\r\n    public Quote getQuoteOfTheDay() {\r\n        return quoteOfTheDay;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/model/QuoteOfTheDay.java b/src/main/model/QuoteOfTheDay.java
+--- a/src/main/model/QuoteOfTheDay.java	(revision faf39aeb979a2c6798e07d9460a964e94aa072f6)
++++ b/src/main/model/QuoteOfTheDay.java	(date 1621775854296)
+@@ -65,7 +65,7 @@
+         JSONArray jsonArray = new JSONArray(responseBody);
+         JSONObject jsonObject = jsonArray.getJSONObject(0);
+         String saying = jsonObject.getString("q");
+-        saying = saying.substring(0, saying.length() - 1);
++//        saying = saying.substring(0, saying.length() - 1);
+         String author = jsonObject.getString("a");
+         Quote quote = new Quote(saying, author);
+         return quote;

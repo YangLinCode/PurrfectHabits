@@ -1,0 +1,152 @@
+Index: src/main/model/FolderManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport model.exceptions.HabitAlreadyExistsException;\r\n\r\nimport java.io.File;\r\n\r\npublic class FolderManager {\r\n    private String destination;\r\n\r\n    public FolderManager(String destination) {\r\n        this.destination = destination;\r\n    }\r\n\r\n    public String getPath() {\r\n        return destination;\r\n    }\r\n\r\n    public void createHabitFolder(String folderName) throws HabitAlreadyExistsException {\r\n        String path = destination + \"\\\\\" + folderName;\r\n        File folder = new File(path);\r\n        if (!folder.exists()) {\r\n            if (folder.mkdir()) {\r\n                System.out.println(\"Habit folder has been created successfully\");\r\n            } else {\r\n                System.out.println(\"Habit folder has failed to be created\");\r\n            }\r\n        } else {\r\n            System.out.println(\"Habit folder already exists\");\r\n        }\r\n\r\n\r\n    }\r\n\r\n    private void createGalleryFolder(String folderName) {\r\n        String path = destination + \"\\\\\" + folderName\r\n    }\r\n\r\n    private void createJsonFile(String folderName) {\r\n\r\n    }\r\n\r\n    public void deleteFolder(String folderName) {\r\n        String path = destination + \"\\\\\" + folderName;\r\n        File folder = new File(path);\r\n\r\n        deleteFolderHelper(folder);\r\n    }\r\n\r\n    private void deleteFolderHelper(File source) {\r\n        File[] files = source.listFiles();\r\n\r\n        for (File file : files) {\r\n            if (file.isDirectory()) {\r\n                deleteFolderHelper(file);\r\n            }\r\n\r\n            file.delete();\r\n        }\r\n\r\n        source.delete();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/model/FolderManager.java b/src/main/model/FolderManager.java
+--- a/src/main/model/FolderManager.java	
++++ b/src/main/model/FolderManager.java	
+@@ -32,7 +32,7 @@
+     }
+ 
+     private void createGalleryFolder(String folderName) {
+-        String path = destination + "\\" + folderName
++        String path = destination + "\\" + folderName;
+     }
+ 
+     private void createJsonFile(String folderName) {
+Index: src/main/model/Dashboard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport static model.Habit.HabitType.BREAKABLE;\r\nimport static model.Habit.HabitType.MAKEABLE;\r\n\r\n// represents a dashboard where the user can look at all their current habits\r\npublic class Dashboard {\r\n    private List<Habit> habitsToBreak;\r\n    private List<Habit> habitsToMake;\r\n    private List<Habit> allHabits;\r\n\r\n    public Dashboard() {\r\n        habitsToBreak = new ArrayList<Habit>();\r\n        habitsToMake = new ArrayList<Habit>();\r\n        allHabits = new ArrayList<Habit>();\r\n    }\r\n\r\n    public List<Habit> getHabitsToBreak() {\r\n        return habitsToBreak;\r\n    }\r\n\r\n    public List<Habit> getHabitsToMake() {\r\n        return habitsToMake;\r\n    }\r\n\r\n    public List<Habit> getAllHabits() {\r\n        return allHabits;\r\n    }\r\n\r\n    // add new habit to proper habits list, then add it to allHabits\r\n    public void addHabit(Habit habit) {\r\n        if (habit.getHabitType() == MAKEABLE && !habitsToMake.contains(habit)) {\r\n            habitsToMake.add(habit);\r\n        } else if (habit.getHabitType() == BREAKABLE && !habitsToBreak.contains(habit)) {\r\n            habitsToBreak.add(habit);\r\n        }\r\n\r\n        if (!allHabits.contains(habit)) {\r\n            allHabits.add(habit);\r\n        }\r\n\r\n        // TODO: un-hardcode this\r\n        String destination = \"C:\\\\Users\\\\ylynn\\\\OneDrive\\\\Documents\\\\Coding Projects\\\\PurrfectHabits\\\\data\\\\habits\";\r\n        FolderManager folderManager = new FolderManager(destination);\r\n        folderManager.createHabitFolder(habit.getTitle());\r\n    }\r\n\r\n    // remove habit from proper habits list, then remove it from allHabits\r\n    public void removeHabit(Habit habit) {\r\n        if (habit.getHabitType() == MAKEABLE) {\r\n            habitsToMake.remove(habit);\r\n        } else {\r\n            habitsToBreak.remove(habit);\r\n        }\r\n\r\n        allHabits.remove(habit);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/model/Dashboard.java b/src/main/model/Dashboard.java
+--- a/src/main/model/Dashboard.java	
++++ b/src/main/model/Dashboard.java	
+@@ -1,61 +1,61 @@
+-package model;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-import static model.Habit.HabitType.BREAKABLE;
+-import static model.Habit.HabitType.MAKEABLE;
+-
+-// represents a dashboard where the user can look at all their current habits
+-public class Dashboard {
+-    private List<Habit> habitsToBreak;
+-    private List<Habit> habitsToMake;
+-    private List<Habit> allHabits;
+-
+-    public Dashboard() {
+-        habitsToBreak = new ArrayList<Habit>();
+-        habitsToMake = new ArrayList<Habit>();
+-        allHabits = new ArrayList<Habit>();
+-    }
+-
+-    public List<Habit> getHabitsToBreak() {
+-        return habitsToBreak;
+-    }
+-
+-    public List<Habit> getHabitsToMake() {
+-        return habitsToMake;
+-    }
+-
+-    public List<Habit> getAllHabits() {
+-        return allHabits;
+-    }
+-
+-    // add new habit to proper habits list, then add it to allHabits
+-    public void addHabit(Habit habit) {
+-        if (habit.getHabitType() == MAKEABLE && !habitsToMake.contains(habit)) {
+-            habitsToMake.add(habit);
+-        } else if (habit.getHabitType() == BREAKABLE && !habitsToBreak.contains(habit)) {
+-            habitsToBreak.add(habit);
+-        }
+-
+-        if (!allHabits.contains(habit)) {
+-            allHabits.add(habit);
+-        }
+-
+-        // TODO: un-hardcode this
+-        String destination = "C:\\Users\\ylynn\\OneDrive\\Documents\\Coding Projects\\PurrfectHabits\\data\\habits";
+-        FolderManager folderManager = new FolderManager(destination);
+-        folderManager.createHabitFolder(habit.getTitle());
+-    }
+-
+-    // remove habit from proper habits list, then remove it from allHabits
+-    public void removeHabit(Habit habit) {
+-        if (habit.getHabitType() == MAKEABLE) {
+-            habitsToMake.remove(habit);
+-        } else {
+-            habitsToBreak.remove(habit);
+-        }
+-
+-        allHabits.remove(habit);
+-    }
+-}
++//package model;
++//
++//import java.util.ArrayList;
++//import java.util.List;
++//
++//import static model.Habit.HabitType.BREAKABLE;
++//import static model.Habit.HabitType.MAKEABLE;
++//
++//// represents a dashboard where the user can look at all their current habits
++//public class Dashboard {
++//    private List<Habit> habitsToBreak;
++//    private List<Habit> habitsToMake;
++//    private List<Habit> allHabits;
++//
++//    public Dashboard() {
++//        habitsToBreak = new ArrayList<Habit>();
++//        habitsToMake = new ArrayList<Habit>();
++//        allHabits = new ArrayList<Habit>();
++//    }
++//
++//    public List<Habit> getHabitsToBreak() {
++//        return habitsToBreak;
++//    }
++//
++//    public List<Habit> getHabitsToMake() {
++//        return habitsToMake;
++//    }
++//
++//    public List<Habit> getAllHabits() {
++//        return allHabits;
++//    }
++//
++//    // add new habit to proper habits list, then add it to allHabits
++//    public void addHabit(Habit habit) {
++//        if (habit.getHabitType() == MAKEABLE && !habitsToMake.contains(habit)) {
++//            habitsToMake.add(habit);
++//        } else if (habit.getHabitType() == BREAKABLE && !habitsToBreak.contains(habit)) {
++//            habitsToBreak.add(habit);
++//        }
++//
++//        if (!allHabits.contains(habit)) {
++//            allHabits.add(habit);
++//        }
++//
++//        // TODO: un-hardcode this
++//        String destination = "C:\\Users\\ylynn\\OneDrive\\Documents\\Coding Projects\\PurrfectHabits\\data\\habits";
++//        FolderManager folderManager = new FolderManager(destination);
++//        folderManager.createHabitFolder(habit.getTitle());
++//    }
++//
++//    // remove habit from proper habits list, then remove it from allHabits
++//    public void removeHabit(Habit habit) {
++//        if (habit.getHabitType() == MAKEABLE) {
++//            habitsToMake.remove(habit);
++//        } else {
++//            habitsToBreak.remove(habit);
++//        }
++//
++//        allHabits.remove(habit);
++//    }
++//}

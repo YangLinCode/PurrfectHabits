@@ -1,0 +1,87 @@
+Index: src/main/ui/controller/GalleryPage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.controller;\r\n\r\npublic class GalleryPage {\r\n\r\n    public GalleryPage(Stage primary)\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/GalleryPage.java b/src/main/ui/controller/GalleryPage.java
+--- a/src/main/ui/controller/GalleryPage.java	
++++ b/src/main/ui/controller/GalleryPage.java	
+@@ -1,6 +1,55 @@
+ package ui.controller;
+ 
++import javafx.event.EventHandler;
++import javafx.geometry.Insets;
++import javafx.scene.Scene;
++import javafx.scene.control.ScrollPane;
++import javafx.scene.image.Image;
++import javafx.scene.image.ImageView;
++import javafx.scene.layout.GridPane;
++import javafx.stage.Stage;
++import model.Award;
++import model.Gallery;
++import model.Habit;
++
++import java.io.FileInputStream;
++import java.io.FileNotFoundException;
++import java.util.List;
++
+ public class GalleryPage {
+ 
+-    public GalleryPage(Stage primary)
++    public GalleryPage(Habit habit) {
++        GridPane gridPane = new GridPane();
++        gridPane.setPadding(new Insets(10, 10, 10,10));
++        gridPane.setVgap(10);
++        gridPane.setHgap(10);
++        ScrollPane scrollPane = new ScrollPane(gridPane);
++        List<Award> allAwards = habit.getAwardsGallery().getAllAwards();
++
++        int rowCount = 0;
++        int columnCount = 0;
++        for (Award award : allAwards) {
++            String dateReceived = award.getDateReceived().toString();
++            String extension = (award.getAwardType() == Award.AwardType.PAWSOME_ACHIEVEMENT) ? ".gif" : ".png";
++            try {
++                FileInputStream inputStream = new FileInputStream("data/habits/" + habit.getTitle() + "/" + habit.getTitle() + "_Gallery/" + dateReceived + extension);
++                ImageView imageView = new ImageView(new Image(inputStream));
++                gridPane.add(imageView, rowCount, columnCount);
++
++                if (rowCount == 3) {
++                    rowCount = 0;
++                    columnCount++;
++                } else {
++                    rowCount++;
++                }
++            } catch (FileNotFoundException e) {
++                e.printStackTrace();
++            }
++        }
++
++        Scene scene = new Scene(scrollPane);
++        Stage stage = new Stage();
++        stage.setScene(scene);
++        stage.show();
++    }
+ }
+Index: src/main/ui/controller/DashboardPage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui.controller;\r\n\r\nimport javafx.event.EventHandler;\r\nimport javafx.geometry.Insets;\r\nimport javafx.geometry.Orientation;\r\nimport javafx.geometry.Pos;\r\nimport javafx.geometry.VerticalDirection;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.chart.*;\r\nimport javafx.scene.control.Button;\r\nimport javafx.scene.control.Label;\r\nimport javafx.scene.control.Separator;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.image.ImageView;\r\nimport javafx.scene.layout.*;\r\nimport javafx.scene.paint.Color;\r\nimport javafx.scene.shape.Rectangle;\r\nimport javafx.scene.text.Font;\r\nimport javafx.stage.Stage;\r\nimport model.*;\r\n\r\nimport java.io.FileInputStream;\r\nimport java.io.FileNotFoundException;\r\nimport java.time.LocalDate;\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\n\r\n\r\npublic class DashboardPage  {\r\n    private static final String yellow = \"-fx-background-color: #FFCB3D\";\r\n    private static final String blue = \"-fx-background-color: #86D0F7\";\r\n    private static final String grey = \"-fx-background-color: #E1E2E3\";\r\n//    private static final String backgroundGrey = \"-fx-background-color: #E9F3F9\";\r\n    private static final String backgroundGrey = \"-fx-background-color: #F5F9FC\";\r\n    private BorderPane borderPane;\r\n    private BorderPane centerBorderPane;\r\n    private VBox leftPane;\r\n    private HBox topPane;\r\n    private Quote quoteOfTheDay;\r\n    private Button settingsButton;\r\n    private Button profileButton;\r\n    private Button friendsButton;\r\n    private Button logoutButton;\r\n    private Button leaderboardButton;\r\n    private Button addHabitButton;\r\n    private Button removeHabitButton;\r\n\r\n    public DashboardPage(Stage primaryStage, EventHandler eventHandler, Dashboard dashboard) throws Exception {\r\n        borderPane = new BorderPane();\r\n        borderPane.setPrefSize(1664, 1000);\r\n        createLeftPane();\r\n        createTopPane();\r\n        createCenterPane(dashboard, eventHandler);\r\n        Scene scene = new Scene(borderPane);\r\n        primaryStage.setScene(scene);\r\n        primaryStage.show();\r\n    }\r\n\r\n    public void createLeftPane() {\r\n        leftPane = new VBox(45);\r\n        leftPane.setStyle(yellow);\r\n        leftPane.setPadding(new Insets(10, 10, 10, 10));\r\n        borderPane.setLeft(leftPane);\r\n        try {\r\n            FileInputStream profileStream = new FileInputStream(\"data/misc/profile.png\");\r\n            FileInputStream logoutStream = new FileInputStream(\"data/misc/logout.png\");\r\n            FileInputStream leaderboardStream = new FileInputStream(\"data/misc/leaderboard.png\");\r\n            FileInputStream friendsStream = new FileInputStream(\"data/misc/friends.png\");\r\n            FileInputStream settingsStream = new FileInputStream(\"data/misc/settings.png\");\r\n            ImageView settingsImage = new ImageView(new Image(settingsStream));\r\n            ImageView friendsImage = new ImageView(new Image(friendsStream));\r\n            ImageView leaderboardImage = new ImageView(new Image(leaderboardStream));\r\n            ImageView logoutImage = new ImageView(new Image(logoutStream));\r\n            ImageView profileImage = new ImageView(new Image(profileStream));\r\n\r\n            List<ImageView> images = Arrays.asList(profileImage, friendsImage, leaderboardImage, settingsImage, logoutImage);\r\n            for (ImageView im : images) {\r\n                im.setFitWidth(50);\r\n                im.setFitHeight(50);\r\n            }\r\n\r\n            settingsButton = new Button(\"\", settingsImage);\r\n            settingsButton.setFocusTraversable(false);\r\n            profileButton = new Button(\"\", profileImage);\r\n            profileButton.setFocusTraversable(false);\r\n            logoutButton = new Button(\"\", logoutImage);\r\n            logoutButton.setFocusTraversable(false);\r\n            friendsButton = new Button(\"\", friendsImage);\r\n            friendsButton.setFocusTraversable(false);\r\n            leaderboardButton = new Button(\"\", leaderboardImage);\r\n            leaderboardButton.setFocusTraversable(false);\r\n\r\n            leftPane.getChildren().addAll(profileButton, friendsButton, leaderboardButton, settingsButton, logoutButton);\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n\r\n    public void createTopPane() {\r\n        topPane = new HBox(10);\r\n        topPane.setStyle(blue);\r\n        topPane.setPadding(new Insets(10, 10, 10, 10));\r\n        borderPane.setTop(topPane);\r\n\r\n        try {\r\n            FileInputStream inputStream = new FileInputStream(\"data/misc/anonCat.png\");\r\n            ImageView imageView = new ImageView(new Image(inputStream));\r\n            imageView.setFitWidth(70);\r\n            imageView.setFitHeight(70);\r\n            topPane.getChildren().add(imageView);\r\n        } catch (FileNotFoundException e) {\r\n            e.printStackTrace();\r\n        }\r\n\r\n        QuoteOfTheDay generator = new QuoteOfTheDay();\r\n        quoteOfTheDay = generator.getQuoteOfTheDay();\r\n\r\n        Label dashboardLabel = new Label(\"Dashboard\");\r\n        dashboardLabel.setFont(new Font(\"Century Gothic Bold\", 55));\r\n        topPane.getChildren().add(dashboardLabel);\r\n\r\n        Separator separator = new Separator(Orientation.VERTICAL);\r\n        topPane.getChildren().add(separator);\r\n\r\n        Label sayingLabel = new Label(\"\\\"\" + quoteOfTheDay.getSaying() + \"\\\"\" + \"\\n\" + \"- \" + quoteOfTheDay.getAuthor());\r\n        sayingLabel.setFont(new Font(\"Century Gothic\", 25));\r\n        sayingLabel.setWrapText(true);\r\n        sayingLabel.setMaxWidth(1200);\r\n        topPane.getChildren().add(sayingLabel);\r\n    }\r\n\r\n    public void createCenterPane(Dashboard dashboard, EventHandler eventHandler) {\r\n        centerBorderPane = new BorderPane();\r\n        centerBorderPane.setStyle(backgroundGrey);\r\n\r\n        createCenterTopPane(eventHandler);\r\n        createCenterCenterPane(dashboard);\r\n        createCenterBotPane(dashboard);\r\n\r\n        borderPane.setCenter(centerBorderPane);\r\n    }\r\n\r\n    public void createCenterTopPane(EventHandler eventHandler) {\r\n        HBox hBox = new HBox(10);\r\n        hBox.setPadding(new Insets(10));\r\n\r\n        Button add = new Button(\"Add\");;\r\n        Button remove = new Button(\"Remove\");\r\n        add.setOnAction(eventHandler);\r\n        remove.setOnAction(eventHandler);\r\n        List<Button> buttons = Arrays.asList(add, remove);\r\n        for (Button b: buttons) {\r\n            b.setStyle(grey);\r\n            b.setFont(new Font(\"Dosis\", 20));\r\n            b.setPrefSize(100, 20);\r\n        }\r\n        hBox.getChildren().addAll(buttons);\r\n        centerBorderPane.setTop(hBox);\r\n    }\r\n\r\n    public void createCenterCenterPane(Dashboard dashboard) {\r\n        GridPane gridPane = new GridPane();\r\n\r\n        for (Habit habit : dashboard.getAllHabits()) {\r\n            System.out.println(habit.getTitle());\r\n            List<Award> allAwards = habit.getAwardsGallery().getAllAwards();\r\n            System.out.println(allAwards.size());\r\n            if (allAwards.size() == 0) {\r\n                try {\r\n                    FileInputStream inputStream = new FileInputStream(\"data/misc/catLogo.png\");\r\n                    ImageView imageView = new ImageView(new Image(inputStream));\r\n                    Button button = new Button(habit.getTitle(), imageView);\r\n                    gridPane.getChildren().add(button);\r\n                } catch (FileNotFoundException e) {\r\n                    e.printStackTrace();\r\n                }\r\n            } else {\r\n                Award lastAwardReceived = allAwards.get(allAwards.size() - 1);\r\n                String lastAwardReceivedDate = lastAwardReceived.getDateReceived().toString();\r\n                String extension = (lastAwardReceived.getAwardType() == Award.AwardType.PAWSOME_ACHIEVEMENT) ? \".gif\" : \".png\";\r\n                try {\r\n                    FileInputStream inputStream = new FileInputStream(\"data/habits/\" + habit.getTitle() + \"/\" + habit.getTitle() + \"_Gallery/\" + lastAwardReceivedDate + extension);\r\n                    ImageView imageView = new ImageView(new Image(inputStream));\r\n                    Button button = new Button(habit.getTitle(), imageView);\r\n                    gridPane.add(button, 0, 0);\r\n                } catch (FileNotFoundException e) {\r\n                    e.printStackTrace();\r\n                }\r\n            }\r\n        }\r\n\r\n        centerBorderPane.setCenter(gridPane);\r\n    }\r\n\r\n    public void createCenterBotPane(Dashboard dashboard) {\r\n        HBox hBox = new HBox(20);\r\n        hBox.setPadding(new Insets(10, 10, 10, 10));\r\n\r\n        NumberAxis xAxisLineGraph = new NumberAxis();\r\n        xAxisLineGraph.setLabel(\"Day #\");\r\n        NumberAxis yAxisLineGraph = new NumberAxis();\r\n        yAxisLineGraph.setLabel(\"Total # of Awards\");\r\n        LineChart lineChart = new LineChart(xAxisLineGraph, yAxisLineGraph);\r\n        XYChart.Series dataSeriesLineGraph = new XYChart.Series();\r\n        dataSeriesLineGraph.setName(\"Total # of Awards Over Time\");\r\n        dataSeriesLineGraph.getData().add(new XYChart.Data(0, 0));\r\n        dataSeriesLineGraph.getData().add(new XYChart.Data(1, 1));\r\n        dataSeriesLineGraph.getData().add(new XYChart.Data(2, 4));\r\n        dataSeriesLineGraph.getData().add(new XYChart.Data(3, 10));\r\n        dataSeriesLineGraph.getData().add(new XYChart.Data(4, 5));\r\n        dataSeriesLineGraph.getData().add(new XYChart.Data(5, 20));\r\n        lineChart.getData().add(dataSeriesLineGraph);\r\n        hBox.getChildren().add(lineChart);\r\n\r\n\r\n        PieChart pieChart = new PieChart();\r\n        PieChart.Data slice1 = new PieChart.Data(\"# Total Relapses\", 4);\r\n        PieChart.Data slice2 = new PieChart.Data(\"# Pawsome Achievements\", 7);\r\n        pieChart.getData().add(slice1);\r\n        pieChart.getData().add(slice2);\r\n        hBox.getChildren().add(pieChart);\r\n\r\n        CategoryAxis xAxisBarGraph = new CategoryAxis();\r\n        xAxisBarGraph.setLabel(\"Habits\");\r\n        NumberAxis yAxisBarGraph = new NumberAxis();\r\n        yAxisBarGraph.setLabel(\"# of Awards\");\r\n        BarChart barChart = new BarChart(xAxisBarGraph, yAxisBarGraph);\r\n        XYChart.Series dataSeriesBarGraph = new XYChart.Series();\r\n        dataSeriesBarGraph.setName(\"# of Awards For Select Habits\");\r\n        dataSeriesBarGraph.getData().add(new XYChart.Data(\"Exercise More\", 20));\r\n        dataSeriesBarGraph.getData().add(new XYChart.Data(\"Read Everyday\", 13));\r\n        dataSeriesBarGraph.getData().add(new XYChart.Data(\"Go To Bed On Time\", 23));\r\n        barChart.getData().add(dataSeriesBarGraph);\r\n        hBox.getChildren().add(barChart);\r\n\r\n        centerBorderPane.setBottom(hBox);\r\n    }\r\n\r\n    public Button getAddHabitButton() {\r\n        return addHabitButton;\r\n    }\r\n\r\n    public Button getRemoveHabitButton() {\r\n        return removeHabitButton;\r\n    }\r\n}\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/controller/DashboardPage.java b/src/main/ui/controller/DashboardPage.java
+--- a/src/main/ui/controller/DashboardPage.java	
++++ b/src/main/ui/controller/DashboardPage.java	
+@@ -163,9 +163,7 @@
+         GridPane gridPane = new GridPane();
+ 
+         for (Habit habit : dashboard.getAllHabits()) {
+-            System.out.println(habit.getTitle());
+             List<Award> allAwards = habit.getAwardsGallery().getAllAwards();
+-            System.out.println(allAwards.size());
+             if (allAwards.size() == 0) {
+                 try {
+                     FileInputStream inputStream = new FileInputStream("data/misc/catLogo.png");

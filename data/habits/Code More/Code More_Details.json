@@ -1,0 +1,19 @@
+{
+    "awardsGallery": {
+        "bestStreakAwards": [],
+        "allAwards": [],
+        "felineGoodAwards": [],
+        "pawsomeAchievementAwards": []
+    },
+    "habitStats": {
+        "currentStreak": 0,
+        "dateCreated": "2021-05-23",
+        "numSetbacks": 0,
+        "longestStreak": 0,
+        "numDaysSinceStarted": 0
+    },
+    "purpose": "Get a job.",
+    "habitType": "MAKEABLE",
+    "title": "Code More",
+    "isCompleted": false
+}

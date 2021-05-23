@@ -1,0 +1,39 @@
+Index: src/main/model/test.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/model/test.fxml b/src/main/model/test.fxml
+new file mode 100644
+--- /dev/null	(date 1621720330841)
++++ b/src/main/model/test.fxml	(date 1621720330841)
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="UTF-8"?>
++
++<?import java.lang.*?>
++<?import java.util.*?>
++<?import javafx.scene.*?>
++<?import javafx.scene.control.*?>
++<?import javafx.scene.layout.*?>
++
++<AnchorPane xmlns="http://javafx.com/javafx"
++            xmlns:fx="http://javafx.com/fxml"
++            fx:controller="model.Test"
++            prefHeight="400.0" prefWidth="600.0">
++
++</AnchorPane>
+Index: src/main/ui/HabitsApp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/ui/HabitsApp.java b/src/main/ui/HabitsApp.java
+new file mode 100644
+--- /dev/null	(date 1621720230109)
++++ b/src/main/ui/HabitsApp.java	(date 1621720230109)
+@@ -0,0 +1,5 @@
++package ui;
++
++public class HabitsApp {
++
++}
